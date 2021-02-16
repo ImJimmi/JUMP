@@ -68,6 +68,16 @@ namespace jump
             buffer.resize(newSize);
         }
 
+        /** Engines should override this method to provide a way to serialise
+            their settings.
+        */
+        virtual juce::ValueTree getStateInformation(const juce::String& nodeName) const = 0;
+
+        /** Engines should override this method to be able load settings from
+            the given ValueTree node.
+        */
+        virtual void setStateInformation(const juce::ValueTree& node) = 0;
+
     protected:
         //==============================================================================================================
         /** Returns a reference to the sample buffer. */
