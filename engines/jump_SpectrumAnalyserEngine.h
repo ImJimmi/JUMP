@@ -23,6 +23,25 @@ namespace jump
     {
     public:
         //==============================================================================================================
+        /** Defines the properties used by the state getters and setters.
+        
+            This avoids the need for hard-coded strings and makes it easier to
+            see what properties are available in the state node.
+        */
+        struct PropertyIDs
+        {
+            PropertyIDs() = delete;
+
+            static constexpr char frequencyRangeStartId[] = "frequencyRange.start";
+            static constexpr char frequencyRangeEndId[]   = "frequencyRange.end";
+            static constexpr char decibelRangeStartId[]   = "decibelRange.start";
+            static constexpr char decibelRangeEndId[]     = "decibelRange.end";
+            static constexpr char holdTimeId[]            = "holdTime";
+            static constexpr char maxHoldTimeId[]         = "maxHoldTime";
+            static constexpr char decayTimeId[]           = "decayTime";
+        };
+
+        //==============================================================================================================
         SpectrumAnalyserEngine()
         {
             previousDBLevels.fill(-1000.f);
@@ -145,6 +164,34 @@ namespace jump
             decayTime = newDecayTimeMs;
         }
 
+        juce::ValueTree getStateInformation(const juce::String& nodeName) const override
+        {
+            return {
+                nodeName,
+                {
+                    { PropertyIDs::frequencyRangeStartId, frequencyRange.start },
+                    { PropertyIDs::frequencyRangeEndId,   frequencyRange.end },
+                    { PropertyIDs::decibelRangeStartId,   decibelRange.start },
+                    { PropertyIDs::decibelRangeEndId,     decibelRange.end },
+                    { PropertyIDs::holdTimeId,            holdTime },
+                    { PropertyIDs::maxHoldTimeId,         maxHoldTime },
+                    { PropertyIDs::decayTimeId,           decayTime }
+                }
+            };
+        }
+
+        void setStateInformation(const juce::ValueTree& node) override
+        {
+            frequencyRange.start = static_cast<float>(node[PropertyIDs::frequencyRangeStartId]);
+            frequencyRange.end   = static_cast<float>(node[PropertyIDs::frequencyRangeEndId]);
+            decibelRange.start   = static_cast<float>(node[PropertyIDs::decibelRangeStartId]);
+            decibelRange.end     = static_cast<float>(node[PropertyIDs::decibelRangeEndId]);
+
+            holdTime    = static_cast<float>(node[PropertyIDs::holdTimeId]);
+            maxHoldTime = static_cast<float>(node[PropertyIDs::maxHoldTimeId]);
+            decayTime   = static_cast<float>(node[PropertyIDs::decayTimeId]);
+        }
+
         //==============================================================================================================
         /** Components should implement this method to receive the latest set of points every time the engine updates
             them and then use them to draw the analyser.
@@ -157,8 +204,6 @@ namespace jump
         struct FrequencyPeakData
         {
             juce::uint32 timeOfPeak;    // The time at which the peak occured.
-            juce::uint32 ellapsedTime;  // The number of milliseconds that have
-                                        // ellapsed since the peak occured.
             float dB = 0.f;             // The level of the peak in Decibels.
         };
 
@@ -184,7 +229,7 @@ namespace jump
             auto prevBin = binRange.getStart();
             const auto now = juce::Time::getMillisecondCounter();
 
-            points.clear();
+            std::vector<juce::Point<float>> points;
             points.reserve(numPoints);
 
             // Loop through each point and calculate its frequency and dB level.
@@ -200,7 +245,7 @@ namespace jump
 
                 // Calculate the dB level for this bin.
                 const auto gain = fftData[currentBin] / (fft->getSize() * 2.f);
-                auto dB = juce::Decibels::gainToDecibels(gain);
+                auto dB = juce::Decibels::gainToDecibels(gain, decibelRange.start);
 
                 // If the index of this bin is equal to that of the previously
                 // calculated bin don't add a point for it.
@@ -216,11 +261,11 @@ namespace jump
                 {
                     // The level was less so apply decay to this bin instead of
                     // using its actual dB level.
-                    peaksData[i].ellapsedTime = (now - peaksData[i].timeOfPeak);
+                    const auto ellapsedTime = static_cast<float>(now - peaksData[i].timeOfPeak);
                     auto multiplier = 1.f;
 
-                    if (!(peaksData[i].ellapsedTime < holdTime || holdTime == maxHoldTime))
-                        multiplier = juce::jlimit(0.f, 1.f, 1.f - (peaksData[i].ellapsedTime - holdTime) / decayTime);
+                    if (!(ellapsedTime < holdTime || holdTime == maxHoldTime))
+                        multiplier = juce::jlimit(0.f, 1.f, 1.f - (ellapsedTime - holdTime) / decayTime);
 
                     dB = ((peaksData[i].dB - decibelRange.start) * multiplier) + decibelRange.start;
                 }
@@ -279,8 +324,8 @@ namespace jump
         float nyquistFrequency = 0.f;
         juce::NormalisableRange<float> frequencyRange{ 20.f, 20000.f };
         juce::NormalisableRange<float> decibelRange{ -100.f, 0.f };
-        juce::uint32 holdTime = 100;
-        juce::uint32 maxHoldTime = 1000;
+        float holdTime = 100.f;
+        float maxHoldTime = 1000.f;
         float decayTime = 500.f;
 
         //==============================================================================================================
