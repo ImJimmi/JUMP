@@ -245,7 +245,7 @@ namespace jump
 
                 // Calculate the dB level for this bin.
                 const auto gain = fftData[currentBin] / (fft->getSize() * 2.f);
-                auto dB = juce::Decibels::gainToDecibels(gain);
+                auto dB = juce::Decibels::gainToDecibels(gain, decibelRange.start);
 
                 // If the index of this bin is equal to that of the previously
                 // calculated bin don't add a point for it.
