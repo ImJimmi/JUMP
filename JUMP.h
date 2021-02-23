@@ -7,6 +7,7 @@
     description:        James' Utilities Module for Plugins.
     website:            https://github.com/ImJimmi/JUMP
     license:            GNU3
+    minimumCppStandard: 17
 
     dependencies:       juce_dsp
 
@@ -14,8 +15,6 @@
 */
 
 //======================================================================================================================
-#include <cassert>
-
 #include <juce_dsp/juce_dsp.h>
 
 //======================================================================================================================
@@ -28,4 +27,5 @@
 
 // Engines
 #include "engines/jump_AudioComponentEngine.h"
+#include "engines/jump_LevelMeterEngine.h"
 #include "engines/jump_SpectrumAnalyserEngine.h"

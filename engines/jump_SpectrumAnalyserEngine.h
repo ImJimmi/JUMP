@@ -32,19 +32,27 @@ namespace jump
         {
             PropertyIDs() = delete;
 
-            static constexpr char frequencyRangeStartId[] = "frequencyRange.start";
-            static constexpr char frequencyRangeEndId[]   = "frequencyRange.end";
-            static constexpr char decibelRangeStartId[]   = "decibelRange.start";
-            static constexpr char decibelRangeEndId[]     = "decibelRange.end";
-            static constexpr char holdTimeId[]            = "holdTime";
-            static constexpr char maxHoldTimeId[]         = "maxHoldTime";
-            static constexpr char decayTimeId[]           = "decayTime";
+            static const inline juce::Identifier nyquistFrequencyId   { "nyquistFrequency" };
+            static const inline juce::Identifier frequencyRangeStartId{ "frequencyRange.start" };
+            static const inline juce::Identifier frequencyRangeEndId  { "frequencyRange.end" };
+            static const inline juce::Identifier decibelRangeStartId  { "decibelRange.start" };
+            static const inline juce::Identifier decibelRangeEndId    { "decibelRange.end" };
+            static const inline juce::Identifier holdTimeId           { "holdTime" };
+            static const inline juce::Identifier maxHoldTimeId        { "maxHoldTime" };
+            static const inline juce::Identifier decayTimeId          { "decayTime" };
         };
 
         //==============================================================================================================
         SpectrumAnalyserEngine()
         {
             previousDBLevels.fill(-1000.f);
+        }
+
+        //==============================================================================================================
+        void addSamples(const std::vector<float>& samples)
+        {
+            for (auto& sample : samples)
+                buffer.write(sample);
         }
 
         //==============================================================================================================
@@ -59,7 +67,7 @@ namespace jump
         {
             fft.reset(new juce::dsp::FFT(newFFTOrder));
             windowingFunction.reset(new juce::dsp::WindowingFunction<float>(static_cast<std::size_t>(1 << newFFTOrder), windowingMethod));
-            setBufferSize(1 << newFFTOrder);
+            buffer.resize(1 << newFFTOrder);
 
             // You need to call setSampleRate first before calling setFFTOrder.
             jassert(nyquistFrequency > 0.f);
@@ -169,10 +177,13 @@ namespace jump
             return {
                 nodeName,
                 {
+                    { PropertyIDs::nyquistFrequencyId,    nyquistFrequency },
+
                     { PropertyIDs::frequencyRangeStartId, frequencyRange.start },
                     { PropertyIDs::frequencyRangeEndId,   frequencyRange.end },
                     { PropertyIDs::decibelRangeStartId,   decibelRange.start },
                     { PropertyIDs::decibelRangeEndId,     decibelRange.end },
+
                     { PropertyIDs::holdTimeId,            holdTime },
                     { PropertyIDs::maxHoldTimeId,         maxHoldTime },
                     { PropertyIDs::decayTimeId,           decayTime }
@@ -182,6 +193,8 @@ namespace jump
 
         void setStateInformation(const juce::ValueTree& node) override
         {
+            nyquistFrequency     = static_cast<float>(node[PropertyIDs::nyquistFrequencyId]);
+
             frequencyRange.start = static_cast<float>(node[PropertyIDs::frequencyRangeStartId]);
             frequencyRange.end   = static_cast<float>(node[PropertyIDs::frequencyRangeEndId]);
             decibelRange.start   = static_cast<float>(node[PropertyIDs::decibelRangeStartId]);
@@ -215,7 +228,7 @@ namespace jump
                 return;
 
             // Get the latest samples from the buffer.
-            auto fftData = getSampleBuffer().read();
+            auto fftData = buffer.read();
 
             // Pad the data with zeros.
             fftData.resize(fft->getSize() * 2, 0.f);
@@ -287,11 +300,6 @@ namespace jump
                 onNewPointsAvailable(points);
         }
 
-        void setBufferSize(int newSize) override
-        {
-            AudioComponentEngine::setBufferSize(newSize);
-        }
-
         //==============================================================================================================
         /** Updates the range of FFT bins that correspond to the current frequency range and sample rate settings.
 
@@ -313,6 +321,8 @@ namespace jump
         }
 
         //==============================================================================================================
+        CircularBuffer<float> buffer;
+
         std::unique_ptr<juce::dsp::FFT> fft;
         std::unique_ptr<juce::dsp::WindowingFunction<float>> windowingFunction;
         juce::Range<int> binRange;

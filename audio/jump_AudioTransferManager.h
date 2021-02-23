@@ -96,7 +96,7 @@ namespace jump
                 } while (!idx.compare_exchange_weak(currentIDX, newValue));
 
                 // Something went wrong here - the value never got changed!
-                assert(newValue != -1);
+                jassert(newValue != -1);
 
                 currentIDX = newValue;
             }
