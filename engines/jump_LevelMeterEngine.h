@@ -1,184 +1,158 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump
+namespace jump::LevelMeter
 {
     //==================================================================================================================
-    class LevelMeterEngine  :   public AudioComponentEngine<float>
+    namespace PropertyIDs
+    {
+        //==============================================================================================================
+        static const inline juce::Identifier rmsAttackTimeId  { "rmsAttackTime" };
+        static const inline juce::Identifier rmsReleaseTimeId { "rmsReleaseTime" };
+        static const inline juce::Identifier peakHoldTimeId   { "peakHoldTime" };
+        static const inline juce::Identifier peakMaxHoldTimeId{ "peakMaxHoldTime" };
+        static const inline juce::Identifier peakReleaseTimeId{ "peakReleaseTime" };
+        static const inline juce::Identifier decibelRangeId   { "decibelRange" };
+    };
+
+    //==================================================================================================================
+    class Engine;
+
+    //==================================================================================================================
+    struct Renderer
+    {
+        //==============================================================================================================
+        virtual ~Renderer() = default;
+
+        //==============================================================================================================
+        /** Derived classes must override this method in order to receive callbacks when a new set of points had been
+            calculated by the given engine.
+        */
+        virtual void newLevelMeterLevelsAvailable(const Engine* engine, float peakLevel, float rmsLevel) = 0;
+    };
+
+    //==================================================================================================================
+    /** Implements the logic required for a basic level meter with peak and RMS levels.
+
+        Given a stream of samples, this class calculates a peak and an RMS level that can be used to draw a level meter.
+        The peak and RMS levels are normalised so they need only be scaled with the desired width and height.
+
+        The levels use a linear Decibel scale but normalised to 0-1 (e.g. if the decibel range is -100dB to 0dB and the
+        peak level is -50dB, the given peak value will be 0.5).
+    */
+    class Engine    :   public AudioComponentEngine<Renderer>
     {
     public:
         //==============================================================================================================
-        /** Defines the properties used by the state getters and setters.
-        
-            This avoids the need for hard-coded strings and makes it easier to
-            see what properties are available in the state node.
+        Engine() = default;
+        Engine(const juce::Identifier& uniqueID, StatefulObject* parentState);
+
+        //==============================================================================================================
+        void addSamples(const std::vector<float>& samples) override;
+
+        //==============================================================================================================
+        /** Specifies the sample rate of the samples being added to this engine.
+
+            The default is 0Hz (so a real value must be set before adding samples).
+
+            @param newSampleRate    The new sample rate to use.
         */
-        struct PropertyIDs
-        {
-            PropertyIDs() = delete;
+        void setSampleRate(double newSampleRate);
 
-            static const inline juce::Identifier rmsAttackTimeId    { "rmsAttackTime" };
-            static const inline juce::Identifier rmsReleaseTimeId   { "rmsReleaseTime" };
-            static const inline juce::Identifier peakHoldTimeId     { "peakHoldTime" };
-            static const inline juce::Identifier peakMaxHoldTimeId  { "peakMaxHoldTime" };
-            static const inline juce::Identifier peakReleaseTimeId  { "peakReleaseTime" };
-            static const inline juce::Identifier decibelRangeStartId{ "decibelRange.start" };
-            static const inline juce::Identifier decibelRangeEndId  { "decibelRange.end" };
-        };
+        /** Changes the attack time of the RMS envelope.
 
-        //==============================================================================================================
-        LevelMeterEngine()
-        {
-            rmsFilter .setLevelCalculationType(juce::dsp::BallisticsFilterLevelCalculationType::RMS);
-            rmsFilter.setAttackTime (rmsAttack);
-            rmsFilter.setReleaseTime(rmsRelease);
-        }
+            The default is 150ms.
 
-        //==============================================================================================================
-        void addSamples(const std::vector<float>& samples)
-        {
-            buffer.insert(std::end(buffer), std::begin(samples), std::end(samples));
-        }
-
-        //==============================================================================================================
-        /** Specifies the current sample rate being used.
-
-            This is important in order for the frequency of the FFT bins to be accurately calculated.
-
-            @param newSampleRate    The new sample rate being used.
+            @param newAttackTimeMS  The new attack time to use for the RMS envelope in milliseconds.
         */
-        void setSampleRate(double newSampleRate)
-        {
-            juce::dsp::ProcessSpec processSpec;
-            processSpec.sampleRate  = newSampleRate;
-            processSpec.numChannels = 1;
+        void setRMSAttackTime(float newAttackTimeMS);
 
-            rmsFilter.prepare(processSpec);
-        }
+        /** Changes the release time of the RMS envelope.
 
-        void setRMSAttackTime(float newAttackTimeMS)
-        {
-            rmsFilter.setAttackTime(newAttackTimeMS);
-            rmsAttack = newAttackTimeMS;
-        }
+            The default is 350ms.
 
-        void setRMSReleaseTime(float newReleaseTimeMS)
-        {
-            rmsFilter.setReleaseTime(newReleaseTimeMS);
-            rmsRelease = newReleaseTimeMS;
-        }
+            @param newReleaseTimeMS The new release time to use for the RMS envelope in milliseconds.
+        */
+        void setRMSReleaseTime(float newReleaseTimeMS);
 
-        void setPeakHoldTime(float newHoldTime)
-        {
-            peakHoldTime = newHoldTime;
-        }
+        /** Changes the hold time for the peak evnelope.
 
-        void setPeakMaxHoldTime(float newMaxHoldTime)
-        {
-            peakMaxHoldTime = newMaxHoldTime;
-        }
+            If this is equal to or greater than the maximum hold time, the envelope will hold at the max peak forever
+            (until a louder peak occurs).
 
-        void setPeakReleaseTime(float newReleaseTime)
-        {
-            peakRelease = newReleaseTime;
-        }
+            The default is 400ms.
 
-        juce::ValueTree getStateInformation(const juce::String& nodeName) const override
-        {
-            return {
-                nodeName,
-                {
-                    { PropertyIDs::rmsAttackTimeId,     rmsAttack },
-                    { PropertyIDs::rmsReleaseTimeId,    rmsRelease },
+            @param newHoldTime  The new hold time to use for the peak envelope in milliseconds.
+        */
+        void setPeakHoldTime(float newHoldTimeMS);
 
-                    { PropertyIDs::peakHoldTimeId,      peakHoldTime },
-                    { PropertyIDs::peakMaxHoldTimeId,   peakMaxHoldTime },
-                    { PropertyIDs::peakReleaseTimeId,   peakRelease },
+        /** Changes the maximum hold time for the peak envelope.
 
-                    { PropertyIDs::decibelRangeStartId, decibelRange.start },
-                    { PropertyIDs::decibelRangeEndId,   decibelRange.end }
-                }
-            };
-        }
+            If the hold time is equal to or greater than this, the envelope will hold at the max peak forever (until a
+            louder peak occurs).
 
-        void setStateInformation(const juce::ValueTree& node) override
-        {
-            setRMSAttackTime (static_cast<float>(node[PropertyIDs::rmsAttackTimeId]));
-            setRMSReleaseTime(static_cast<float>(node[PropertyIDs::rmsReleaseTimeId]));
+            The default is 10s.
 
-            setPeakHoldTime   (static_cast<float>(node[PropertyIDs::peakHoldTimeId]));
-            setPeakMaxHoldTime(static_cast<float>(node[PropertyIDs::peakMaxHoldTimeId]));
-            setPeakReleaseTime(static_cast<float>(node[PropertyIDs::peakReleaseTimeId]));
+            @param newMaxHoldTime   The new maximum hold time to use for the peak envelope in milliseconds.
+        */
+        void setPeakMaxHoldTime(float newMaxHoldTimeMS);
 
-            decibelRange.start = static_cast<float>(node[PropertyIDs::decibelRangeStartId]);
-            decibelRange.end   = static_cast<float>(node[PropertyIDs::decibelRangeEndId]);
-        }
+        /** Changes the release time of the peak envelope.
 
-        //==============================================================================================================
-        std::function<void(float peakLevel, float rmsLevel)> onNewLevelsCalculated = nullptr;
+            The default is 1.5s.
+
+            @param newReleaseTimeMS The new release time to use for the peak envelope in milliseconds.
+        */
+        void setPeakReleaseTime(float newReleaseTimeMS);
+
+        /** Changes the decibel range of the meter.
+
+            The start of the range will be treated as -inf Decibels and will be normalised to a value of 0 while the end
+            of the range will be normalised to a value of 1.
+
+            The default is -100dB to 0dB.
+
+            @param newDecibelRange  The new decibel range to use.
+        */
+        void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange);
 
     private:
         //==============================================================================================================
-        void update() override
+        struct StateInitialiser
         {
-            juce::var peak;
-            juce::var rms;
+            StateInitialiser(Engine& engine);
+        };
 
-            const auto now = juce::Time::getMillisecondCounter();
+        //==============================================================================================================
+        void update(juce::uint32 now) override;
+        void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override;
 
-            for (auto& value : buffer)
-            {
-                rms = rmsFilter.processSample(0, value);
+        //==============================================================================================================
+        float updatePeak(float gainValue, juce::uint32 now);
 
-                auto peakDB = juce::Decibels::gainToDecibels(value, decibelRange.start);
-
-                if (peakDB < previousPeakDB)
-                {
-                    const auto ellapsedTime = static_cast<float>(now - timeOfPeakMax);
-                    auto multiplier{ 1.f };
-
-                    if (!(ellapsedTime < peakHoldTime || peakHoldTime == peakMaxHoldTime))
-                        multiplier = juce::jlimit(0.f, 1.f, 1.f - (ellapsedTime - peakHoldTime) / peakRelease);
-
-                    peakDB = ((peakMaxDB - decibelRange.start) * multiplier) + decibelRange.start;
-                }
-                else
-                {
-                    peakMaxDB = peakDB;
-                    timeOfPeakMax = now;
-                }
-
-                peak = peakDB;
-                previousPeakDB = peakDB;
-            }
-
-            buffer.clear();
-
-            if (peak != juce::var() && rms != juce::var())
-            {
-                rms = juce::Decibels::gainToDecibels(static_cast<float>(rms), decibelRange.start);
-
-                if (onNewLevelsCalculated != nullptr)
-                    onNewLevelsCalculated(1.f - decibelRange.convertTo0to1(peak), 1.f - decibelRange.convertTo0to1(rms));
-            }
-        }
+        //==============================================================================================================
+        void setSampleRateInternal(double newSampleRate);
+        void setRMSAttackTimeInternal(float newAttackTimeMS);
+        void setRMSReleaseTimeInternal(float newReleaseTimeMS);
 
         //==============================================================================================================
         std::vector<float> buffer;
         juce::dsp::BallisticsFilter<float> rmsFilter;
-        float rmsAttack{ 150.f };
-        float rmsRelease{ 350.f };
+        bool rmsFilterIsPrepared{ false };
+        float rmsAttack{ 0.f };
+        float rmsRelease{ 0.f };
 
         float previousPeakDB{ 0.f };
         juce::uint32 timeOfPeakMax{ 0 };
         float peakMaxDB{ 0.f };
-        float peakHoldTime{ 400.f };
-        float peakMaxHoldTime{ 10.f };
-        float peakRelease{ 1500.f };
+        float peakHoldTime{ 0.f };
+        float peakMaxHoldTime{ 0.f };
+        float peakRelease{ 0.f };
+        juce::NormalisableRange<float> decibelRange;
 
-        juce::NormalisableRange<float> decibelRange{ -100.f, 0.f };
+        StateInitialiser stateInitialiser{ *this };
 
         //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterEngine)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Engine)
     };
 }   // namespace jump

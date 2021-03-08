@@ -42,16 +42,16 @@ namespace jump
             @param other    The other ATM object to copy from.
         */
         AudioTransferManager(const AudioTransferManager& other)
-            :   buffers(other.buffers),
-                idx(other.idx.load())
+            :   buffers{ other.buffers },
+                idx{ other.idx.load() }
         {
         }
 
         ~AudioTransferManager()
         {
             static_assert(std::is_trivially_copyable<SampleType>::value,
-                          "'SampleType' for AudioTransferManager must be "
-                          "trivially copyable.");
+                          "'SampleType' for AudioTransferManager must be trivially copyable.");
+            static_assert(capacity >= 0, "AudioTransferManager's capacity must be positive!")
         }
 
         //==============================================================================================================
@@ -136,7 +136,7 @@ namespace jump
                 return result;
             }
 
-            int writeIndex = 0;
+            int writeIndex{ 0 };
             std::array<SampleType, capacity> buffer;
         };
 

@@ -1,61 +1,80 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump
+namespace jump::SpectrumAnalyser
 {
+    //==================================================================================================================
+    namespace PropertyIDs
+    {
+        //==============================================================================================================
+        static const inline juce::Identifier windowingMethodId{ "windowingMethod" };
+        static const inline juce::Identifier fftOrderId       { "fftOrder" };
+        static const inline juce::Identifier frequencyRangeId { "frequencyRange" };
+        static const inline juce::Identifier decibelRangeId   { "decibelRange" };
+        static const inline juce::Identifier holdTimeId       { "holdTime" };
+        static const inline juce::Identifier maxHoldTimeId    { "maxHoldTime" };
+        static const inline juce::Identifier decayTimeId      { "decayTime" };
+        static const inline juce::Identifier numPointsId      { "numPoints" };
+    };
+
+    //==================================================================================================================
+    class Engine;
+
+    //==================================================================================================================
+    struct Renderer
+    {
+        //==============================================================================================================
+        virtual ~Renderer() = default;
+
+        //==============================================================================================================
+        /** Derived classes must override this method in order to receive callbacks when a new set of points had been
+            calculated by the given engine.
+        */
+        virtual void newSpectrumAnalyserPointsAvailable(const Engine* engine,
+                                                        const std::vector<juce::Point<float>>& points) = 0;
+    };
+
     //==================================================================================================================
     /** Implements the logic required for a spectrum analyser.
 
         Given a stream of samples, this class calculates points that can be used to plot a spectrum analyser. The
         resultant points are normalised so they need only be scaled with the desired width and height in order to
         display an accurate representation of the stream's frequency content.
-        
-        The number of points to generate must be specified by the template parameter however it should be noted that
-        some points are dropped from the lower end in order to avoid the stepped appearance of the spectrum.
 
-        @tparam numPoints       The number of points to generate (see above).
-        @tparam windowingMethod The windowing method to apply to samples before they're passed to the FFT. The default
-                                is the hann window.
+        The Y axis of the analyser uses Decibels and will be linear.
+        The X axis of the analyser is in Hz and will use a logarithmic scale (base 2) to more accurately represent how
+        we as humans perceive pitch.
     */
-    template <int numPoints,
-              juce::dsp::WindowingFunction<float>::WindowingMethod windowingMethod = juce::dsp::WindowingFunction<float>::hann>
-    class SpectrumAnalyserEngine    :   public AudioComponentEngine<float>
+    class Engine    :   public AudioComponentEngine<Renderer>
     {
     public:
         //==============================================================================================================
-        /** Defines the properties used by the state getters and setters.
-        
-            This avoids the need for hard-coded strings and makes it easier to
-            see what properties are available in the state node.
+        using WindowingMethod = juce::dsp::WindowingFunction<float>::WindowingMethod;
+
+        //==============================================================================================================
+        Engine() = default;
+        Engine(const juce::Identifier& uniqueID, StatefulObject* parentState);
+
+        //==============================================================================================================
+        void addSamples(const std::vector<float>& samples) override;
+
+        //==============================================================================================================
+        /** Specifies the sample rate of the samples being added to this engine.
+
+            The default is 0Hz (so a real value must be set before adding samples).
+
+            @param newSampleRate    The new sample rate to use.
         */
-        struct PropertyIDs
-        {
-            PropertyIDs() = delete;
+        void setSampleRate(double newSampleRate);
 
-            static const inline juce::Identifier nyquistFrequencyId   { "nyquistFrequency" };
-            static const inline juce::Identifier frequencyRangeStartId{ "frequencyRange.start" };
-            static const inline juce::Identifier frequencyRangeEndId  { "frequencyRange.end" };
-            static const inline juce::Identifier decibelRangeStartId  { "decibelRange.start" };
-            static const inline juce::Identifier decibelRangeEndId    { "decibelRange.end" };
-            static const inline juce::Identifier holdTimeId           { "holdTime" };
-            static const inline juce::Identifier maxHoldTimeId        { "maxHoldTime" };
-            static const inline juce::Identifier decayTimeId          { "decayTime" };
-        };
+        /** Specifies the windowing method to use with the FFT.
 
-        //==============================================================================================================
-        SpectrumAnalyserEngine()
-        {
-            previousDBLevels.fill(-1000.f);
-        }
+            The default is a hann window.
 
-        //==============================================================================================================
-        void addSamples(const std::vector<float>& samples)
-        {
-            for (auto& sample : samples)
-                buffer.write(sample);
-        }
+            @param newWindowingMethod   The new windowing method to use.
+        */
+        void setWindowingMethod(WindowingMethod newWindowingMethod);
 
-        //==============================================================================================================
         /** Changes the size of the FFT to 2 ^ newFFTOrder.
 
             The nyquist frequency is required to update the range of FFT bins that are used in rendering so
@@ -63,31 +82,7 @@ namespace jump
 
             @param newFFTOrder  The new order to use for the FFT.
         */
-        void setFFTOrder(int newFFTOrder)
-        {
-            fft.reset(new juce::dsp::FFT(newFFTOrder));
-            windowingFunction.reset(new juce::dsp::WindowingFunction<float>(static_cast<std::size_t>(1 << newFFTOrder), windowingMethod));
-            buffer.resize(1 << newFFTOrder);
-
-            // You need to call setSampleRate first before calling setFFTOrder.
-            jassert(nyquistFrequency > 0.f);
-
-            updateBinRange();
-        }
-
-        /** Specifies the current sample rate being used.
-
-            This is important in order for the frequency of the FFT bins to be accurately calculated.
-
-            @param newSampleRate    The new sample rate being used.
-        */
-        void setSampleRate(double newSampleRate)
-        {
-            jassert(newSampleRate > 0);
-
-            nyquistFrequency = static_cast<float>(newSampleRate) / 2.f;
-            updateBinRange();
-        }
+        void setFFTOrder(int newFFTOrder);
 
         /** Changes the range of frequencies for which the points will be calculated.
 
@@ -97,29 +92,18 @@ namespace jump
 
             @param newFrequencyRange    The new frequency range to use.
         */
-        void setFrequencyRange(const juce::NormalisableRange<float>& newFrequencyRange)
-        {
-            jassert(newFrequencyRange.start > 0.f);
-            jassert(newFrequencyRange.end <= nyquistFrequency);
+        void setFrequencyRange(const juce::NormalisableRange<float>& newFrequencyRange);
 
-            frequencyRange = newFrequencyRange;
+        /** Changes the decibel range of the analyser.
 
-            updateBinRange();
-        }
-
-        /** Changes the decibel range used to determine points' Y coordinates.
-
-            Bins will almost always have negative dB levels so you'll likely want ot make sure the lower limit is
-            negative although there's no actual restrictions on the range of decibels that can be used.
+            The start of the range will be treated as -inf Decibels and will be normalised to a value of 0 while the end
+            of the range will be normalised to a value of 1.
 
             The default is -100dB to 0dB.
 
-            @param newDecibalRange  The new decibel range to use.
+            @param newDecibelRange  The new decibel range to use.
         */
-        void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
-        {
-            decibelRange = newDecibelRange;
-        }
+        void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange);
 
         /** Changes the time, in milliseconds, for which peaks are held before they start to decay.
 
@@ -132,13 +116,7 @@ namespace jump
 
             @param newHoldTimeMs    The new hold time to use, in milliseconds.
         */
-        void setHoldTime(float newHoldTimeMs)
-        {
-            jassert(newHoldTimeMs >= 0.f);
-            jassert(newHoldTimeMs <= maxHoldTime);
-
-            holdTime = static_cast<juce::uint32>(juce::roundToInt(newHoldTimeMs));
-        }
+        void setHoldTime(float newHoldTimeMs);
 
         /** Changes the maximum value for the hold time.
 
@@ -151,13 +129,7 @@ namespace jump
             @param newMaxHoldTimeMs The new maximum hold time to use, in
                                     milliseconds.
         */
-        void setMaxHoldTime(float newMaxHoldTimeMs)
-        {
-            jassert(newMaxHoldTimeMs >= 0.f);
-            jassert(holdTime <= newMaxHoldTimeMs);
-
-            maxHoldTime = static_cast<juce::uint32>(juce::roundToInt(newMaxHoldTimeMs));
-        }
+        void setMaxHoldTime(float newMaxHoldTimeMs);
 
         /** Changes the time in which peaks will decay to -inf Decibels.
 
@@ -167,178 +139,81 @@ namespace jump
 
             @param newDecayTimeMs   The new decay time to use, in milliseconds.
         */
-        void setDecayTime(float newDecayTimeMs)
-        {
-            decayTime = newDecayTimeMs;
-        }
+        void setDecayTime(float newDecayTimeMs);
 
-        juce::ValueTree getStateInformation(const juce::String& nodeName) const override
-        {
-            return {
-                nodeName,
-                {
-                    { PropertyIDs::nyquistFrequencyId,    nyquistFrequency },
+        /** Changes the number of points to calculate for the spectrum.
 
-                    { PropertyIDs::frequencyRangeStartId, frequencyRange.start },
-                    { PropertyIDs::frequencyRangeEndId,   frequencyRange.end },
-                    { PropertyIDs::decibelRangeStartId,   decibelRange.start },
-                    { PropertyIDs::decibelRangeEndId,     decibelRange.end },
+            Note that this is the maximum number of points as some points may be removed if they share the same
+            frequency bin as an existing point (i.e. at low frequencies).
 
-                    { PropertyIDs::holdTimeId,            holdTime },
-                    { PropertyIDs::maxHoldTimeId,         maxHoldTime },
-                    { PropertyIDs::decayTimeId,           decayTime }
-                }
-            };
-        }
+            The default is 256.
 
-        void setStateInformation(const juce::ValueTree& node) override
-        {
-            nyquistFrequency     = static_cast<float>(node[PropertyIDs::nyquistFrequencyId]);
-
-            frequencyRange.start = static_cast<float>(node[PropertyIDs::frequencyRangeStartId]);
-            frequencyRange.end   = static_cast<float>(node[PropertyIDs::frequencyRangeEndId]);
-            decibelRange.start   = static_cast<float>(node[PropertyIDs::decibelRangeStartId]);
-            decibelRange.end     = static_cast<float>(node[PropertyIDs::decibelRangeEndId]);
-
-            holdTime    = static_cast<float>(node[PropertyIDs::holdTimeId]);
-            maxHoldTime = static_cast<float>(node[PropertyIDs::maxHoldTimeId]);
-            decayTime   = static_cast<float>(node[PropertyIDs::decayTimeId]);
-        }
-
-        //==============================================================================================================
-        /** Components should implement this method to receive the latest set of points every time the engine updates
-            them and then use them to draw the analyser.
+            @param newNumPoints The new number of points to calculate.
         */
-        std::function<void(const std::vector<juce::Point<float>>&)> onNewPointsAvailable = nullptr;
+        void setNumPoints(int newNumPoints);
 
     private:
         //==============================================================================================================
-        /** Holds information about peaks in the spectrum. */
-        struct FrequencyPeakData
+        struct StateInitialiser
         {
-            juce::uint32 timeOfPeak;    // The time at which the peak occured.
-            float dB = 0.f;             // The level of the peak in Decibels.
+            StateInitialiser(Engine& engine);
+        };
+
+        class AnalyserPointInfo
+        {
+        public:
+            AnalyserPointInfo(int fftBinIndex, float frequency, const juce::NormalisableRange<float>& freqRange);
+
+            void update(const std::vector<float>& fftData, int fftSize,
+                        const juce::NormalisableRange<float>& decibelRange, juce::uint32 now, float holdTime,
+                        float maxHoldTime, float decayTime);
+
+            juce::Point<float> normalise(const juce::NormalisableRange<float>& decibelRange);
+
+            const int binIndex;
+
+        private:
+            const float normalisedX;
+
+            float dB{ std::numeric_limits<float>::lowest() };
+
+            juce::uint32 timeOfLatestPeak{ 0 };
+            float levelOfLatestPeak{ std::numeric_limits<float>::lowest() };
         };
 
         //==============================================================================================================
-        void update() override
-        {
-            // If there FFT hasn't been created yet just do nothing.
-            if (fft.get() == nullptr)
-                return;
-
-            // Get the latest samples from the buffer.
-            auto fftData = buffer.read();
-
-            // Pad the data with zeros.
-            fftData.resize(fft->getSize() * 2, 0.f);
-
-            // Apply the windowing function to the data.
-            windowingFunction->multiplyWithWindowingTable(fftData.data(), fftData.size());
-
-            // Process the FFT.
-            fft->performFrequencyOnlyForwardTransform(fftData.data());
-
-            auto prevBin = binRange.getStart();
-            const auto now = juce::Time::getMillisecondCounter();
-
-            std::vector<juce::Point<float>> points;
-            points.reserve(numPoints);
-
-            // Loop through each point and calculate its frequency and dB level.
-            for (int i = 0; i < numPoints; i++)
-            {
-                // Calculate the frequency using a logarithmic scale then
-                // calculate the correct bin from the FFT data to use for that
-                // frequency.
-                const auto proportion = i / static_cast<float>(numPoints - 1);
-                const auto frequency = Math::logspace(frequencyRange.start, frequencyRange.end, proportion);
-                const auto currentBin = juce::roundToInt(juce::jmap(frequency, frequencyRange.start, frequencyRange.end,
-                                                                    static_cast<float>(binRange.getStart()), static_cast<float>(binRange.getEnd())));
-
-                // Calculate the dB level for this bin.
-                const auto gain = fftData[currentBin] / (fft->getSize() * 2.f);
-                auto dB = juce::Decibels::gainToDecibels(gain, decibelRange.start);
-
-                // If the index of this bin is equal to that of the previously
-                // calculated bin don't add a point for it.
-                if (prevBin == currentBin && i != 0)
-                {
-                    previousDBLevels[i] = dB;
-                    continue;
-                }
-
-                // Check if the new dB level is greater or less than the
-                // previous level for this bin.
-                if (dB < previousDBLevels[i])
-                {
-                    // The level was less so apply decay to this bin instead of
-                    // using its actual dB level.
-                    const auto ellapsedTime = static_cast<float>(now - peaksData[i].timeOfPeak);
-                    auto multiplier = 1.f;
-
-                    if (!(ellapsedTime < holdTime || holdTime == maxHoldTime))
-                        multiplier = juce::jlimit(0.f, 1.f, 1.f - (ellapsedTime - holdTime) / decayTime);
-
-                    dB = ((peaksData[i].dB - decibelRange.start) * multiplier) + decibelRange.start;
-                }
-                else
-                {
-                    // The level was greater so register it as a peak.
-                    peaksData[i].dB = dB;
-                    peaksData[i].timeOfPeak = now;
-                }
-
-                // Add the point whilst normalising the frequency and dB.
-                points.push_back({ proportion, 1.f - decibelRange.convertTo0to1(dB) });
-
-                previousDBLevels[i] = dB;
-                prevBin = currentBin;
-            }
-
-            if (onNewPointsAvailable != nullptr)
-                onNewPointsAvailable(points);
-        }
+        void update(juce::uint32 now) override;
+        void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override;
 
         //==============================================================================================================
-        /** Updates the range of FFT bins that correspond to the current frequency range and sample rate settings.
+        void updateBinRange();
 
-            This should be called anytime any of those parameters are updated.
-        */
-        void updateBinRange()
-        {
-            // No point in updating the range yet if the FFT hasn't been instantiated.
-            if (fft.get() == nullptr)
-                return;
-
-            // Find the total number of bins in the useable range (i.e. from 0Hz to the nyquist limit, which is half the
-            // size of the FFT since the FFT generates frequencies up to the sample rate).
-            const auto totalNumBins = fft->getSize() / 2;
-
-            // Update the range's limits.
-            binRange.setStart(juce::roundToInt(totalNumBins * frequencyRange.start / nyquistFrequency));
-            binRange.setEnd  (juce::roundToInt(totalNumBins * frequencyRange.end / nyquistFrequency));
-        }
+        //==============================================================================================================
+        void setFFTOrderInternal(int newFFTOrder);
+        void setSampleRateInternal(double newSampleRate);
+        void setFrequencyRangeInternal(const juce::NormalisableRange<float>& newFrequencyRange);
 
         //==============================================================================================================
         CircularBuffer<float> buffer;
 
         std::unique_ptr<juce::dsp::FFT> fft;
+        juce::dsp::WindowingFunction<float>::WindowingMethod windowingMethod;
         std::unique_ptr<juce::dsp::WindowingFunction<float>> windowingFunction;
         juce::Range<int> binRange;
 
-        std::array<float, numPoints> previousDBLevels;      // Holds the previous dB level for each point.
-        std::array<FrequencyPeakData, numPoints> peaksData; // Holds info about peaks.
+        std::vector<AnalyserPointInfo> pointsInfo;
 
-        // Configurable options (see setter methods).
-        float nyquistFrequency = 0.f;
-        juce::NormalisableRange<float> frequencyRange{ 20.f, 20000.f };
-        juce::NormalisableRange<float> decibelRange{ -100.f, 0.f };
-        float holdTime = 100.f;
-        float maxHoldTime = 1000.f;
-        float decayTime = 500.f;
+        float nyquistFrequency{ 0.f };
+        juce::NormalisableRange<float> frequencyRange;
+        juce::NormalisableRange<float> decibelRange;
+        float holdTime{ 0.f };
+        float maxHoldTime{ 0.f };
+        float decayTime{ 0.f };
+        int numPoints{ 0 };
+
+        StateInitialiser stateInitialiser{ *this };
 
         //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalyserEngine)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Engine)
     };
-}   // namespace jump
+}   // namespace jump::SpectrumAnalyser

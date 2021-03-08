@@ -8,26 +8,21 @@ namespace jump
 
         The derived engines should be used to implement the logic for a specific type of audio visualiser such as a
         spectrum analyser or level meter.
-
-        @tparam SampleType  The data type of samples that will be added via addSamples().
-        @tparam desiredFPS  The frequency at which the update() method should be called. The default is 60Hz.
     */
-    template <typename SampleType, int desiredFPS = 60>
-    class AudioComponentEngine  :   private juce::Timer
+    template <typename RendererType>
+    class AudioComponentEngine  :   protected StatefulObject,
+                                    private juce::Timer
     {
     public:
         //==============================================================================================================
-        AudioComponentEngine()
+        AudioComponentEngine() = default;
+
+        AudioComponentEngine(const juce::Identifier& uniqueID, StatefulObject* parentState)
+            :   StatefulObject{ uniqueID, parentState }
         {
-            startTimerHz(desiredFPS);
         }
 
-        ~AudioComponentEngine()
-        {
-            static_assert(std::is_trivially_copyable<SampleType>::value,
-                        "'SampleType' for jump::AudioComponentEngine should be "
-                        "trivially copyable.");
-        }
+        virtual ~AudioComponentEngine() = default;
 
         //==============================================================================================================
         /** Writes a stream of samples to the sample buffer.
@@ -37,38 +32,59 @@ namespace jump
 
             @param samples  The block of samples to write to the buffer.
         */
-        virtual void addSamples(const std::vector<SampleType>& samples) = 0;
+        virtual void addSamples(const std::vector<float>& samples) = 0;
 
-        //==============================================================================================================
-        /** Returns a ValueTree that represents the current state of this
-            engine.
+        /** Registers a renderer that will receive callbacks when new points are calculated by this engine.
 
-            @param nodeName The name that should be used for the returned node.
-
-            @returns A juce::ValueTree to represent this engine.
+            @param newRenderer  The renderer to add.
         */
-        virtual juce::ValueTree getStateInformation(const juce::String& nodeName) const = 0;
-
-        /** Changes the properties of this engine to those in the given state
-            node.
-
-            @param node The node representing the state that this engine should
-                        take.
-        */
-        virtual void setStateInformation(const juce::ValueTree& node) = 0;
-
-    protected:
-        //==============================================================================================================
-        virtual void update() = 0;
-
-    private:
-        //==============================================================================================================
-        void timerCallback() override
+        void addRenderer(RendererType* rendererToAdd)
         {
-            update();
+            renderers.add(rendererToAdd);
+        }
+
+        /** Removes a renderer from this engine so that it will no longer receive callbacks.
+
+            @param renderToRemove   The renderer that should be removed.
+        */
+        void removeRenderer(RendererType* rendererToRemove)
+        {
+            renderers.remove(rendererToRemove);
         }
 
         //==============================================================================================================
-        CircularBuffer<SampleType> buffer;
+        void setFPS(int newFPS)
+        {
+            stopTimer();
+            startTimerHz(newFPS);
+        }
+
+    protected:
+        //==============================================================================================================
+        virtual void update(juce::uint32 now) = 0;
+
+        //==============================================================================================================
+        juce::ListenerList<RendererType> renderers;
+
+    private:
+        //==============================================================================================================
+        struct StartTimerOnCreation
+        {
+            StartTimerOnCreation(juce::Timer& timerToStart, int timerHz)
+            {
+                timerToStart.startTimerHz(timerHz);
+            }
+        };
+
+        //==============================================================================================================
+        void timerCallback() override
+        {
+            const auto now = juce::Time::getMillisecondCounter();
+            update(now);
+        }
+
+        //==============================================================================================================
+        CircularBuffer<float> buffer;
+        StartTimerOnCreation timerStarter{ *this, 60 };
     };
 }
