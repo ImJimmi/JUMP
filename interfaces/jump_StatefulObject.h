@@ -21,7 +21,7 @@ namespace jump
         //==============================================================================================================
         StatefulObject& setProperty(const juce::Identifier& name, const juce::var& newValue)
         {
-            setPropertyRecursively(name, newValue, valueTree);
+            valueTree.setProperty(name, newValue, nullptr);
 
             return *this;
         }
@@ -86,16 +86,6 @@ namespace jump
         }
 
         //==============================================================================================================
-        void setPropertyRecursively(const juce::Identifier& name, const juce::var& newValue, juce::ValueTree& originTree)
-        {
-            if (valueTree.hasProperty(name))
-                valueTree.setProperty(name, newValue, nullptr);
-            else if (parent != nullptr)
-                parent->setPropertyRecursively(name, newValue, originTree);
-            else
-                originTree.setProperty(name, newValue, nullptr);
-        }
-
         juce::var getPropertyRecursively(const juce::Identifier& name) const noexcept
         {
             if (valueTree.hasProperty(name))
