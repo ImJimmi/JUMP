@@ -19,28 +19,6 @@
 #include <juce_dsp/juce_dsp.h>
 
 //======================================================================================================================
-namespace juce
-{
-    //==================================================================================================================
-    template <>
-    struct VariantConverter<juce::dsp::WindowingFunction<float>::WindowingMethod>
-    {
-        //==============================================================================================================
-        using WindowingMethod = juce::dsp::WindowingFunction<float>::WindowingMethod;
-
-        //==============================================================================================================
-        static WindowingMethod fromVar(const juce::var& v)
-        {
-            return static_cast<WindowingMethod>(static_cast<int>(v));
-        }
-
-        static juce::var toVar(const WindowingMethod& method)
-        {
-            return { static_cast<int>(method) };
-        }
-    };
-}   // namespace juce
-
 namespace jump
 {
     //==================================================================================================================
@@ -58,13 +36,23 @@ namespace jump
 }   // namespace jump
 
 //======================================================================================================================
+#include "containers/jump_CircularBuffer.h"
 #include "interfaces/jump_StatefulObject.h"
+#include "interfaces/jump_AudioComponentEngine.h"
+#include "utilities/jump_LookAndFeelAccessor.h"
 #include "utilities/jump_Functions.h"
+#include "utilities/jump_VariantConverters.h"
 
 #include "audio/jump_AudioTransferManager.h"
-#include "containers/jump_CircularBuffer.h"
-#include "engines/jump_AudioComponentEngine.h"
-#include "engines/jump_LevelMeterEngine.h"
 #include "engines/jump_SpectrumAnalyserEngine.h"
 #include "interfaces/jump_PluginProcessor.h"
 #include "interfaces/jump_PluginEditor.h"
+
+#include "components/level_meter/jump_LevelMeter.h"
+#include "components/level_meter/jump_LevelMeterEngine.h"
+#include "components/level_meter/jump_LevelMeterBackgroundComponent.h"
+#include "components/level_meter/jump_LevelMeterLabelsComponent.h"
+#include "components/level_meter/jump_LevelMeterRendererComponent.h"
+#include "components/level_meter/jump_LevelMeterComponent.h"
+
+#include "graphics/jump_LookAndFeel.h"

@@ -1,4 +1,4 @@
-#pragma once
+#include "jump_LevelMeterEngine.h"
 
 //======================================================================================================================
 namespace jump::LevelMeter
@@ -11,13 +11,18 @@ namespace jump::LevelMeter
         engine.setProperty(PropertyIDs::peakHoldTimeId,    400.f);
         engine.setProperty(PropertyIDs::peakMaxHoldTimeId, 10000.f);
         engine.setProperty(PropertyIDs::peakReleaseTimeId, 1500.f);
-        engine.setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0]");
+        engine.setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0, 2.5]");
     }
 
     //==================================================================================================================
     Engine::Engine(const juce::Identifier & uniqueID, StatefulObject* parentState)
         :   AudioComponentEngine{ uniqueID, parentState }
     {
+        for (auto i = 0; i < getState().getNumProperties(); i++)
+        {
+            const auto name = getState().getPropertyName(i);
+            propertyChanged(name, getState().getProperty(name));
+        }
     }
 
     //==================================================================================================================
@@ -71,31 +76,31 @@ namespace jump::LevelMeter
 
     void Engine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
     {
-        const auto value = juce::var{ juce::Array<juce::var>{ newDecibelRange.start, newDecibelRange.end } };
-        setProperty(PropertyIDs::decibelRangeId, juce::JSON::toString(value, true));
+        const auto value = juce::VariantConverter<juce::NormalisableRange<float>>::toVar(newDecibelRange);
+        setProperty(PropertyIDs::decibelRangeId, value);
+    }
+
+    const juce::NormalisableRange<float>& Engine::getDecibelRange() const noexcept
+    {
+        return decibelRange;
     }
 
     //==================================================================================================================
-    float normaliseDecibelValue(float value, const juce::NormalisableRange<float>& decibelRange)
-    {
-        return 1.f - ((value - decibelRange.start) / (decibelRange.end - decibelRange.start));
-    }
-
     void callRenderers(juce::ListenerList<Renderer>& renderers, const Engine* engine, juce::var peak, juce::var rms,
                        const juce::NormalisableRange<float>& decibelRange)
     {
         if (peak != juce::var() && rms != juce::var())
         {
-            rms = juce::Decibels::gainToDecibels(static_cast<float>(rms), decibelRange.start);
+            const auto peakValue = normaliseDecibelsTo0To1(static_cast<float>(peak), decibelRange);
+            const auto rmsValue = normaliseDecibelsTo0To1(static_cast<float>(rms), decibelRange);
 
-            renderers.call(&Renderer::newLevelMeterLevelsAvailable,
-                           engine, normaliseDecibelValue(peak, decibelRange), normaliseDecibelValue(rms, decibelRange));
+            renderers.call(&Renderer::newLevelMeterLevelsAvailable, engine, peakValue, rmsValue);
         }
     }
 
     void Engine::update(juce::uint32 now)
     {
-        if (!rmsFilterIsPrepared)
+        if (!rmsFilterIsPrepared || buffer.size() == 0)
             return;
 
         juce::var peak;
@@ -107,6 +112,7 @@ namespace jump::LevelMeter
             peak = updatePeak(value, now);
         }
 
+        rms = juce::Decibels::gainToDecibels(static_cast<float>(rms), decibelRange.start);
         callRenderers(renderers, this, peak, rms, decibelRange);
 
         buffer.clear();
@@ -128,16 +134,8 @@ namespace jump::LevelMeter
             peakHoldTime = newValue;
         else if (name == PropertyIDs::peakMaxHoldTimeId)
             peakMaxHoldTime = newValue;
-
         else if (name == PropertyIDs::decibelRangeId)
-        {
-            auto value = juce::JSON::fromString(newValue.toString());
-
-            jassert(value.isArray());
-            jassert(value.size() == 2);
-
-            decibelRange = juce::NormalisableRange<float>{ value[0], value[1] };
-        }
+            decibelRange = juce::VariantConverter<juce::NormalisableRange<float>>::fromVar(newValue);
         else
         {
             // Unhandled property ID.

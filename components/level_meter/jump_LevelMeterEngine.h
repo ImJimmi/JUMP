@@ -4,18 +4,6 @@
 namespace jump::LevelMeter
 {
     //==================================================================================================================
-    namespace PropertyIDs
-    {
-        //==============================================================================================================
-        static const inline juce::Identifier rmsAttackTimeId  { "rmsAttackTime" };
-        static const inline juce::Identifier rmsReleaseTimeId { "rmsReleaseTime" };
-        static const inline juce::Identifier peakHoldTimeId   { "peakHoldTime" };
-        static const inline juce::Identifier peakMaxHoldTimeId{ "peakMaxHoldTime" };
-        static const inline juce::Identifier peakReleaseTimeId{ "peakReleaseTime" };
-        static const inline juce::Identifier decibelRangeId   { "decibelRange" };
-    };
-
-    //==================================================================================================================
     class Engine;
 
     //==================================================================================================================
@@ -43,6 +31,16 @@ namespace jump::LevelMeter
     class Engine    :   public AudioComponentEngine<Renderer>
     {
     public:
+        //==================================================================================================================
+        struct PropertyIDs
+        {
+            static const inline juce::Identifier rmsAttackTimeId  { "rmsAttackTime" };
+            static const inline juce::Identifier rmsReleaseTimeId { "rmsReleaseTime" };
+            static const inline juce::Identifier peakHoldTimeId   { "peakHoldTime" };
+            static const inline juce::Identifier peakMaxHoldTimeId{ "peakMaxHoldTime" };
+            static const inline juce::Identifier peakReleaseTimeId{ "peakReleaseTime" };
+            static const inline juce::Identifier decibelRangeId   { "decibelRange" };
+        };
         //==============================================================================================================
         Engine() = default;
         Engine(const juce::Identifier& uniqueID, StatefulObject* parentState);
@@ -115,6 +113,8 @@ namespace jump::LevelMeter
             @param newDecibelRange  The new decibel range to use.
         */
         void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange);
+
+        const juce::NormalisableRange<float>& getDecibelRange() const noexcept;
 
     private:
         //==============================================================================================================
