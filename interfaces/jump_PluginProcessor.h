@@ -16,10 +16,37 @@ namespace jump
         //==============================================================================================================
         explicit PluginProcessor(const BusesProperties& busesProperties,
                                  juce::AudioProcessorValueTreeState::ParameterLayout parametersLayout,
+                                 juce::dsp::ProcessorBase& mainAudioProcessor,
                                  const juce::Identifier& apvtsID = juce::String{ JucePlugin_Name }.replace(" ", "_"))
             :   juce::AudioProcessor{ busesProperties },
-                apvts{ *this, &undoManager, apvtsID, std::move(parametersLayout) }
+                apvts{ *this, &undoManager, apvtsID, std::move(parametersLayout) },
+                audioProcessor{ mainAudioProcessor }
         {
+        }
+
+        //==============================================================================================================
+        void prepareToPlay(double sampleRate, int blockSize) override
+        {
+            prepareAudioProcessor();
+        }
+
+        void numChannelsChanged() override
+        {
+            prepareAudioProcessor();
+        }
+
+        void processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& /*midiBuffer*/) override
+        {
+            juce::ScopedNoDenormals noDenormals;
+
+            juce::dsp::AudioBlock<float> block{ buffer };
+            juce::dsp::ProcessContextReplacing<float> context{ block };
+            audioProcessor.process(context);
+        }
+
+        void releaseResources() override
+        {
+            audioProcessor.reset();
         }
 
         //==============================================================================================================
@@ -102,6 +129,17 @@ namespace jump
 
     private:
         //==============================================================================================================
+        void prepareAudioProcessor()
+        {
+            juce::dsp::ProcessSpec spec;
+            spec.sampleRate = getSampleRate();
+            spec.maximumBlockSize = getBlockSize();
+            spec.numChannels = juce::jmax(getTotalNumInputChannels(), getTotalNumOutputChannels());
+
+            audioProcessor.prepare(spec);
+        }
+
+        //==============================================================================================================
         /** Should be called by the editor to set the ValueTree object to use for the GUI's state information.
 
             If no matching element is found in the APVTS's state, the given ValueTree will be added as a new child. If
@@ -118,6 +156,8 @@ namespace jump
         //==============================================================================================================
         juce::AudioProcessorValueTreeState apvts;
         juce::UndoManager undoManager;
+
+        juce::dsp::ProcessorBase& audioProcessor;
 
         friend class PluginEditor;
     };

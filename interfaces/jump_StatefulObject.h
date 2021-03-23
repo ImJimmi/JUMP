@@ -8,7 +8,7 @@ namespace jump
     {
     public:
         //==============================================================================================================
-        StatefulObject(const juce::Identifier& type, StatefulObject* parentState = nullptr)
+        StatefulObject(const juce::Identifier& type = "UnnamedStatefulObject", StatefulObject* parentState = nullptr)
             :   valueTree{ type },
                 parent{ parentState }
         {

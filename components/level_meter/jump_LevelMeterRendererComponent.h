@@ -62,6 +62,9 @@ namespace jump::LevelMeter
 
         void newLevelMeterLevelsAvailable(const Engine*, float peakLevel, float rmsLevel) override
         {
+            if (!lookAndFeel)
+                return;
+
             meterPath.clear();
             meterPath = lookAndFeel->createLevelMeterPath(*this, orientation, peakLevel, rmsLevel);
             repaint();

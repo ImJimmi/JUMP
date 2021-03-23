@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="YlM6wN" name="demo-plugin" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="17"
+              headerPath="../../source/" companyName="James Johnson" pluginCode="Demo"
+              pluginManufacturerCode="JaJo">
+  <MAINGROUP id="QRVqnS" name="demo-plugin">
+    <GROUP id="{B97617FB-257F-EFD0-36A7-616AA394A2A4}" name="source">
+      <GROUP id="{ED6FACDA-5BF6-2DC2-62C8-B91870904050}" name="audio">
+        <FILE id="caVX9A" name="DemoPluginAudioProcessor.cpp" compile="1" resource="0"
+              file="source/audio/DemoPluginAudioProcessor.cpp"/>
+        <FILE id="cNCQgL" name="DemoPluginAudioProcessor.h" compile="0" resource="0"
+              file="source/audio/DemoPluginAudioProcessor.h"/>
+      </GROUP>
+      <GROUP id="{B9CBEDE6-F3EE-A418-5C57-80444701A909}" name="core">
+        <FILE id="VGAsnE" name="DemoPluginInstance.cpp" compile="1" resource="0"
+              file="source/core/DemoPluginInstance.cpp"/>
+        <FILE id="EOjBM0" name="DemoPluginInstance.h" compile="0" resource="0"
+              file="source/core/DemoPluginInstance.h"/>
+      </GROUP>
+      <GROUP id="{F0685A04-F594-FAF2-93ED-385835750287}" name="editor">
+        <GROUP id="{00B41A4B-BDA5-6B32-9D61-34273F0442BD}" name="demos">
+          <FILE id="imyrBK" name="LevelMetersDemo.cpp" compile="1" resource="0"
+                file="source/editor/demos/LevelMetersDemo.cpp"/>
+          <FILE id="FmX6Za" name="LevelMetersDemo.h" compile="0" resource="0"
+                file="source/editor/demos/LevelMetersDemo.h"/>
+        </GROUP>
+        <FILE id="OnHmsP" name="DemoPluginEditor.cpp" compile="1" resource="0"
+              file="source/editor/DemoPluginEditor.cpp"/>
+        <FILE id="bD4dKD" name="DemoPluginEditor.h" compile="0" resource="0"
+              file="source/editor/DemoPluginEditor.h"/>
+      </GROUP>
+    </GROUP>
+  </MAINGROUP>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="demo-plugin"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="demo-plugin"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="JUMP" path="../../../Projects"/>
+        <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="JUMP" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <LIVE_SETTINGS>
+    <OSX/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>

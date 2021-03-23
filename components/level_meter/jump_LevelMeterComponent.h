@@ -48,6 +48,7 @@ namespace jump
         //==============================================================================================================
         void resized() override;
         void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override;
+        void colourChanged() override;
 
         //==============================================================================================================
         void initialiseState();

@@ -6,20 +6,6 @@
 namespace jump
 {
     //==================================================================================================================
-    namespace ColourPalette
-    {
-        //==============================================================================================================
-        static const juce::Colour blueGrey050{ 0xFFECEFF1 };
-        static const juce::Colour blueGrey100{ 0xFFCFD8DC };
-        static const juce::Colour blueGrey800{ 0xFF37474F };
-        static const juce::Colour blueGrey850{ 0xFF2E3C43 };
-        static const juce::Colour blueGrey900{ 0xFF263238 };
-
-        static const juce::Colour lightGreen500{ 0xFF8BC34A };
-        static const juce::Colour yellow500    { 0XFFFFEB3B };
-        static const juce::Colour red500       { 0XFFF44336 };
-    }   // namespace ColourPalette
-
     namespace Constants
     {
         //==============================================================================================================
@@ -57,7 +43,7 @@ namespace jump
     //=========================================//
     int LookAndFeel::getLevelMetersGap(const LevelMeterComponent&) const noexcept
     {
-        return 10;
+        return 5;
     }
 
     //=====================================================//
@@ -256,7 +242,7 @@ namespace jump
     juce::Font LookAndFeel::getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const
     {
         const auto flags = getFontFlagsForLevelMeterText(decibelLevel, isNegativeInf);
-        return { "Helvetica", 16.f, flags };
+        return { "Helvetica", 12.f, flags };
     }
 
     juce::Colour LookAndFeel::getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const

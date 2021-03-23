@@ -274,6 +274,34 @@ namespace jump
             setOrientationInternal(juce::VariantConverter<LevelMeter::Orientation>::fromVar(newValue));
     }
 
+    void LevelMeterComponent::colourChanged()
+    {
+        if (isColourSpecified(LookAndFeel::levelMeterSafeColourId))
+        {
+            for (auto& meter : meters)
+            {
+                meter->setColour(LookAndFeel::levelMeterSafeColourId,
+                                 findColour(LookAndFeel::levelMeterSafeColourId));
+            }
+        }
+        if (isColourSpecified(LookAndFeel::levelMeterWarningColourId))
+        {
+            for (auto& meter : meters)
+            {
+                meter->setColour(LookAndFeel::levelMeterWarningColourId,
+                                 findColour(LookAndFeel::levelMeterWarningColourId));
+            }
+        }
+        if (isColourSpecified(LookAndFeel::levelMeterDangerColourId))
+        {
+            for (auto& meter : meters)
+            {
+                meter->setColour(LookAndFeel::levelMeterDangerColourId,
+                                 findColour(LookAndFeel::levelMeterDangerColourId));
+            }
+        }
+    }
+
     //==================================================================================================================
     void LevelMeterComponent::initialiseState()
     {

@@ -1,4 +1,6 @@
 .vscode/
+Builds/
+JuceLibraryCode/
 
 .DS_Store
 
