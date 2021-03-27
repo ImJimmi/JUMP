@@ -38,7 +38,7 @@ namespace jump
 
             @param newRenderer  The renderer to add.
         */
-        void addRenderer(RendererType* rendererToAdd)
+        void addRenderer(RendererType* rendererToAdd) const
         {
             renderers.add(rendererToAdd);
         }
@@ -47,7 +47,7 @@ namespace jump
 
             @param renderToRemove   The renderer that should be removed.
         */
-        void removeRenderer(RendererType* rendererToRemove)
+        void removeRenderer(RendererType* rendererToRemove) const
         {
             renderers.remove(rendererToRemove);
         }
@@ -64,7 +64,7 @@ namespace jump
         virtual void update(juce::uint32 now) = 0;
 
         //==============================================================================================================
-        juce::ListenerList<RendererType> renderers;
+        mutable juce::ListenerList<RendererType> renderers;
 
     private:
         //==============================================================================================================

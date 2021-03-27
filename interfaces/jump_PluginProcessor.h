@@ -25,7 +25,7 @@ namespace jump
         }
 
         //==============================================================================================================
-        void prepareToPlay(double sampleRate, int blockSize) override
+        void prepareToPlay(double /*sampleRate*/, int /*blockSize*/) override
         {
             prepareAudioProcessor();
         }

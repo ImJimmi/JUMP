@@ -1,11 +1,11 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump::LevelMeter
+namespace jump
 {
     //==================================================================================================================
-    class LabelsComponent   :   public juce::Component,
-                                private LookAndFeelAccessorListener
+    class LevelMeterLabelsComponent :   public juce::Component,
+                                        private LookAndFeelAccessorListener
     {
     public:
         //==============================================================================================================
@@ -19,13 +19,13 @@ namespace jump::LevelMeter
         };
 
         //==============================================================================================================
-        LabelsComponent(const Engine& engineToUse)
+        LevelMeterLabelsComponent(const LevelMeterEngine& engineToUse)
             :   engine{ engineToUse }
         {
             lookAndFeel.addListener(this);
         }
 
-        ~LabelsComponent()
+        ~LevelMeterLabelsComponent()
         {
             lookAndFeel.removeListener(this);
         }
@@ -54,7 +54,7 @@ namespace jump::LevelMeter
 
             for (const auto& label : labels)
             {
-                const auto fontHeight = label->getFont().getHeight();
+                const auto fontHeight = static_cast<int>(std::ceil(label->getFont().getHeight()));
 
                 if (fontHeight > result)
                     result = fontHeight;
@@ -77,7 +77,7 @@ namespace jump::LevelMeter
             updateLabels();
         }
 
-        void setOrientation(LevelMeter::Orientation newOrientation)
+        void setOrientation(Orientation newOrientation)
         {
             orientation = newOrientation;
             resized();
@@ -97,7 +97,7 @@ namespace jump::LevelMeter
                 const auto level = static_cast<float>(label->getProperties()[valuePropertyId]);
                 auto normalisedLevel = normaliseDecibelsTo0To1(level, range);
 
-                if (orientation == Orientation::Vertical)
+                if (orientation == Orientation::vertical)
                 {
                     const auto y = (1.f - normalisedLevel) * getHeight();
 
@@ -106,7 +106,7 @@ namespace jump::LevelMeter
 
                     label->setBounds(0, labelY, getWidth(), labelHeight);
                 }
-                else if (orientation == Orientation::Horizontal)
+                else if (orientation == Orientation::horizontal)
                 {
                     const auto x = normalisedLevel * getWidth();
 
@@ -176,13 +176,16 @@ namespace jump::LevelMeter
         }
 
         //==============================================================================================================
-        const Engine& engine;
+        const LevelMeterEngine& engine;
         juce::OwnedArray<juce::Label> labels;
         std::vector<float> levels;
         juce::Justification justification{ juce::Justification::left };
-        LevelMeter::Orientation orientation{ LevelMeter::Orientation::Vertical };
+        Orientation orientation{ Orientation::vertical };
         static inline const juce::Identifier valuePropertyId{ "value" };
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
+
+        //==============================================================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterLabelsComponent)
     };
 }   // namespace jump::LevelMeter

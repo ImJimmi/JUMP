@@ -1,19 +1,19 @@
-#include "jump_LevelMeterComponent.h"
+#include "jump_MultiMeter.h"
 
 //======================================================================================================================
 namespace juce
 {
     //==================================================================================================================
     template <>
-    struct VariantConverter<jump::LevelMeterComponent::LabelsPosition>
+    struct VariantConverter<jump::MultiMeter::LabelsPosition>
     {
         //==============================================================================================================
-        static jump::LevelMeterComponent::LabelsPosition fromVar(const juce::var& v)
+        static jump::MultiMeter::LabelsPosition fromVar(const juce::var& v)
         {
-            return static_cast<jump::LevelMeterComponent::LabelsPosition>(static_cast<int>(v));
+            return static_cast<jump::MultiMeter::LabelsPosition>(static_cast<int>(v));
         }
 
-        static juce::var toVar(const jump::LevelMeterComponent::LabelsPosition& position)
+        static juce::var toVar(const jump::MultiMeter::LabelsPosition& position)
         {
             return { static_cast<int>(position) };
         }
@@ -24,8 +24,8 @@ namespace juce
 namespace jump
 {
     //==================================================================================================================
-    LevelMeterComponent::LevelMeterComponent(const std::vector<LevelMeter::Engine*>& enginesToUse,
-                                             juce::Identifier type, StatefulObject* parentState)
+    MultiMeter::MultiMeter(const std::vector<LevelMeterEngine*>& enginesToUse,
+                           juce::Identifier type, StatefulObject* parentState)
         :   StatefulObject{ type, parentState },
             mainEngine{ *enginesToUse.front() },
             labels{ *enginesToUse.front() }
@@ -34,43 +34,43 @@ namespace jump
 
         for (auto& engine : enginesToUse)
         {
-            auto renderer = std::make_unique<LevelMeter::DefaultRenderer>(*engine);
-            addAndMakeVisible(*renderer);
-            meters.add(std::move(renderer));
+            auto meter = std::make_unique<LevelMeter>(*engine);
+            addAndMakeVisible(*meter);
+            meters.add(std::move(meter));
         }
 
         addAndMakeVisible(labels);
     }
 
     //==================================================================================================================
-    void LevelMeterComponent::setLabelsPosition(LabelsPosition newPosition)
+    void MultiMeter::setLabelsPosition(LabelsPosition newPosition)
     {
         setProperty(PropertyIDs::labelsPositionId, juce::VariantConverter<LabelsPosition>::toVar(newPosition));
     }
 
-    void LevelMeterComponent::setShowLabels(bool shouldShowLabels)
+    void MultiMeter::setShowLabels(bool shouldShowLabels)
     {
         setProperty(PropertyIDs::labelsVisibleId, shouldShowLabels);
     }
 
-    void LevelMeterComponent::setDecibelLevelsForLabels(const std::vector<float>& newLabelLevels)
+    void MultiMeter::setDecibelLevelsForLabels(const std::vector<float>& newLabelLevels)
     {
         setProperty(PropertyIDs::highlightedLevelsId, juce::VariantConverter<std::vector<float>>::toVar(newLabelLevels));
     }
 
-    void LevelMeterComponent::setOrientation(LevelMeter::Orientation newOrientation)
+    void MultiMeter::setOrientation(Orientation newOrientation)
     {
-        setProperty(PropertyIDs::orientationId, juce::VariantConverter<LevelMeter::Orientation>::toVar(newOrientation));
+        setProperty(PropertyIDs::orientationId, juce::VariantConverter<Orientation>::toVar(newOrientation));
     }
 
     //==================================================================================================================
-    juce::StringArray getTemplateAreasForLayout(LevelMeter::Orientation orientation,
-                                                LevelMeterComponent::LabelsPosition position, int numMeters,
-                                                const juce::String& meterAreaName, const juce::String& labelsAreaName)
+    juce::StringArray getTemplateAreasForLayout(Orientation orientation,
+                                                MultiMeter::LabelsPosition /*position*/, int numMeters,
+                                                const juce::String& meterAreaName, const juce::String& /*labelsAreaName*/)
     {
         juce::StringArray result;
 
-        if (orientation == LevelMeter::Orientation::Vertical)
+        if (orientation == Orientation::vertical)
         {
             juce::String row;
 
@@ -84,7 +84,7 @@ namespace jump
 
             result.add(row);
         }
-        else if (orientation == LevelMeter::Orientation::Horizontal)
+        else if (orientation == Orientation::horizontal)
         {
             for (auto i = 0; i < numMeters; i++)
                 result.add(meterAreaName + juce::String{ i });
@@ -98,8 +98,8 @@ namespace jump
         return result;
     }
 
-    juce::Array<juce::Grid::TrackInfo> getTrackInfoArray(LevelMeter::Orientation orientation,
-                                                         LevelMeter::Orientation orientationForSingleElement,
+    juce::Array<juce::Grid::TrackInfo> getTrackInfoArray(Orientation orientation,
+                                                         Orientation orientationForSingleElement,
                                                          int numElementsOtherwise)
     {
         using Fr = juce::Grid::Fr;
@@ -115,32 +115,32 @@ namespace jump
         return result;
     }
 
-    juce::Array<juce::Grid::TrackInfo> getTemplateColumnsForLayout(LevelMeter::Orientation orientation, int numElements)
+    juce::Array<juce::Grid::TrackInfo> getTemplateColumnsForLayout(Orientation orientation, int numElements)
     {
-        return getTrackInfoArray(orientation, LevelMeter::Orientation::Horizontal, numElements);
+        return getTrackInfoArray(orientation, Orientation::horizontal, numElements);
     }
 
-    juce::Array<juce::Grid::TrackInfo> getTemplateRowsForLayout(LevelMeter::Orientation orientation, int numElements)
+    juce::Array<juce::Grid::TrackInfo> getTemplateRowsForLayout(Orientation orientation, int numElements)
     {
-        return getTrackInfoArray(orientation, LevelMeter::Orientation::Vertical, numElements);
+        return getTrackInfoArray(orientation, Orientation::vertical, numElements);
     }
 
-    void addLabelsElementToTemplateAreas(juce::StringArray& templateAreas, LevelMeterComponent::LabelsPosition position,
-                                         LevelMeter::Orientation orientation, const juce::String& labelsAreaName)
+    void addLabelsElementToTemplateAreas(juce::StringArray& templateAreas, MultiMeter::LabelsPosition position,
+                                         Orientation orientation, const juce::String& labelsAreaName)
     {
-        if (position == LevelMeterComponent::LabelsPosition::Left
-            || position == LevelMeterComponent::LabelsPosition::Right)
+        if (position == MultiMeter::LabelsPosition::left
+            || position == MultiMeter::LabelsPosition::right)
         {
             for (auto i = 0; i < templateAreas.size(); i++)
             {
-                if (position == LevelMeterComponent::LabelsPosition::Left)
+                if (position == MultiMeter::LabelsPosition::left)
                     templateAreas.set(i, labelsAreaName + " " + templateAreas[i]);
                 else
                     templateAreas.set(i, templateAreas[i] + " " + labelsAreaName);
             }
         }
-        else if (position == LevelMeterComponent::LabelsPosition::Above
-                 || position == LevelMeterComponent::LabelsPosition::Below)
+        else if (position == MultiMeter::LabelsPosition::above
+                 || position == MultiMeter::LabelsPosition::below)
         {
             const juce::String existingRow{ templateAreas.size() > 0 ? templateAreas[0] : "" };
             const auto existingTokens = juce::StringArray::fromTokens(existingRow, true);
@@ -155,14 +155,14 @@ namespace jump
                     newRow += " ";
             }
 
-            if (position == LevelMeterComponent::LabelsPosition::Above)
+            if (position == MultiMeter::LabelsPosition::above)
                 templateAreas.insert(0, newRow);
             else
                 templateAreas.add(newRow);
         }
-        else if (position == LevelMeterComponent::LabelsPosition::Centred)
+        else if (position == MultiMeter::LabelsPosition::centred)
         {
-            if (orientation == LevelMeter::Orientation::Vertical)
+            if (orientation == Orientation::vertical)
             {
                 juce::String row{ templateAreas[0] };
                 auto tokens = juce::StringArray::fromTokens(row, true);
@@ -173,7 +173,7 @@ namespace jump
                 row = tokens.joinIntoString(" ");
                 templateAreas.set(0, row);
             }
-            else if (orientation == LevelMeter::Orientation::Horizontal)
+            else if (orientation == Orientation::horizontal)
             {
                 const auto midIndex = templateAreas.size() / 2;
                 templateAreas.insert(midIndex, labelsAreaName);
@@ -193,28 +193,28 @@ namespace jump
 
     void addLabelsElementToTemplateColumnsOrRows(juce::Array<juce::Grid::TrackInfo>& templateColumns,
                                                  juce::Array<juce::Grid::TrackInfo>& templateRows,
-                                                 LevelMeterComponent::LabelsPosition position,
-                                                 LevelMeter::Orientation orientation,
+                                                 MultiMeter::LabelsPosition position,
+                                                 Orientation orientation,
                                                  int labelsWidthIfColumn, int labelsHeightIfRow)
     {
         using Px = juce::Grid::Px;
 
-        if (position == LevelMeterComponent::LabelsPosition::Left)
+        if (position == MultiMeter::LabelsPosition::left)
             templateColumns.insert(0, Px{ labelsWidthIfColumn });
-        else if (position == LevelMeterComponent::LabelsPosition::Right)
+        else if (position == MultiMeter::LabelsPosition::right)
             templateColumns.add(Px{ labelsWidthIfColumn });
-        else if (position == LevelMeterComponent::LabelsPosition::Above)
+        else if (position == MultiMeter::LabelsPosition::above)
             templateRows.insert(0, Px{ labelsHeightIfRow });
-        else if (position == LevelMeterComponent::LabelsPosition::Below)
+        else if (position == MultiMeter::LabelsPosition::below)
             templateRows.add(Px{ labelsHeightIfRow });
-        else if (position == LevelMeterComponent::LabelsPosition::Centred)
+        else if (position == MultiMeter::LabelsPosition::centred)
         {
-            if (orientation == LevelMeter::Orientation::Vertical)
+            if (orientation == Orientation::vertical)
             {
                 const auto midIndex = templateColumns.size() / 2;
                 templateColumns.insert(midIndex, Px{ labelsWidthIfColumn });
             }
-            else if (orientation == LevelMeter::Orientation::Horizontal)
+            else if (orientation == Orientation::horizontal)
             {
                 const auto midIndex = templateRows.size() / 2;
                 templateRows.insert(midIndex, Px{ labelsHeightIfRow });
@@ -232,7 +232,7 @@ namespace jump
         }
     }
 
-    void LevelMeterComponent::resized()
+    void MultiMeter::resized()
     {
         if (!isVisible() || getWidth() == 0 || getHeight() == 0)
             return;
@@ -262,7 +262,7 @@ namespace jump
         grid.performLayout(bounds);
     }
 
-    void LevelMeterComponent::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
+    void MultiMeter::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
     {
         if (name == PropertyIDs::labelsPositionId)
             setLabelsPositionInternal(juce::VariantConverter<LabelsPosition>::fromVar(newValue));
@@ -271,10 +271,10 @@ namespace jump
         else if (name == PropertyIDs::highlightedLevelsId)
             labels.setHighlightedLevels(juce::VariantConverter<std::vector<float>>::fromVar(newValue));
         else if (name == PropertyIDs::orientationId)
-            setOrientationInternal(juce::VariantConverter<LevelMeter::Orientation>::fromVar(newValue));
+            setOrientationInternal(juce::VariantConverter<Orientation>::fromVar(newValue));
     }
 
-    void LevelMeterComponent::colourChanged()
+    void MultiMeter::colourChanged()
     {
         if (isColourSpecified(LookAndFeel::levelMeterSafeColourId))
         {
@@ -303,10 +303,10 @@ namespace jump
     }
 
     //==================================================================================================================
-    void LevelMeterComponent::initialiseState()
+    void MultiMeter::initialiseState()
     {
         setProperty(PropertyIDs::labelsPositionId,
-                    juce::VariantConverter<LabelsPosition>::toVar(LabelsPosition::Left));
+                    juce::VariantConverter<LabelsPosition>::toVar(LabelsPosition::left));
 
         setProperty(PropertyIDs::labelsVisibleId, true);
 
@@ -314,15 +314,15 @@ namespace jump
                     juce::VariantConverter<std::vector<float>>::toVar({ 0.f, -6.f, -12.f, -24.f, -48.f, -9999.f }));
 
         setProperty(PropertyIDs::orientationId,
-                    juce::VariantConverter<LevelMeter::Orientation>::toVar(LevelMeter::Orientation::Vertical));
+                    juce::VariantConverter<Orientation>::toVar(Orientation::vertical));
     }
 
     //==================================================================================================================
-    void LevelMeterComponent::setLabelsPositionInternal(LabelsPosition newLabelsPosition)
+    void MultiMeter::setLabelsPositionInternal(LabelsPosition newLabelsPosition)
     {
-        if (newLabelsPosition == LabelsPosition::Left)
+        if (newLabelsPosition == LabelsPosition::left)
             labels.setJustification(juce::Justification::right);
-        else if (newLabelsPosition == LabelsPosition::Right)
+        else if (newLabelsPosition == LabelsPosition::right)
             labels.setJustification(juce::Justification::left);
         else
             labels.setJustification(juce::Justification::centred);
@@ -331,21 +331,21 @@ namespace jump
         resized();
     }
 
-    void LevelMeterComponent::setOrientationInternal(LevelMeter::Orientation newOrientation)
+    void MultiMeter::setOrientationInternal(Orientation newOrientation)
     {
-        if (newOrientation == LevelMeter::Orientation::Vertical)
+        if (newOrientation == Orientation::vertical)
         {
-            if (labelsPosition == LabelsPosition::Above)
-                setLabelsPosition(LabelsPosition::Left);
-            else if (labelsPosition == LabelsPosition::Below)
-                setLabelsPosition(LabelsPosition::Right);
+            if (labelsPosition == LabelsPosition::above)
+                setLabelsPosition(LabelsPosition::left);
+            else if (labelsPosition == LabelsPosition::below)
+                setLabelsPosition(LabelsPosition::right);
         }
-        else if (newOrientation == LevelMeter::Orientation::Horizontal)
+        else if (newOrientation == Orientation::horizontal)
         {
-            if (labelsPosition == LabelsPosition::Left)
-                setLabelsPosition(LabelsPosition::Above);
-            else if (labelsPosition == LabelsPosition::Right)
-                setLabelsPosition(LabelsPosition::Below);
+            if (labelsPosition == LabelsPosition::left)
+                setLabelsPosition(LabelsPosition::above);
+            else if (labelsPosition == LabelsPosition::right)
+                setLabelsPosition(LabelsPosition::below);
         }
         else
         {

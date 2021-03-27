@@ -1,104 +1,105 @@
 #include "jump_LevelMeterEngine.h"
 
 //======================================================================================================================
-namespace jump::LevelMeter
+namespace jump
 {
     //==================================================================================================================
-    Engine::StateInitialiser::StateInitialiser(Engine& engine)
+    void LevelMeterEngine::initialise()
     {
-        engine.setProperty(PropertyIDs::rmsAttackTimeId,   150.f);
-        engine.setProperty(PropertyIDs::rmsReleaseTimeId,  350.f);
-        engine.setProperty(PropertyIDs::peakHoldTimeId,    400.f);
-        engine.setProperty(PropertyIDs::peakMaxHoldTimeId, 10000.f);
-        engine.setProperty(PropertyIDs::peakReleaseTimeId, 1500.f);
-        engine.setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0, 2.5]");
+        setProperty(PropertyIDs::rmsAttackTimeId,   150.f);
+        setProperty(PropertyIDs::rmsReleaseTimeId,  350.f);
+        setProperty(PropertyIDs::peakHoldTimeId,    400.f);
+        setProperty(PropertyIDs::peakMaxHoldTimeId, 10000.f);
+        setProperty(PropertyIDs::peakReleaseTimeId, 1500.f);
+        setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0, 2.5]");
     }
 
     //==================================================================================================================
-    Engine::Engine(const juce::Identifier & uniqueID, StatefulObject* parentState)
+    LevelMeterEngine::LevelMeterEngine()
+    {
+        initialise();
+    }
+
+    LevelMeterEngine::LevelMeterEngine(const juce::Identifier & uniqueID, StatefulObject* parentState)
         :   AudioComponentEngine{ uniqueID, parentState }
     {
-        for (auto i = 0; i < getState().getNumProperties(); i++)
-        {
-            const auto name = getState().getPropertyName(i);
-            propertyChanged(name, getState().getProperty(name));
-        }
+        initialise();
     }
 
     //==================================================================================================================
-    void Engine::addSamples(const std::vector<float>& samples)
+    void LevelMeterEngine::addSamples(const std::vector<float>& samples)
     {
         buffer.insert(std::end(buffer), std::begin(samples), std::end(samples));
     }
 
     //==================================================================================================================
-    void Engine::setSampleRate(double newSampleRate)
+    void LevelMeterEngine::setSampleRate(double newSampleRate)
     {
         jassert(newSampleRate > 0.0);
 
         setProperty(SharedPropertyIDs::sampleRateId, newSampleRate);
     }
 
-    void Engine::setRMSAttackTime(float newAttackTimeMS)
+    void LevelMeterEngine::setRMSAttackTime(float newAttackTimeMS)
     {
         jassert(newAttackTimeMS >= 0.f);
 
         setProperty(PropertyIDs::rmsAttackTimeId, newAttackTimeMS);
     }
 
-    void Engine::setRMSReleaseTime(float newReleaseTimeMS)
+    void LevelMeterEngine::setRMSReleaseTime(float newReleaseTimeMS)
     {
         jassert(newReleaseTimeMS >= 0.f);
 
         setProperty(PropertyIDs::rmsReleaseTimeId, newReleaseTimeMS);
     }
 
-    void Engine::setPeakHoldTime(float newHoldTimeMS)
+    void LevelMeterEngine::setPeakHoldTime(float newHoldTimeMS)
     {
         jassert(newHoldTimeMS >= 0.f);
 
         setProperty(PropertyIDs::peakHoldTimeId, newHoldTimeMS);
     }
 
-    void Engine::setPeakMaxHoldTime(float newMaxHoldTimeMS)
+    void LevelMeterEngine::setPeakMaxHoldTime(float newMaxHoldTimeMS)
     {
         jassert(newMaxHoldTimeMS >= 0.f);
 
         setProperty(PropertyIDs::peakMaxHoldTimeId, newMaxHoldTimeMS);
     }
 
-    void Engine::setPeakReleaseTime(float newReleaseTimeMS)
+    void LevelMeterEngine::setPeakReleaseTime(float newReleaseTimeMS)
     {
         jassert(newReleaseTimeMS >= 0.f);
 
         setProperty(PropertyIDs::peakReleaseTimeId, newReleaseTimeMS);
     }
 
-    void Engine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
+    void LevelMeterEngine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
     {
         const auto value = juce::VariantConverter<juce::NormalisableRange<float>>::toVar(newDecibelRange);
         setProperty(PropertyIDs::decibelRangeId, value);
     }
 
-    const juce::NormalisableRange<float>& Engine::getDecibelRange() const noexcept
+    const juce::NormalisableRange<float>& LevelMeterEngine::getDecibelRange() const noexcept
     {
         return decibelRange;
     }
 
     //==================================================================================================================
-    void callRenderers(juce::ListenerList<Renderer>& renderers, const Engine* engine, juce::var peak, juce::var rms,
-                       const juce::NormalisableRange<float>& decibelRange)
+    void callRenderers(juce::ListenerList<LevelMeterRendererBase>& renderers, const LevelMeterEngine* engine,
+                       juce::var peak, juce::var rms, const juce::NormalisableRange<float>& decibelRange)
     {
         if (peak != juce::var() && rms != juce::var())
         {
             const auto peakValue = normaliseDecibelsTo0To1(static_cast<float>(peak), decibelRange);
             const auto rmsValue = normaliseDecibelsTo0To1(static_cast<float>(rms), decibelRange);
 
-            renderers.call(&Renderer::newLevelMeterLevelsAvailable, engine, peakValue, rmsValue);
+            renderers.call(&LevelMeterRendererBase::newLevelMeterLevelsAvailable, *engine, peakValue, rmsValue);
         }
     }
 
-    void Engine::update(juce::uint32 now)
+    void LevelMeterEngine::update(juce::uint32 now)
     {
         if (!rmsFilterIsPrepared || buffer.size() == 0)
             return;
@@ -118,7 +119,7 @@ namespace jump::LevelMeter
         buffer.clear();
     }
 
-    void Engine::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
+    void LevelMeterEngine::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
     {
         if (name == SharedPropertyIDs::sampleRateId)
             setSampleRateInternal(newValue);
@@ -144,7 +145,7 @@ namespace jump::LevelMeter
     }
 
     //==================================================================================================================
-    float Engine::updatePeak(float gainValue, juce::uint32 now)
+    float LevelMeterEngine::updatePeak(float gainValue, juce::uint32 now)
     {
         auto peakDB = juce::Decibels::gainToDecibels(gainValue, decibelRange.start);
 
@@ -164,7 +165,7 @@ namespace jump::LevelMeter
     }
 
     //==================================================================================================================
-    void Engine::setSampleRateInternal(double newSampleRate)
+    void LevelMeterEngine::setSampleRateInternal(double newSampleRate)
     {
         if (newSampleRate <= 0.0)
             return;
@@ -178,13 +179,13 @@ namespace jump::LevelMeter
         rmsFilterIsPrepared = true;
     }
 
-    void Engine::setRMSAttackTimeInternal(float newAttackTimeMS)
+    void LevelMeterEngine::setRMSAttackTimeInternal(float newAttackTimeMS)
     {
         rmsFilter.setAttackTime(newAttackTimeMS);
         rmsAttack = newAttackTimeMS;
     }
 
-    void Engine::setRMSReleaseTimeInternal(float newReleaseTimeMS)
+    void LevelMeterEngine::setRMSReleaseTimeInternal(float newReleaseTimeMS)
     {
         rmsFilter.setReleaseTime(newReleaseTimeMS);
         rmsRelease = newReleaseTimeMS;

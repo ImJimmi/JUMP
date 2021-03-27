@@ -1,11 +1,11 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump::LevelMeter
+namespace jump
 {
     //==================================================================================================================
-    class DefaultRenderer   :   public juce::Component,
-                                public Renderer
+    class LevelMeterRenderer    :   public juce::Component,
+                                    public LevelMeterRendererBase
     {
     public:
         //==============================================================================================================
@@ -13,23 +13,21 @@ namespace jump::LevelMeter
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual juce::Path createLevelMeterPath(const juce::Component& component, Orientation orientation,
+            virtual juce::Path createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
                                                     float peakLevel, float rmsLevel) = 0;
-            virtual void drawLevelMeter(juce::Graphics& g, const juce::Component& component, Orientation orientation,
+            virtual void drawLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
                                         const juce::NormalisableRange<float>& decibelRange,
                                         const juce::Path& meterPath) = 0;
         };
 
         //==============================================================================================================
-        explicit DefaultRenderer(Engine& engineToUse)
+        explicit LevelMeterRenderer(const LevelMeterEngine& engineToUse)
             :   engine{ engineToUse }
         {
             engineToUse.addRenderer(this);
-
-            addAndMakeVisible(background);
         }
 
-        ~DefaultRenderer()
+        ~LevelMeterRenderer()
         {
             engine.removeRenderer(this);
         }
@@ -37,8 +35,6 @@ namespace jump::LevelMeter
         //==============================================================================================================
         void setOrientation(Orientation newOrientation)
         {
-            background.setOrientation(newOrientation);
-
             orientation = newOrientation;
             repaint();
         }
@@ -50,17 +46,12 @@ namespace jump::LevelMeter
 
     private:
         //==============================================================================================================
-        void paintOverChildren(juce::Graphics& g) override
+        void paint(juce::Graphics& g) override
         {
             lookAndFeel->drawLevelMeter(g, *this, orientation, engine.getDecibelRange(), meterPath);
         }
 
-        void resized() override
-        {
-            background.setBounds(getLocalBounds());
-        }
-
-        void newLevelMeterLevelsAvailable(const Engine*, float peakLevel, float rmsLevel) override
+        void newLevelMeterLevelsAvailable(const LevelMeterEngine&, float peakLevel, float rmsLevel) override
         {
             if (!lookAndFeel)
                 return;
@@ -71,12 +62,14 @@ namespace jump::LevelMeter
         }
 
         //==============================================================================================================
-        Engine& engine;
-        BackgroundComponent background{ engine };
+        const LevelMeterEngine& engine;
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
 
         juce::Path meterPath;
-        Orientation orientation{ Orientation::Vertical };
+        Orientation orientation{ Orientation::vertical };
+
+        //==============================================================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterRenderer)
     };
 }   // namespace jump

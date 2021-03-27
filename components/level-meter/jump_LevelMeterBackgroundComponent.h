@@ -1,11 +1,11 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump::LevelMeter
+namespace jump
 {
     //==================================================================================================================
-    class BackgroundComponent   :   public juce::Component,
-                                    private juce::ValueTree::Listener
+    class LevelMeterBackgroundComponent :   public juce::Component,
+                                            private juce::ValueTree::Listener
     {
     public:
         //==============================================================================================================
@@ -13,20 +13,21 @@ namespace jump::LevelMeter
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual void drawLevelMeterBackground(juce::Graphics& g, const BackgroundComponent& component) const = 0;
-            virtual float getLevelMeterGridlineInterval(const BackgroundComponent& component) const = 0;
-            virtual void drawLevelMeterGridline(juce::Graphics& g, const BackgroundComponent& component,
+            virtual void drawLevelMeterBackground(juce::Graphics& g,
+                                                  const LevelMeterBackgroundComponent& component) const = 0;
+            virtual float getLevelMeterGridlineInterval(const LevelMeterBackgroundComponent& component) const = 0;
+            virtual void drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundComponent& component,
                                                 float normalisedLevel, float decibelLevel,
-                                                LevelMeter::Orientation orientation) const = 0;
+                                                Orientation orientation) const = 0;
         };
 
         //==============================================================================================================
-        explicit BackgroundComponent(const Engine& correspondingEngine)
+        explicit LevelMeterBackgroundComponent(const LevelMeterEngine& correspondingEngine)
             :   engine{ correspondingEngine }
         {
         }
 
-        ~BackgroundComponent()
+        ~LevelMeterBackgroundComponent()
         {
         }
 
@@ -57,10 +58,13 @@ namespace jump::LevelMeter
         }
 
         //==============================================================================================================
-        const Engine& engine;
+        const LevelMeterEngine& engine;
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
 
-        Orientation orientation{ Orientation::Vertical };
+        Orientation orientation{ Orientation::vertical };
+
+        //==============================================================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterBackgroundComponent)
     };
 }   // namespace jump

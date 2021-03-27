@@ -5,10 +5,10 @@ namespace jump
 {
     //==================================================================================================================
     class LookAndFeel   :   public juce::LookAndFeel_V4,
-                            public LevelMeterComponent::LookAndFeelMethods,
-                            public LevelMeter::BackgroundComponent::LookAndFeelMethods,
-                            public LevelMeter::DefaultRenderer::LookAndFeelMethods,
-                            public LevelMeter::LabelsComponent::LookAndFeelMethods
+                            public LevelMeterBackgroundComponent::LookAndFeelMethods,
+                            public LevelMeterLabelsComponent::LookAndFeelMethods,
+                            public LevelMeterRenderer::LookAndFeelMethods,
+                            public MultiMeter::LookAndFeelMethods
     {
     public:
         //==============================================================================================================
@@ -48,32 +48,32 @@ namespace jump
 
     private:
         //==============================================================================================================
-        //=========================================//
-        // LevelMeterComponent::LookAndFeelMethods //
-        //=========================================//
-        int getLevelMetersGap(const LevelMeterComponent& component) const noexcept override;
+        //================================//
+        // MultiMeter::LookAndFeelMethods //
+        //================================//
+        int getLevelMetersGap(const MultiMeter& component) const noexcept override;
 
-        //=====================================================//
-        // LevelMeter::BackgroundComponent::LookAndFeelMethods //
-        //=====================================================//
+        //===================================================//
+        // LevelMeterBackgroundComponent::LookAndFeelMethods //
+        //===================================================//
         void drawLevelMeterBackground(juce::Graphics& g,
-                                      const LevelMeter::BackgroundComponent& component) const override;
-        float getLevelMeterGridlineInterval(const LevelMeter::BackgroundComponent& component) const override;
-        void drawLevelMeterGridline(juce::Graphics& g, const LevelMeter::BackgroundComponent& component,
+                                      const LevelMeterBackgroundComponent& component) const override;
+        float getLevelMeterGridlineInterval(const LevelMeterBackgroundComponent& component) const override;
+        void drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundComponent& component,
                                     float normalisedLevel, float decibelLevel,
-                                    LevelMeter::Orientation orientation) const override;
+                                    Orientation orientation) const override;
 
-        //=================================================//
-        // LevelMeter::DefaultRenderer::LookAndFeelMethods //
-        //=================================================//
-        juce::Path createLevelMeterPath(const juce::Component& component, LevelMeter::Orientation orientation,
+        //========================================//
+        // LevelMeterRenderer::LookAndFeelMethods //
+        //========================================//
+        juce::Path createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
                                         float peakLevel, float rmsLevel) override;
-        void drawLevelMeter(juce::Graphics& g, const juce::Component& component, LevelMeter::Orientation orientation,
+        void drawLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
                             const juce::NormalisableRange<float>& decibelRange, const juce::Path& meterPath) override;
 
-        //=================================================//
-        // LevelMeter::LabelsComponent::LookAndFeelMethods //
-        //=================================================//
+        //===============================================//
+        // LevelMeterLabelsComponent::LookAndFeelMethods //
+        //===============================================//
         juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const override;
         juce::Font getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const override;
         juce::Colour getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const override;

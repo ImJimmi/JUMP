@@ -38,10 +38,10 @@ namespace jump
     }
 
     //==================================================================================================================
-    //=========================================//
-    // LevelMeterComponent::LookAndFeelMethods //
-    //=========================================//
-    int LookAndFeel::getLevelMetersGap(const LevelMeterComponent&) const noexcept
+    //================================//
+    // MultiMeter::LookAndFeelMethods //
+    //================================//
+    int LookAndFeel::getLevelMetersGap(const MultiMeter&) const noexcept
     {
         return 5;
     }
@@ -63,7 +63,7 @@ namespace jump
     }
 
     void LookAndFeel::drawLevelMeterBackground(juce::Graphics& g,
-                                               const LevelMeter::BackgroundComponent& component) const
+                                               const LevelMeterBackgroundComponent& component) const
     {
         const auto widgetShape = getLevelMeterShape(component.getLocalBounds().toFloat().reduced(0.5f));
 
@@ -74,14 +74,14 @@ namespace jump
         g.strokePath(widgetShape, juce::PathStrokeType{ Constants::widgetBorderThickness });
     }
 
-    float LookAndFeel::getLevelMeterGridlineInterval(const LevelMeter::BackgroundComponent&) const
+    float LookAndFeel::getLevelMeterGridlineInterval(const LevelMeterBackgroundComponent&) const
     {
         return Constants::levelMeterGridlineInterval;
     }
 
-    void LookAndFeel::drawLevelMeterGridline(juce::Graphics& g, const LevelMeter::BackgroundComponent& component,
+    void LookAndFeel::drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundComponent& component,
                                             float normalisedLevel, float decibelLevel,
-                                            LevelMeter::Orientation orientation) const
+                                            Orientation orientation) const
     {
         const auto meterShape = getLevelMeterShape(component.getLocalBounds().reduced(1).toFloat());
         g.reduceClipRegion(meterShape);
@@ -93,12 +93,12 @@ namespace jump
 
         const auto lineThickness = Constants::levelMeterMajorGridlineLevels.count(decibelLevel) > 0 ? 1.5f : 1.f;
 
-        if (orientation == LevelMeter::Orientation::Vertical)
+        if (orientation == Orientation::vertical)
         {
             const auto y = std::round((1.f - normalisedLevel) * component.getHeight()) - lineThickness / 2.f;
             g.drawLine({ { 0.f, y }, { static_cast<float>(component.getWidth()), y } }, lineThickness);
         }
-        else if (orientation == LevelMeter::Orientation::Horizontal)
+        else if (orientation == Orientation::horizontal)
         {
             const auto x = std::round(normalisedLevel * component.getWidth()) - lineThickness / 2.f;
             g.drawLine({ { x, 0.f }, { x, static_cast<float>(component.getHeight()) } }, lineThickness);
@@ -112,12 +112,12 @@ namespace jump
     //=================================================//
     // LevelMeter::DefaultRenderer::LookAndFeelMethods //
     //=================================================//
-    juce::Path createLevelMeterPeakShape(LevelMeter::Orientation orientation, const juce::Rectangle<int>& meterBounds,
+    juce::Path createLevelMeterPeakShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
                                          float peakLevel)
     {
         juce::Rectangle<float> bounds;
 
-        if (orientation == LevelMeter::Orientation::Vertical)
+        if (orientation == Orientation::vertical)
         {
             bounds.setWidth(meterBounds.toFloat().getWidth());
             bounds.setHeight(Constants::levelMeterPeakIndicatorThickness);
@@ -127,7 +127,7 @@ namespace jump
                 meterBounds.getHeight() * (1.f - peakLevel)
             );
         }
-        else if (orientation == LevelMeter::Orientation::Horizontal)
+        else if (orientation == Orientation::horizontal)
         {
             bounds.setWidth(Constants::levelMeterPeakIndicatorThickness);
             bounds.setHeight(meterBounds.toFloat().getHeight());
@@ -148,13 +148,13 @@ namespace jump
         return path;
     }
 
-    juce::Path createLevelMeterRMSShape(LevelMeter::Orientation orientation, const juce::Rectangle<int>& meterBounds,
+    juce::Path createLevelMeterRMSShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
                                         float rmsLevel)
     {
         juce::Rectangle<float> bounds{ meterBounds.toFloat() };
         juce::Path path;
 
-        if (orientation == LevelMeter::Orientation::Vertical)
+        if (orientation == Orientation::vertical)
         {
             bounds.setTop(bounds.getHeight() * (1.f - rmsLevel));
 
@@ -162,7 +162,7 @@ namespace jump
                                      Constants::levelMeterCornerSize, Constants::levelMeterCornerSize,
                                      true, true, false, false);
         }
-        else if (orientation == LevelMeter::Orientation::Horizontal)
+        else if (orientation == Orientation::horizontal)
         {
             bounds.setRight(bounds.getWidth() * rmsLevel);
 
@@ -178,39 +178,39 @@ namespace jump
         return path;
     }
 
-    juce::Path LookAndFeel::createLevelMeterPath(const juce::Component& component, LevelMeter::Orientation orientation,
+    juce::Path LookAndFeel::createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
                                                  float peakLevel, float rmsLevel)
     {
         juce::Path path;
 
-        path.addPath(createLevelMeterPeakShape(orientation, component.getLocalBounds(), peakLevel));
-        path.addPath(createLevelMeterRMSShape (orientation, component.getLocalBounds(), rmsLevel));
+        path.addPath(createLevelMeterPeakShape(orientation, renderer.getLocalBounds(), peakLevel));
+        path.addPath(createLevelMeterRMSShape (orientation, renderer.getLocalBounds(), rmsLevel));
 
         return path;
     }
 
-    void LookAndFeel::drawLevelMeter(juce::Graphics& g, const juce::Component& component, LevelMeter::Orientation orientation,
+    void LookAndFeel::drawLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
                                      const juce::NormalisableRange<float>& decibelRange, const juce::Path& meterPath)
     {
         const auto cornerRadiusModifier = -1.f;
-        const auto meterShape = getLevelMeterShape(component.getLocalBounds().reduced(1).toFloat(), cornerRadiusModifier);
+        const auto meterShape = getLevelMeterShape(renderer.getLocalBounds().reduced(1).toFloat(), cornerRadiusModifier);
         g.reduceClipRegion(meterShape);
 
         juce::ColourGradient gradient;
-        const auto safeColour = component.findColour(levelMeterSafeColourId);
-        const auto warningColour = component.findColour(levelMeterWarningColourId);
-        const auto dangerColour = component.findColour(levelMeterDangerColourId);
+        const auto safeColour = renderer.findColour(levelMeterSafeColourId);
+        const auto warningColour = renderer.findColour(levelMeterWarningColourId);
+        const auto dangerColour = renderer.findColour(levelMeterDangerColourId);
 
         const auto normalisedNegative12 = decibelRange.convertTo0to1(-12.f);
 
-        if (orientation == LevelMeter::Orientation::Vertical)
+        if (orientation == Orientation::vertical)
         {
-            gradient = juce::ColourGradient::vertical(dangerColour, safeColour, component.getLocalBounds());
+            gradient = juce::ColourGradient::vertical(dangerColour, safeColour, renderer.getLocalBounds());
             gradient.addColour(static_cast<double>(1.f - normalisedNegative12), warningColour);
         }
-        else if (orientation == LevelMeter::Orientation::Horizontal)
+        else if (orientation == Orientation::horizontal)
         {
-            gradient = juce::ColourGradient::horizontal(safeColour, dangerColour, component.getLocalBounds());
+            gradient = juce::ColourGradient::horizontal(safeColour, dangerColour, renderer.getLocalBounds());
             gradient.addColour(static_cast<double>(normalisedNegative12), warningColour);
         }
 

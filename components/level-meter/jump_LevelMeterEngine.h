@@ -1,22 +1,22 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump::LevelMeter
+namespace jump
 {
     //==================================================================================================================
-    class Engine;
+    class LevelMeterEngine;
 
     //==================================================================================================================
-    struct Renderer
+    struct LevelMeterRendererBase
     {
         //==============================================================================================================
-        virtual ~Renderer() = default;
+        virtual ~LevelMeterRendererBase() = default;
 
         //==============================================================================================================
         /** Derived classes must override this method in order to receive callbacks when a new set of points had been
             calculated by the given engine.
         */
-        virtual void newLevelMeterLevelsAvailable(const Engine* engine, float peakLevel, float rmsLevel) = 0;
+        virtual void newLevelMeterLevelsAvailable(const LevelMeterEngine& engine, float peakLevel, float rmsLevel) = 0;
     };
 
     //==================================================================================================================
@@ -25,10 +25,9 @@ namespace jump::LevelMeter
         Given a stream of samples, this class calculates a peak and an RMS level that can be used to draw a level meter.
         The peak and RMS levels are normalised so they need only be scaled with the desired width and height.
 
-        The levels use a linear Decibel scale but normalised to 0-1 (e.g. if the decibel range is -100dB to 0dB and the
-        peak level is -50dB, the given peak value will be 0.5).
+        The levels use a linear Decibel scale normalised to 0-1.
     */
-    class Engine    :   public AudioComponentEngine<Renderer>
+    class LevelMeterEngine  :   public AudioComponentEngine<LevelMeterRendererBase>
     {
     public:
         //==================================================================================================================
@@ -41,9 +40,10 @@ namespace jump::LevelMeter
             static const inline juce::Identifier peakReleaseTimeId{ "peakReleaseTime" };
             static const inline juce::Identifier decibelRangeId   { "decibelRange" };
         };
+
         //==============================================================================================================
-        Engine() = default;
-        Engine(const juce::Identifier& uniqueID, StatefulObject* parentState);
+        LevelMeterEngine();
+        LevelMeterEngine(const juce::Identifier& uniqueID, StatefulObject* parentState);
 
         //==============================================================================================================
         void addSamples(const std::vector<float>& samples) override;
@@ -114,20 +114,16 @@ namespace jump::LevelMeter
         */
         void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange);
 
+        /** Returns the engine's current decibel range. */
         const juce::NormalisableRange<float>& getDecibelRange() const noexcept;
 
     private:
-        //==============================================================================================================
-        struct StateInitialiser
-        {
-            StateInitialiser(Engine& engine);
-        };
-
         //==============================================================================================================
         void update(juce::uint32 now) override;
         void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override;
 
         //==============================================================================================================
+        void initialise();
         float updatePeak(float gainValue, juce::uint32 now);
 
         //==============================================================================================================
@@ -150,9 +146,7 @@ namespace jump::LevelMeter
         float peakRelease{ 0.f };
         juce::NormalisableRange<float> decibelRange;
 
-        StateInitialiser stateInitialiser{ *this };
-
         //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Engine)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterEngine)
     };
 }   // namespace jump

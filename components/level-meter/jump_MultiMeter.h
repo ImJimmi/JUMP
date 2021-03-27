@@ -4,18 +4,18 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeterComponent   :   public juce::Component,
-                                    private StatefulObject
+    class MultiMeter    :   public juce::Component,
+                            private StatefulObject
     {
     public:
         //==============================================================================================================
         enum class LabelsPosition
         {
-            Left,
-            Right,
-            Above,
-            Below,
-            Centred
+            left,
+            right,
+            above,
+            below,
+            centred
         };
 
         struct PropertyIDs
@@ -30,19 +30,19 @@ namespace jump
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual int getLevelMetersGap(const LevelMeterComponent& component) const noexcept = 0;
+            virtual int getLevelMetersGap(const MultiMeter& component) const noexcept = 0;
         };
 
         //==============================================================================================================
-        LevelMeterComponent(const std::vector<LevelMeter::Engine*>& enginesToUse,
-                            juce::Identifier type = "NonStatefulLevelMeterComponent",
-                            StatefulObject* parentState = nullptr);
+        MultiMeter(const std::vector<LevelMeterEngine*>& enginesToUse,
+                   juce::Identifier type = "NonStatefulLevelMeterComponent",
+                   StatefulObject* parentState = nullptr);
 
         //==============================================================================================================
         void setLabelsPosition(LabelsPosition newPosition);
         void setShowLabels(bool shouldShowLabels);
         void setDecibelLevelsForLabels(const std::vector<float>& newLabelLevels);
-        void setOrientation(LevelMeter::Orientation newOrientation);
+        void setOrientation(Orientation newOrientation);
 
     private:
         //==============================================================================================================
@@ -55,21 +55,21 @@ namespace jump
 
         //==============================================================================================================
         void setLabelsPositionInternal(LabelsPosition newLabelsPosition);
-        void setOrientationInternal(LevelMeter::Orientation newOrientation);
+        void setOrientationInternal(Orientation newOrientation);
 
         //==============================================================================================================
-        const LevelMeter::Engine& mainEngine;
-        juce::OwnedArray<LevelMeter::DefaultRenderer> meters;
-        LevelMeter::LabelsComponent labels;
+        const LevelMeterEngine& mainEngine;
+        juce::OwnedArray<LevelMeter> meters;
+        LevelMeterLabelsComponent labels;
 
-        LabelsPosition labelsPosition{ LabelsPosition::Left };
-        LevelMeter::Orientation orientation{ LevelMeter::Orientation::Vertical };
+        LabelsPosition labelsPosition{ LabelsPosition::left };
+        Orientation orientation{ Orientation::vertical };
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
 
         static inline const juce::Identifier labelsLevelPropertyID{ "level" };
 
         //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterComponent)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MultiMeter)
     };
 }   // namespace jump

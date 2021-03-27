@@ -1,7 +1,8 @@
 #include "JUMP.h"
 
 //======================================================================================================================
-#include "components/level_meter/jump_LevelMeterEngine.cpp"
-#include "components/level_meter/jump_LevelMeterComponent.cpp"
+#include "components/level-meter/jump_LevelMeterEngine.cpp"
+#include "components/level-meter/jump_LevelMeter.cpp"
+#include "components/level-meter/jump_MultiMeter.cpp"
 
 #include "graphics/jump_LookAndFeel.cpp"

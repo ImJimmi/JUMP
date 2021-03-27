@@ -29,11 +29,38 @@ namespace jump
     };  // namespace SharedPropertyIDs
 
     //==================================================================================================================
+    enum class Orientation
+    {
+        vertical,
+        horizontal
+    };
+
+    //==================================================================================================================
     using BoolParam   = juce::AudioParameterBool;
     using ChoiceParam = juce::AudioParameterChoice;
     using FloatParam  = juce::AudioParameterFloat;
     using IntParam    = juce::AudioParameterInt;
 }   // namespace jump
+
+//======================================================================================================================
+namespace juce
+{
+    //==================================================================================================================
+    template <>
+    struct VariantConverter<jump::Orientation>
+    {
+        //==============================================================================================================
+        static jump::Orientation fromVar(const juce::var& v)
+        {
+            return static_cast<jump::Orientation>(static_cast<int>(v));
+        }
+
+        static juce::var toVar(const jump::Orientation& orientation)
+        {
+            return { static_cast<int>(orientation) };
+        }
+    };
+}
 
 //======================================================================================================================
 #include "containers/jump_CircularBuffer.h"
@@ -48,11 +75,11 @@ namespace jump
 #include "interfaces/jump_PluginProcessor.h"
 #include "interfaces/jump_PluginEditor.h"
 
-#include "components/level_meter/jump_LevelMeter.h"
-#include "components/level_meter/jump_LevelMeterEngine.h"
-#include "components/level_meter/jump_LevelMeterBackgroundComponent.h"
-#include "components/level_meter/jump_LevelMeterLabelsComponent.h"
-#include "components/level_meter/jump_LevelMeterRendererComponent.h"
-#include "components/level_meter/jump_LevelMeterComponent.h"
+#include "components/level-meter/jump_LevelMeterEngine.h"
+#include "components/level-meter/jump_LevelMeterBackgroundComponent.h"
+#include "components/level-meter/jump_LevelMeterRenderer.h"
+#include "components/level-meter/jump_LevelMeter.h"
+#include "components/level-meter/jump_LevelMeterLabelsComponent.h"
+#include "components/level-meter/jump_MultiMeter.h"
 
 #include "graphics/jump_LookAndFeel.h"
