@@ -11,7 +11,7 @@ namespace jump
         LevelMeter(const LevelMeterEngine& engineToUse);
 
         //==============================================================================================================
-        void setOrientation(LevelMeter::Orientation newOrientation);
+        void setOrientation(Orientation newOrientation);
 
     private:
         //==============================================================================================================
