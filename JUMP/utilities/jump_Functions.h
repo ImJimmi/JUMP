@@ -96,4 +96,16 @@ namespace jump
 
         return ((peakLevelDB - decibelRange.start) * multiplier) + decibelRange.start;
     }
+
+    template <typename T>
+    inline T normaliseDecibelsTo0To1(T value, const juce::NormalisableRange<T>& range)
+    {
+        if (value <= range.start)
+            return 0.f;
+
+        auto normalised = (value - range.start) / (range.end - range.start);
+        normalised = std::pow(normalised, range.skew);
+
+        return normalised;
+    }
 }   // namespace jump

@@ -1,0 +1,141 @@
+trigger:
+- wip_audio_components
+
+jobs:
+  #=============================================================================
+  - job: Windows
+    pool:
+      vmImage: 'windows-latest'
+
+    steps:
+    - checkout: self
+      submodules: recursive
+
+    - task: PowerShell@2
+      displayName: "Build demo-plugin"
+      inputs:
+        targetType: 'inline'
+        script: |
+          Set-Location demo-plugin
+
+          Write-Host "================ Construct Directory Name ================"
+          $Version = (Get-Content "./version.txt") + ".$(Build.BuildId)"
+          $DirectoryName = "JUMP-Demo-v$($Version)_Windows"
+          Write-Host "##vso[task.setvariable variable=Version]$Version"
+          Set-Content -Path "./version.txt" -Value "$($Version)"
+
+          Write-Host "================ Build x64 ================"
+          cmake -B x64 -A x64
+          cmake --build x64 --config Release
+          if ($LastExitCode -ne 0) { Throw }
+          Get-ChildItem -Filter "*.vst3" -Recurse | Rename-Item -NewName {$_.Name -replace ".vst3", "_x64.vst3"}
+
+          Write-Host "================ Build Win32 ================"
+          cmake -B Win32 -A Win32
+          cmake --build Win32 --config Release
+          if ($LastExitCode -ne 0) { Throw }
+          Get-ChildItem -Filter "*.vst3" -Recurse | Where-Object {$_.Name -NotLike "*_x64.vst3"} | Rename-Item -NewName {$_.Name -replace ".vst3", "_Win32.vst3"}
+
+          Write-Host "================ Copy Plugins to ASD ================"
+          New-Item -Path "$(Build.ArtifactStagingDirectory)" -Name "$($DirectoryName)" -ItemType "directory"
+          Get-ChildItem -Filter "*.vst3" -Recurse | ForEach-Object {
+              if (Test-Path -Path $_.FullName -PathType Leaf) {
+                  Copy-Item -Path $_.FullName -Destination "$(Build.ArtifactStagingDirectory)/$($DirectoryName)/"
+              }
+          }
+
+          Write-Host "================ Download Pluginval ================"
+          Invoke-WebRequest "https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Windows.zip" -OutFile "pluginval.zip"
+          Expand-Archive "pluginval.zip" -DestinationPath .
+
+          Write-Host "================ Validate Plugin ================"
+          Get-ChildItem "$(Build.ArtifactStagingDirectory)/$($DirectoryName)" -Filter "*_x64.vst3" | ForEach-Object {
+              cmd.exe /c "pluginval.exe --validate $($_.FullName) --strictness-level 10 --validate-in-process --verbose"
+              if ($LastExitCode -ne 0) { Throw }
+          }
+
+          Write-Host "================ Compress to ZIP ================"
+          Compress-Archive -Path "$(Build.ArtifactStagingDirectory)/*" -DestinationPath "$(Build.ArtifactStagingDirectory)/$($DirectoryName).zip"
+
+    - task: GitHubRelease@1
+      displayName: "Upload demo-plugin to GitHub"
+      inputs:
+        gitHubConnection: 'GitHub PAT'
+        repositoryName: '$(Build.Repository.Name)'
+        action: 'edit'
+        target: '$(Build.SourceVersion)'
+        tag: 'v$(Version)'
+        assets: '$(Build.ArtifactStagingDirectory)\*.zip'
+        assetUploadMode: 'replace'
+        changeLogCompareToRelease: 'lastFullRelease'
+        changeLogType: 'commitBased'
+
+  #=============================================================================
+  - job: MacOS
+    pool:
+      vmImage: 'macOS-latest'
+
+    steps:
+    - checkout: self
+      submodules: recursive
+
+    - task: PowerShell@2
+      displayName: "Build demo-plugin"
+      inputs:
+        targetType: 'inline'
+        script: |
+          Set-Location demo-plugin
+
+          Write-Host "================ Construct Directory Name ================"
+          $Version = (Get-Content "./version.txt") + ".$(Build.BuildId)"
+          $Directoryname = "JUMP-Demo-v$($Version)_MacOS"
+          Write-Host "##vso[task.setvariable variable=Version]$Version"
+          Write-Host "##vso[task.setvariable variable=DirectoryName]$DirectoryName"
+          Set-Content -Path "./version.txt" -Value "$($Version)"
+
+          Write-Host "================ Build ================"
+          cmake -B build -G Xcode
+          cmake --build build --config Release
+          if ($LastExitCode -ne 0) { Throw }
+
+          Write-Host "================ Copy Plugins to ASD ================"
+          New-Item -Path "$(Build.ArtifactStagingDirectory)" -Name "$($DirectoryName)" -ItemType "directory"
+          Get-ChildItem -Exclude "build/" | Get-ChildItem -Recurse -Include "*.vst3","*.component" | ForEach-Object {
+              Copy-Item -Path $_.FullName -Destination "$(Build.ArtifactStagingDirectory)/$($DirectoryName)/" -Recurse
+          }
+
+    - task: Bash@3
+      displayName: "Validate Plugins"
+      inputs:
+        targetType: 'inline'
+        script: |
+          curl -L "https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_macOS.zip" -o pluginval.zip
+          unzip pluginval
+
+          for file in $(Build.ArtifactStagingDirectory)/$(DirectoryName)/*
+          do
+              if [ ${file: -5} == ".vst3" ]
+              then
+                  pluginval.app/Contents/MacOS/pluginval --validate "$file" --strictness-level 10 --validate-in-process --verbose
+              fi
+          done
+    
+    - task: PowerShell@2
+      displayName: "Compress to ZIP"
+      inputs:
+        targetType: 'inline'
+        script: |
+          Compress-Archive -Path "$(Build.ArtifactStagingDirectory)/*" -DestinationPath "$(Build.ArtifactStagingDirectory)/$(DirectoryName).zip"
+
+    - task: GitHubRelease@1
+      displayName: "Upload demo-plugin to GitHub"
+      inputs:
+        gitHubConnection: 'GitHub PAT'
+        repositoryName: '$(Build.Repository.Name)'
+        action: 'edit'
+        target: '$(Build.SourceVersion)'
+        tag: 'v$(Version)'
+        assets: '$(Build.ArtifactStagingDirectory)/*.zip'
+        assetUploadMode: 'replace'
+        changeLogCompareToRelease: 'lastFullRelease'
+        changeLogType: 'commitBased'

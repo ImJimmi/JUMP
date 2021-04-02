@@ -51,7 +51,7 @@ namespace jump
         {
             static_assert(std::is_trivially_copyable<SampleType>::value,
                           "'SampleType' for AudioTransferManager must be trivially copyable.");
-            static_assert(capacity >= 0, "AudioTransferManager's capacity must be positive!")
+            static_assert(capacity >= 0, "AudioTransferManager's capacity must be positive!");
         }
 
         //==============================================================================================================
@@ -70,6 +70,12 @@ namespace jump
             idx.store((writeIndex & DataFlags::IDX) | DataFlags::NewData);
         }
 
+        void write(const SampleType* samples, int numSamples)
+        {
+            for (auto ptr = samples; ptr < samples + numSamples; ptr++)
+                write(*ptr);
+        }
+
         /** Returns a vector containing all new samples added to this container since it was last read from (or, if it
             hasn't been read from yet, since it was created).
 
@@ -77,7 +83,7 @@ namespace jump
 
             @returns    A vector containing the latest samples.
         */
-        std::vector<SampleType> read()
+        std::vector<SampleType> read() const
         {
             // Get the current state of the idx.
             auto currentIDX = idx.load();
@@ -126,17 +132,17 @@ namespace jump
                 buffer[writeIndex++] = sample;
             }
 
-            std::vector<SampleType> read()
+            std::vector<SampleType> read() const
             {
                 std::vector<SampleType> result(writeIndex);
-                std::copy(buffer.begin(), buffer.begin() + writeIndex, result.begin());
+                std::copy(buffer.cbegin(), buffer.cbegin() + writeIndex, result.begin());
 
                 writeIndex = 0;
 
                 return result;
             }
 
-            int writeIndex{ 0 };
+            mutable int writeIndex{ 0 };
             std::array<SampleType, capacity> buffer;
         };
 
@@ -150,6 +156,6 @@ namespace jump
             Busy    = 1 << 2
         };
 
-        std::atomic<int> idx{ 0 };
+        mutable std::atomic<int> idx{ 0 };
     };
 }   // namespace jump

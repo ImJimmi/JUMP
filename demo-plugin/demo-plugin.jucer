@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="YlM6wN" name="demo-plugin" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="17"
+              headerPath="../../source/" companyName="James Johnson" pluginCode="Demo"
+              pluginManufacturerCode="JaJo">
+  <MAINGROUP id="QRVqnS" name="demo-plugin">
+    <GROUP id="{B97617FB-257F-EFD0-36A7-616AA394A2A4}" name="source">
+      <GROUP id="{ED6FACDA-5BF6-2DC2-62C8-B91870904050}" name="audio">
+        <FILE id="caVX9A" name="jumpDemo_AudioProcessor.cpp" compile="1" resource="0"
+              file="source/audio/jumpDemo_AudioProcessor.cpp"/>
+        <FILE id="cNCQgL" name="jumpDemo_AudioProcessor.h" compile="0" resource="0"
+              file="source/audio/jumpDemo_AudioProcessor.h"/>
+      </GROUP>
+      <GROUP id="{B9CBEDE6-F3EE-A418-5C57-80444701A909}" name="core">
+        <FILE id="VGAsnE" name="jumpDemo_PluginInstance.cpp" compile="1" resource="0"
+              file="source/core/jumpDemo_PluginInstance.cpp"/>
+        <FILE id="EOjBM0" name="jumpDemo_PluginInstance.h" compile="0" resource="0"
+              file="source/core/jumpDemo_PluginInstance.h"/>
+      </GROUP>
+      <GROUP id="{F0685A04-F594-FAF2-93ED-385835750287}" name="editor">
+        <GROUP id="{00B41A4B-BDA5-6B32-9D61-34273F0442BD}" name="demos">
+          <FILE id="imyrBK" name="jumpDemo_LevelMeters.cpp" compile="1" resource="0"
+                file="source/editor/demos/jumpDemo_LevelMeters.cpp"/>
+          <FILE id="FmX6Za" name="jumpDemo_LevelMeters.h" compile="0" resource="0"
+                file="source/editor/demos/jumpDemo_LevelMeters.h"/>
+        </GROUP>
+        <FILE id="OnHmsP" name="jumpDemo_PluginEditor.cpp" compile="1" resource="0"
+              file="source/editor/jumpDemo_PluginEditor.cpp"/>
+        <FILE id="bD4dKD" name="jumpDemo_PluginEditor.h" compile="0" resource="0"
+              file="source/editor/jumpDemo_PluginEditor.h"/>
+      </GROUP>
+    </GROUP>
+  </MAINGROUP>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="demo-plugin" osxCompatibility="10.7 SDK"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="demo-plugin" osxCompatibility="10.7 SDK"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="JUMP" path="../../"/>
+        <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2019 targetFolder="Builds/VisualStudio2019">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release x64" useRuntimeLibDLL="0" winArchitecture="x64"/>
+        <CONFIGURATION isDebug="0" name="Release Win32" useRuntimeLibDLL="0" winArchitecture="Win32"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="JUMP" path="../../"/>
+        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
+        <MODULEPATH id="juce_graphics" path="../../juce"/>
+        <MODULEPATH id="juce_events" path="../../juce"/>
+        <MODULEPATH id="juce_dsp" path="../../juce"/>
+        <MODULEPATH id="juce_data_structures" path="../../juce"/>
+        <MODULEPATH id="juce_core" path="../../juce"/>
+        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
+        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
+        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
+        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+      </MODULEPATHS>
+    </VS2019>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="JUMP" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <LIVE_SETTINGS>
+    <OSX/>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>
