@@ -133,8 +133,9 @@ namespace jump
         {
             juce::dsp::ProcessSpec spec;
             spec.sampleRate = getSampleRate();
-            spec.maximumBlockSize = getBlockSize();
-            spec.numChannels = juce::jmax(getTotalNumInputChannels(), getTotalNumOutputChannels());
+            spec.maximumBlockSize = static_cast<juce::uint32>(getBlockSize());
+            spec.numChannels = static_cast<juce::uint32>(juce::jmax(getTotalNumInputChannels(),
+                                                                    getTotalNumOutputChannels()));
 
             audioProcessor.prepare(spec);
         }

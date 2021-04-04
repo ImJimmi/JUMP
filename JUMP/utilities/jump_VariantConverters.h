@@ -33,10 +33,10 @@ namespace juce
 
             jassert(value.isArray());
 
-            std::vector<float> result(value.size());
+            std::vector<float> result(static_cast<std::size_t>(value.size()));
 
             for (auto i = 0; i < value.size(); i++)
-                result[i] = value[i];
+                result[static_cast<std::size_t>(i)] = value[i];
 
             return result;
         }
@@ -46,8 +46,8 @@ namespace juce
             juce::var result;
             result.resize(static_cast<int>(values.size()));
 
-            for (auto i = 0; i < values.size(); i++)
-                result[i] = values[i];
+            for (auto i = 0; i < static_cast<int>(values.size()); i++)
+                result[i] = values[static_cast<std::size_t>(i)];
 
             return juce::JSON::toString(result, true);
         }

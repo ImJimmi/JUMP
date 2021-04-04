@@ -10,7 +10,7 @@ namespace jump
         //==============================================================================================================
         explicit PluginEditor(PluginProcessor& p)
             :   juce::AudioProcessorEditor{ &p },
-                processor{ p }
+                pluginProcessor{ p }
         {
         }
 
@@ -18,10 +18,10 @@ namespace jump
         //==============================================================================================================
         void setGUIState(juce::ValueTree& valueTreeToUseForGUIState)
         {
-            processor.setGUIState(valueTreeToUseForGUIState);
+            pluginProcessor.setGUIState(valueTreeToUseForGUIState);
         }
 
         //==============================================================================================================
-        PluginProcessor& processor;
+        PluginProcessor& pluginProcessor;
     };
 }   // namespace jump

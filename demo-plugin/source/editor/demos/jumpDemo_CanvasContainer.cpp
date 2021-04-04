@@ -15,9 +15,9 @@ namespace jumpDemo
     }
 
     //==================================================================================================================
-    void CanvasContainer::LookAndFeel::drawSmileyFace(juce::Graphics& g, const SmileyFace& smiley) const noexcept
+    void CanvasContainer::LookAndFeel::drawSmileyFace(juce::Graphics& g, const SmileyFace& smileyFace) const noexcept
     {
-        const auto bounds = smiley.getLocalBounds().toFloat();
+        const auto bounds = smileyFace.getLocalBounds().toFloat();
 
         g.setGradientFill(juce::ColourGradient::vertical(juce::Colours::yellow.brighter(),
                                                          juce::Colours::yellow.darker(),
@@ -29,7 +29,7 @@ namespace jumpDemo
         g.addTransform(juce::AffineTransform::translation(bounds.getWidth() * 0.05f, 0.f));
         g.setColour(juce::Colours::black);
         g.setFont({"Comic Sans", bounds.getHeight() * 0.8f, 0});
-        g.drawText(":)", smiley.getLocalBounds().toFloat(), juce::Justification::centred);
+        g.drawText(":)", smileyFace.getLocalBounds().toFloat(), juce::Justification::centred);
     }
 
     void CanvasContainer::LookAndFeel::drawGloucestershireFlag(juce::Graphics& g,

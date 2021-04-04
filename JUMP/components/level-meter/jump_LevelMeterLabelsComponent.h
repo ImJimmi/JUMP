@@ -24,7 +24,7 @@ namespace jump
             lookAndFeel.attachTo(this);
         }
 
-        ~LevelMeterLabelsComponent()
+        ~LevelMeterLabelsComponent() override
         {
         }
 

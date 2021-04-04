@@ -26,7 +26,7 @@ namespace jump
     {
         //==============================================================================================================
         const static juce::Identifier sampleRateId{ "sampleRate" };
-    };  // namespace SharedPropertyIDs
+    }  // namespace SharedPropertyIDs
 
     //==================================================================================================================
     enum class Orientation

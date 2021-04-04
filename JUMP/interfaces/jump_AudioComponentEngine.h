@@ -22,7 +22,7 @@ namespace jump
         {
         }
 
-        virtual ~AudioComponentEngine() = default;
+        virtual ~AudioComponentEngine() override = default;
 
         //==============================================================================================================
         /** Writes a stream of samples to the sample buffer.

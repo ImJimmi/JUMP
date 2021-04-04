@@ -66,7 +66,7 @@ namespace jump
         void write(SampleType sample)
         {
             const auto writeIndex = idx.fetch_or(DataFlags::Busy) & DataFlags::IDX;
-            buffers[writeIndex].write(sample);
+            buffers[static_cast<std::size_t>(writeIndex)].write(sample);
             idx.store((writeIndex & DataFlags::IDX) | DataFlags::NewData);
         }
 
@@ -108,7 +108,7 @@ namespace jump
             }
 
             const auto readIndex = (currentIDX & DataFlags::IDX) ^ 1;
-            return buffers[readIndex].read();
+            return buffers[static_cast<std::size_t>(readIndex)].read();
         }
 
         /** Returns the capacity of this container. */
@@ -129,12 +129,12 @@ namespace jump
                 if (writeIndex >= capacity)
                     writeIndex = 0;
 
-                buffer[writeIndex++] = sample;
+                buffer[static_cast<std::size_t>(writeIndex++)] = sample;
             }
 
             std::vector<SampleType> read() const
             {
-                std::vector<SampleType> result(writeIndex);
+                std::vector<SampleType> result(static_cast<std::size_t>(writeIndex));
                 std::copy(buffer.cbegin(), buffer.cbegin() + writeIndex, result.begin());
 
                 writeIndex = 0;

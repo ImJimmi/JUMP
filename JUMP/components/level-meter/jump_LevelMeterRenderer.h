@@ -28,7 +28,7 @@ namespace jump
             lookAndFeel.attachTo(this);
         }
 
-        ~LevelMeterRenderer()
+        ~LevelMeterRenderer() override
         {
             engine.removeRenderer(this);
         }

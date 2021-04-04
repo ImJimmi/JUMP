@@ -15,7 +15,7 @@ namespace jump::SpectrumAnalyser
         static const inline juce::Identifier maxHoldTimeId    { "maxHoldTime" };
         static const inline juce::Identifier decayTimeId      { "decayTime" };
         static const inline juce::Identifier numPointsId      { "numPoints" };
-    };
+    }
 
     //==================================================================================================================
     class Engine;
