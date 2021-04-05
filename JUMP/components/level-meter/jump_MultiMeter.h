@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class MultiMeter    :   public juce::Component,
+    class MultiMeter    :   public Container,
                             private StatefulObject
     {
     public:
@@ -65,7 +65,7 @@ namespace jump
         LabelsPosition labelsPosition{ LabelsPosition::left };
         Orientation orientation{ Orientation::vertical };
 
-        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
+        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
 
         static inline const juce::Identifier labelsLevelPropertyID{ "level" };
 

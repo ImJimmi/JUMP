@@ -46,9 +46,9 @@ namespace jump
         return 5;
     }
 
-    //=====================================================//
-    // LevelMeter::BackgroundComponent::LookAndFeelMethods //
-    //=====================================================//
+    //================================================//
+    // LevelMeterBackgroundCanvas::LookAndFeelMethods //
+    //================================================//
     juce::Path createBasicWidgetShape(const juce::Rectangle<float>& bounds, float cornerRadiusModifier = 0.f)
     {
         juce::Path path;
@@ -63,7 +63,7 @@ namespace jump
     }
 
     void LookAndFeel::drawLevelMeterBackground(juce::Graphics& g,
-                                               const LevelMeterBackgroundComponent& component) const
+                                               const LevelMeterBackgroundCanvas& component) const noexcept
     {
         const auto widgetShape = getLevelMeterShape(component.getLocalBounds().toFloat().reduced(0.5f));
 
@@ -74,14 +74,14 @@ namespace jump
         g.strokePath(widgetShape, juce::PathStrokeType{ Constants::widgetBorderThickness });
     }
 
-    float LookAndFeel::getLevelMeterGridlineInterval(const LevelMeterBackgroundComponent&) const
+    float LookAndFeel::getLevelMeterGridlineInterval(const LevelMeterBackgroundCanvas&) const noexcept
     {
         return Constants::levelMeterGridlineInterval;
     }
 
-    void LookAndFeel::drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundComponent& component,
+    void LookAndFeel::drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundCanvas& component,
                                             float normalisedLevel, float decibelLevel,
-                                            Orientation orientation) const
+                                            Orientation orientation) const noexcept
     {
         const auto meterShape = getLevelMeterShape(component.getLocalBounds().reduced(1).toFloat());
         g.reduceClipRegion(meterShape);
@@ -179,7 +179,7 @@ namespace jump
     }
 
     juce::Path LookAndFeel::createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
-                                                 float peakLevel, float rmsLevel)
+                                                 float peakLevel, float rmsLevel) const noexcept
     {
         juce::Path path;
 
@@ -189,8 +189,9 @@ namespace jump
         return path;
     }
 
-    void LookAndFeel::drawLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
-                                     const juce::NormalisableRange<float>& decibelRange, const juce::Path& meterPath)
+    void LookAndFeel::drawJumpLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
+                                         const juce::NormalisableRange<float>& decibelRange,
+                                         const juce::Path& meterPath) const noexcept
     {
         const auto cornerRadiusModifier = -1.f;
         const auto meterShape = getLevelMeterShape(renderer.getLocalBounds().reduced(1).toFloat(), cornerRadiusModifier);
@@ -221,7 +222,7 @@ namespace jump
     //=================================================//
     // LevelMeter::LabelsComponent::LookAndFeelMethods //
     //=================================================//
-    juce::String LookAndFeel::getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const
+    juce::String LookAndFeel::getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const noexcept
     {
         static const juce::String units{ "dB" };
 
@@ -239,13 +240,13 @@ namespace jump
         return juce::Font::plain;
     }
 
-    juce::Font LookAndFeel::getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const
+    juce::Font LookAndFeel::getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const noexcept
     {
         const auto flags = getFontFlagsForLevelMeterText(decibelLevel, isNegativeInf);
         return { "Helvetica", 12.f, flags };
     }
 
-    juce::Colour LookAndFeel::getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const
+    juce::Colour LookAndFeel::getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const noexcept
     {
         if (decibelLevel == 0.f || isNegativeInf)
             return findColour(levelMeterLabelHighlightedTextColourId);

@@ -3,7 +3,9 @@ build/
 Builds/
 JuceLibraryCode/
 
-.DS_Store
+*.component
+*.DS_Store
+*.vst3
 
 # Prerequisites
 *.d

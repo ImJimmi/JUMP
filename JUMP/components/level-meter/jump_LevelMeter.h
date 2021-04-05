@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeter    :   public juce::Component
+    class LevelMeter    :   public Container
     {
     public:
         //==============================================================================================================
@@ -19,7 +19,7 @@ namespace jump
         void colourChanged() override;
 
         //==============================================================================================================
-        LevelMeterBackgroundComponent background;
+        LevelMeterBackgroundCanvas background;
         LevelMeterRenderer renderer;
 
         //==============================================================================================================

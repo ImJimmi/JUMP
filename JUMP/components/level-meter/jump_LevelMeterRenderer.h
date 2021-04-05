@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeterRenderer    :   public juce::Component,
+    class LevelMeterRenderer    :   public Canvas,
                                     public LevelMeterRendererBase
     {
     public:
@@ -14,10 +14,10 @@ namespace jump
             virtual ~LookAndFeelMethods() = default;
 
             virtual juce::Path createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
-                                                    float peakLevel, float rmsLevel) = 0;
-            virtual void drawLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
-                                        const juce::NormalisableRange<float>& decibelRange,
-                                        const juce::Path& meterPath) = 0;
+                                                    float peakLevel, float rmsLevel) const noexcept = 0;
+            virtual void drawJumpLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
+                                            const juce::NormalisableRange<float>& decibelRange,
+                                            const juce::Path& meterPath) const noexcept = 0;
         };
 
         //==============================================================================================================
@@ -25,6 +25,7 @@ namespace jump
             :   engine{ engineToUse }
         {
             engineToUse.addRenderer(this);
+            lookAndFeel.attachTo(this);
         }
 
         ~LevelMeterRenderer()
@@ -48,7 +49,7 @@ namespace jump
         //==============================================================================================================
         void paint(juce::Graphics& g) override
         {
-            lookAndFeel->drawLevelMeter(g, *this, orientation, engine.getDecibelRange(), meterPath);
+            lookAndFeel->drawJumpLevelMeter(g, *this, orientation, engine.getDecibelRange(), meterPath);
         }
 
         void newLevelMeterLevelsAvailable(const LevelMeterEngine&, float peakLevel, float rmsLevel) override
@@ -64,7 +65,7 @@ namespace jump
         //==============================================================================================================
         const LevelMeterEngine& engine;
 
-        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
+        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
 
         juce::Path meterPath;
         Orientation orientation{ Orientation::vertical };

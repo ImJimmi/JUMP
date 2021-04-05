@@ -4,8 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeterLabelsComponent :   public juce::Component,
-                                        private LookAndFeelAccessorListener
+    class LevelMeterLabelsComponent :   public Container
     {
     public:
         //==============================================================================================================
@@ -13,21 +12,20 @@ namespace jump
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const = 0;
-            virtual juce::Font getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const = 0;
-            virtual juce::Colour getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const = 0;
+            virtual juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const noexcept = 0;
+            virtual juce::Font getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const noexcept = 0;
+            virtual juce::Colour getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const noexcept = 0;
         };
 
         //==============================================================================================================
         LevelMeterLabelsComponent(const LevelMeterEngine& engineToUse)
             :   engine{ engineToUse }
         {
-            lookAndFeel.addListener(this);
+            lookAndFeel.attachTo(this);
         }
 
         ~LevelMeterLabelsComponent()
         {
-            lookAndFeel.removeListener(this);
         }
 
         //==============================================================================================================
@@ -125,20 +123,23 @@ namespace jump
             }
         }
 
-        void validLookAndFeelInUse() override
+        void lookAndFeelChanged() override
         {
-            for (auto& label : labels)
+            if (lookAndFeel)
             {
-                const auto level = static_cast<float>(label->getProperties()[valuePropertyId]);
-                const auto isNegativeInf = level <= engine.getDecibelRange().start;
-                const auto text = lookAndFeel->getLevelMeterTextForLevel(level, isNegativeInf);
-                label->setText(text, juce::dontSendNotification);
+                for (auto& label : labels)
+                {
+                    const auto level = static_cast<float>(label->getProperties()[valuePropertyId]);
+                    const auto isNegativeInf = level <= engine.getDecibelRange().start;
+                    const auto text = lookAndFeel->getLevelMeterTextForLevel(level, isNegativeInf);
+                    label->setText(text, juce::dontSendNotification);
 
-                const auto font = lookAndFeel->getLevelMeterTextFont(level, isNegativeInf);
-                label->setFont(font);
+                    const auto font = lookAndFeel->getLevelMeterTextFont(level, isNegativeInf);
+                    label->setFont(font);
 
-                const auto colour = lookAndFeel->getLevelMeterTextColour(level, isNegativeInf);
-                label->setColour(juce::Label::textColourId, colour);
+                    const auto colour = lookAndFeel->getLevelMeterTextColour(level, isNegativeInf);
+                    label->setColour(juce::Label::textColourId, colour);
+                }
             }
         }
 
@@ -183,7 +184,7 @@ namespace jump
         Orientation orientation{ Orientation::vertical };
         static inline const juce::Identifier valuePropertyId{ "value" };
 
-        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
+        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
 
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterLabelsComponent)

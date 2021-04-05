@@ -3,7 +3,7 @@
 <JUCERPROJECT id="YlM6wN" name="demo-plugin" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" cppLanguageStandard="17"
               headerPath="../../source/" companyName="James Johnson" pluginCode="Demo"
-              pluginManufacturerCode="JaJo">
+              pluginManufacturerCode="Jump">
   <MAINGROUP id="QRVqnS" name="demo-plugin">
     <GROUP id="{B97617FB-257F-EFD0-36A7-616AA394A2A4}" name="source">
       <GROUP id="{ED6FACDA-5BF6-2DC2-62C8-B91870904050}" name="audio">
@@ -20,6 +20,10 @@
       </GROUP>
       <GROUP id="{F0685A04-F594-FAF2-93ED-385835750287}" name="editor">
         <GROUP id="{00B41A4B-BDA5-6B32-9D61-34273F0442BD}" name="demos">
+          <FILE id="kY7XwZ" name="jumpDemo_CanvasContainer.cpp" compile="1" resource="0"
+                file="source/editor/demos/jumpDemo_CanvasContainer.cpp"/>
+          <FILE id="YNBE6Z" name="jumpDemo_CanvasContainer.h" compile="0" resource="0"
+                file="source/editor/demos/jumpDemo_CanvasContainer.h"/>
           <FILE id="imyrBK" name="jumpDemo_LevelMeters.cpp" compile="1" resource="0"
                 file="source/editor/demos/jumpDemo_LevelMeters.cpp"/>
           <FILE id="FmX6Za" name="jumpDemo_LevelMeters.h" compile="0" resource="0"
@@ -36,8 +40,8 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug" targetName="demo-plugin" osxCompatibility="10.7 SDK"/>
-        <CONFIGURATION isDebug="0" name="Release" targetName="demo-plugin" osxCompatibility="10.7 SDK"/>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="demo-plugin" osxCompatibility="10.9 SDK"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="demo-plugin" osxCompatibility="10.9 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
@@ -52,8 +56,8 @@
         <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
-        <MODULEPATH id="JUMP" path="../../"/>
         <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+        <MODULEPATH id="JUMP" path="../../JUMP"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2019 targetFolder="Builds/VisualStudio2019">
@@ -63,7 +67,6 @@
         <CONFIGURATION isDebug="0" name="Release Win32" useRuntimeLibDLL="0" winArchitecture="Win32"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="JUMP" path="../../"/>
         <MODULEPATH id="juce_gui_extra" path="../../juce"/>
         <MODULEPATH id="juce_gui_basics" path="../../juce"/>
         <MODULEPATH id="juce_graphics" path="../../juce"/>
@@ -77,6 +80,7 @@
         <MODULEPATH id="juce_audio_formats" path="../../juce"/>
         <MODULEPATH id="juce_audio_devices" path="../../juce"/>
         <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+        <MODULEPATH id="JUMP" path="../../JUMP"/>
       </MODULEPATHS>
     </VS2019>
   </EXPORTFORMATS>
@@ -95,7 +99,7 @@
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
-    <MODULE id="JUMP" showAllCode="0" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="JUMP" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <LIVE_SETTINGS>
     <OSX/>

@@ -30,6 +30,8 @@ namespace jump
             mainEngine{ *enginesToUse.front() },
             labels{ *enginesToUse.front() }
     {
+        lookAndFeel.attachTo(this);
+
         initialiseState();
 
         for (auto& engine : enginesToUse)

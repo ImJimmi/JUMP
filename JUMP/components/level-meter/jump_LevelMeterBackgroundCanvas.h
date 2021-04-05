@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeterBackgroundComponent :   public juce::Component,
+    class LevelMeterBackgroundCanvas    :   public Canvas,
                                             private juce::ValueTree::Listener
     {
     public:
@@ -14,22 +14,21 @@ namespace jump
             virtual ~LookAndFeelMethods() = default;
 
             virtual void drawLevelMeterBackground(juce::Graphics& g,
-                                                  const LevelMeterBackgroundComponent& component) const = 0;
-            virtual float getLevelMeterGridlineInterval(const LevelMeterBackgroundComponent& component) const = 0;
-            virtual void drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundComponent& component,
+                                                  const LevelMeterBackgroundCanvas& component) const noexcept = 0;
+            virtual float getLevelMeterGridlineInterval(const LevelMeterBackgroundCanvas& component) const noexcept = 0;
+            virtual void drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundCanvas& component,
                                                 float normalisedLevel, float decibelLevel,
-                                                Orientation orientation) const = 0;
+                                                Orientation orientation) const noexcept = 0;
         };
 
         //==============================================================================================================
-        explicit LevelMeterBackgroundComponent(const LevelMeterEngine& correspondingEngine)
+        explicit LevelMeterBackgroundCanvas(const LevelMeterEngine& correspondingEngine)
             :   engine{ correspondingEngine }
         {
+            lookAndFeel.attachTo(this);
         }
 
-        ~LevelMeterBackgroundComponent()
-        {
-        }
+        ~LevelMeterBackgroundCanvas() override = default;
 
         //==============================================================================================================
         void setOrientation(Orientation newOrientation)
@@ -60,11 +59,11 @@ namespace jump
         //==============================================================================================================
         const LevelMeterEngine& engine;
 
-        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel{ *this };
+        LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
 
         Orientation orientation{ Orientation::vertical };
 
         //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterBackgroundComponent)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterBackgroundCanvas)
     };
 }   // namespace jump

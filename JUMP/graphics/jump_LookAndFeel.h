@@ -5,7 +5,7 @@ namespace jump
 {
     //==================================================================================================================
     class LookAndFeel   :   public juce::LookAndFeel_V4,
-                            public LevelMeterBackgroundComponent::LookAndFeelMethods,
+                            public LevelMeterBackgroundCanvas::LookAndFeelMethods,
                             public LevelMeterLabelsComponent::LookAndFeelMethods,
                             public LevelMeterRenderer::LookAndFeelMethods,
                             public MultiMeter::LookAndFeelMethods
@@ -53,29 +53,30 @@ namespace jump
         //================================//
         int getLevelMetersGap(const MultiMeter& component) const noexcept override;
 
-        //===================================================//
-        // LevelMeterBackgroundComponent::LookAndFeelMethods //
-        //===================================================//
+        //================================================//
+        // LevelMeterBackgroundCanvas::LookAndFeelMethods //
+        //================================================//
         void drawLevelMeterBackground(juce::Graphics& g,
-                                      const LevelMeterBackgroundComponent& component) const override;
-        float getLevelMeterGridlineInterval(const LevelMeterBackgroundComponent& component) const override;
-        void drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundComponent& component,
+                                      const LevelMeterBackgroundCanvas& component) const noexcept override;
+        float getLevelMeterGridlineInterval(const LevelMeterBackgroundCanvas& component) const noexcept override;
+        void drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundCanvas& component,
                                     float normalisedLevel, float decibelLevel,
-                                    Orientation orientation) const override;
+                                    Orientation orientation) const noexcept override;
 
         //========================================//
         // LevelMeterRenderer::LookAndFeelMethods //
         //========================================//
         juce::Path createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
-                                        float peakLevel, float rmsLevel) override;
-        void drawLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
-                            const juce::NormalisableRange<float>& decibelRange, const juce::Path& meterPath) override;
+                                        float peakLevel, float rmsLevel) const noexcept override;
+        void drawJumpLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
+                                const juce::NormalisableRange<float>& decibelRange,
+                                const juce::Path& meterPath) const noexcept override;
 
         //===============================================//
         // LevelMeterLabelsComponent::LookAndFeelMethods //
         //===============================================//
-        juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const override;
-        juce::Font getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const override;
-        juce::Colour getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const override;
+        juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const noexcept override;
+        juce::Font getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const noexcept override;
+        juce::Colour getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const noexcept override;
     };
 }   // namespace jump

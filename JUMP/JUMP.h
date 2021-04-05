@@ -70,18 +70,18 @@ namespace juce
 #include "utilities/jump_Functions.h"
 #include "utilities/jump_VariantConverters.h"
 
+#include "interfaces/jump_Canvas.h"
+#include "interfaces/jump_Container.h"
+
 #include "audio/jump_AudioTransferManager.h"
-#include "engines/jump_SpectrumAnalyserEngine.h"
 #include "interfaces/jump_PluginProcessor.h"
 #include "interfaces/jump_PluginEditor.h"
 
 #include "components/level-meter/jump_LevelMeterEngine.h"
-#include "components/level-meter/jump_LevelMeterBackgroundComponent.h"
+#include "components/level-meter/jump_LevelMeterBackgroundCanvas.h"
 #include "components/level-meter/jump_LevelMeterRenderer.h"
 #include "components/level-meter/jump_LevelMeter.h"
 #include "components/level-meter/jump_LevelMeterLabelsComponent.h"
 #include "components/level-meter/jump_MultiMeter.h"
 
 #include "graphics/jump_LookAndFeel.h"
-
-#include "interfaces/jump_Canvas.h"

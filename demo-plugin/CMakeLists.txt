@@ -32,6 +32,8 @@ set(DEMO_PLUGIN_SOURCES
 
     source/editor/jumpDemo_PluginEditor.cpp
     source/editor/jumpDemo_PluginEditor.h
+    source/editor/demos/jumpDemo_CanvasContainer.cpp
+    source/editor/demos/jumpDemo_CanvasContainer.h
     source/editor/demos/jumpDemo_LevelMeters.cpp
     source/editor/demos/jumpDemo_LevelMeters.h
 )

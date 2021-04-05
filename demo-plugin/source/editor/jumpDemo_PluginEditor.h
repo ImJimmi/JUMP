@@ -1,7 +1,5 @@
 #pragma once
 
-#include "demos/jumpDemo_LevelMeters.h"
-
 #include <JuceHeader.h>
 #include <core/jumpDemo_PluginInstance.h>
 
@@ -19,15 +17,16 @@ namespace jumpDemo
 
     private:
         //==============================================================================================================
-        void paint(juce::Graphics&) override;
         void resized() override;
         void timerCallback() override;
 
         //==============================================================================================================
         PluginInstance& pluginInstance;
         jump::LookAndFeel jumpLookAndFeel;
+        jump::Canvas backgroundCanvas;
 
-        LevelMeters levelMetersDemo;
+        juce::ComboBox demoSelector;
+        std::unique_ptr<juce::Component> activeDemo;
 
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)

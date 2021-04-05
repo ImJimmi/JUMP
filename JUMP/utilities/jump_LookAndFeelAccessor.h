@@ -4,75 +4,42 @@
 namespace jump
 {
     //==================================================================================================================
-    struct LookAndFeelAccessorListener
-    {
-        virtual ~LookAndFeelAccessorListener() = default;
-
-        virtual void validLookAndFeelInUse() = 0;
-    };
-
-    //==================================================================================================================
     template <typename LookAndFeelMethods>
-    class LookAndFeelAccessor   :   private juce::Component
+    class LookAndFeelAccessor
     {
     public:
         //==============================================================================================================
-        using Listener = LookAndFeelAccessorListener;
+        LookAndFeelAccessor() = default;
 
         //==============================================================================================================
-        LookAndFeelAccessor(juce::Component& parent)
+        void attachTo(juce::Component* componentToAttachTo)
         {
-            parent.addChildComponent(*this);
+            component = componentToAttachTo;
         }
 
         //==============================================================================================================
-        void addListener(Listener* newListener)
+        const LookAndFeelMethods* operator->() const
         {
-            listeners.add(newListener);
-        }
+            if (auto laf = dynamic_cast<LookAndFeelMethods*>(&component->getLookAndFeel()))
+                return laf;
 
-        void removeListener(Listener* listenerToRemove)
-        {
-            listeners.remove(listenerToRemove);
-        }
-
-        //==============================================================================================================
-        LookAndFeelMethods* operator->()
-        {
-            /** The look and feel type being used by the parent component isn't of the type given as a template
-                argument!
+            /** The look and feel type being used by the Component this object is attached to isn't of the type given as
+                a template argument!
 
                 You should make sure to only use this operator when you're sure the correct LookAndFeel is being used.
             */
-            jassert(lookAndFeel != nullptr);
+            jassertfalse;
 
-            return lookAndFeel;
+            return nullptr;
         }
 
         operator bool()
         {
-            return lookAndFeel != nullptr;
+            return dynamic_cast<LookAndFeelMethods*>(&component->getLookAndFeel()) != nullptr;
         }
 
     private:
         //==============================================================================================================
-        void parentHierarchyChanged() override
-        {
-            lookAndFeelChanged();
-        }
-
-        void lookAndFeelChanged() override
-        {
-            if (auto laf = dynamic_cast<LookAndFeelMethods*>(&getLookAndFeel()))
-            {
-                lookAndFeel = laf;
-
-                listeners.call(&Listener::validLookAndFeelInUse);
-            }
-        }
-
-        //==============================================================================================================
-        LookAndFeelMethods* lookAndFeel{ nullptr };
-        juce::ListenerList<Listener> listeners;
+        juce::Component* component{ nullptr };
     };
 }   // namespace jump
