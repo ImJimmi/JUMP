@@ -59,6 +59,8 @@ namespace jump
         {
             for (auto child : getChildren())
             {
+                juce::ignoreUnused(child);
+
                 // Canvas's should never have child components (with the exception of the LookAndFeelListener used by
                 // the LookAndFeelAccessor class since it's always invisible).
                 jassert(dynamic_cast<LookAndFeelListenerBase*>(child) != nullptr);

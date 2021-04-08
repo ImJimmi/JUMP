@@ -6,8 +6,8 @@ namespace constants
     //==================================================================================================================
     namespace pluginEditor
     {
-        constexpr auto demoSelectorWidth = 160;
-        constexpr auto demoSelectorHeight = 25;
+        constexpr auto demoSelectorWidth = 160.f;
+        constexpr auto demoSelectorHeight = 25.f;
         constexpr auto demoSelectorMargin = 10.f;
     }   // pluginEditor
 }   // namespace constants
@@ -30,7 +30,7 @@ namespace jumpDemo::lookAndFeelImplementations
         };
     }
 
-    jump::Size<int> PluginEditorLookAndFeel::getDemoSelectorSize() const noexcept
+    jump::Size<float> PluginEditorLookAndFeel::getDemoSelectorSize() const noexcept
     {
         return {
             constants::pluginEditor::demoSelectorWidth,

@@ -12,7 +12,13 @@ set(JUCE_ENABLE_MODULE_SOURCE_GROUPS ON CACHE BOOL "" FORCE)
 set(JUCE_COPY_PLUGIN_AFTER_BUILD ON CACHE BOOL "" FORCE)
 add_subdirectory(JUCE)
 
-add_subdirectory(../ JUMP)
+juce_add_module(../JUMP ALIAS_NAMESPACE jump)
+
+option(
+    COPY_DIR
+    "Where to copy plugins after a build."
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 juce_add_plugin(demo-plugin
     PLUGIN_MANUFACTURER_CODE Jump
@@ -21,9 +27,8 @@ juce_add_plugin(demo-plugin
 
     COMPANY_NAME JUMP
 
-    # COPY_PLUGIN_AFTER_BUILD True
-    # VST3_COPY_DIR ${CMAKE_CURRENT_SOURCE_DIR}
-    # AU_COPY_DIR ${CMAKE_CURRENT_SOURCE_DIR}
+    VST3_COPY_DIR ${COPY_DIR}
+    AU_COPY_DIR ${COPY_DIR}
 )
 
 set(DEMO_PLUGIN_SOURCES

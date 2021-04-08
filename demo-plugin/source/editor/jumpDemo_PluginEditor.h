@@ -19,7 +19,7 @@ namespace jumpDemo
             virtual void drawSeparator(juce::Graphics& g, const jump::Canvas& canvas) const noexcept = 0;
 
             virtual jump::TrackInfoList getTemplateColumns() const noexcept = 0;
-            virtual jump::Size<int> getDemoSelectorSize() const noexcept = 0;
+            virtual jump::Size<float> getDemoSelectorSize() const noexcept = 0;
             virtual jump::Margin<float> getDemoSelectorMargin() const noexcept = 0;
         };
 
