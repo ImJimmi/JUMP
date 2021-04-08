@@ -1,0 +1,69 @@
+name: CMake
+
+on:
+  push:
+    branches:
+    - wip-github-action
+
+env:
+  BUILD_TYPE: Release
+  PRODUCT_NAME: demo-plugin
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create x64 Build Environment
+      run: cmake -B ${{ github.workspace }}/x64 -A x64
+
+    - name: Build x64
+      working-directory: ${{ github.workspace }}
+      shell: cmd
+      run: |
+        cmake --build x64 --config $BUILD_TYPE
+        Ren "${{ env.PRODUCT_NAME }}.vst3" "${{ env.PRODUCT_NAME }}_x64.vst3"
+        
+    - name: Test With Pluginval
+      working-directory: ${{ github.workspace }}
+      shell: cmd
+      run: |
+        powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Windows.zip -OutFile pluginval.zip"
+        powershell -Command "Expand-Archive pluginval.zip -DestinationPath ."
+        pluginval.exe --validate-in-process --validate "${{ env.PRODUCT_NAME }}.vst3" --strictness-level 10 --verbose
+        if %ERRORLEVEL% neq 0 exit /b 1
+
+    - name: Create Win32 Build Environment
+      run: cmake -B ${{ github.workspace }}/Win32 -A Win32
+      
+    - name: Build Win32
+      working-directory: ${{ github.workspace }}
+      shell: cmd
+      run: |
+        cmake --build Win32 --config $BUILD_TYPE
+        Ren "${{ env.PRODUCT_NAME }}.vst3" "${{ env.PRODUCT_NAME }}_Win32.vst3"
+        
+    - name: Generate Build Number
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{ secrets/github_token }}
+        
+    - name: Prepare ZIP File
+      working-directory: ${{ github.workspace }}
+      shell: cmd
+      run: |
+        set /p VERSION=<version.txt
+        set VERSION_AND_BUILD_NUM=%VERSION%.$BUILD_NUMBER
+        set DIR=${{ env.PRODUCT_NAME }}_%VERSION_AND_BUILD_NUM%
+        mkdir %DIR%
+        move /y *.vst3 %DIR%
+        powershell -Command "Compress-Archive %DIR% %DIR%.zip"
+        
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: artifact
+        path: ${{ github.workspace }}/*.zip
+        
