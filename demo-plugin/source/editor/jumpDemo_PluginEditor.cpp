@@ -1,5 +1,6 @@
 #include "jumpDemo_PluginEditor.h"
 
+#include "jumpDemo_LookAndFeel.h"
 #include "demos/jumpDemo_CanvasContainer.h"
 #include "demos/jumpDemo_LevelMeters.h"
 
@@ -7,25 +8,22 @@
 namespace jumpDemo
 {
     //==================================================================================================================
-    namespace Constants
+    namespace constants
     {
         //==============================================================================================================
-        namespace DemoNames
+        namespace demoNames
         {
             static const juce::String canvases   { "Canvases" };
             static const juce::String levelMeters{ "Level Meters" };
         }   // namespace DemoNames
-
-        //==============================================================================================================
-        static constexpr auto demoSelectorColumnWidth = 180;
     }   // namespace Constants
 
     //==================================================================================================================
     std::unique_ptr<juce::Component> getDemoFromName(const juce::String& demoName, double sampleRate)
     {
-        if (demoName == Constants::DemoNames::canvases)
+        if (demoName == constants::demoNames::canvases)
             return std::make_unique<CanvasContainer>();
-        if (demoName == Constants::DemoNames::levelMeters)
+        if (demoName == constants::demoNames::levelMeters)
         {
             auto demo = std::make_unique<LevelMeters>();
             demo->setSampleRate(sampleRate);
@@ -40,22 +38,21 @@ namespace jumpDemo
     //==================================================================================================================
     PluginEditor::PluginEditor(PluginInstance& p)
         :   jump::PluginEditor{ p },
-            pluginInstance{ p }
+            pluginInstance{ p },
+            lookAndFeel{ std::make_unique<LookAndFeel>() }
     {
-        setLookAndFeel(&jumpLookAndFeel);
+        setLookAndFeel(lookAndFeel.get());
+
         addAndMakeVisible(backgroundCanvas);
         backgroundCanvas.setDrawFunction([this](juce::Graphics& g) {
             g.fillAll(findColour(juce::ResizableWindow::backgroundColourId));
-
-            g.setColour(juce::Colours::white.withAlpha(0.2f));
-            g.drawVerticalLine(Constants::demoSelectorColumnWidth, 0.f, static_cast<float>(getHeight()));
         });
 
         addAndMakeVisible(demoSelector);
         demoSelector.setEditableText(false);
         const juce::StringArray demos {
-            Constants::DemoNames::canvases,
-            Constants::DemoNames::levelMeters
+            constants::demoNames::canvases,
+            constants::demoNames::levelMeters
         };
         demoSelector.addItemList(demos,
                                  demoSelector.getNumItems() + 1);
@@ -64,7 +61,9 @@ namespace jumpDemo
             addAndMakeVisible(*activeDemo);
             resized();
         };
-        demoSelector.setSelectedItemIndex(demos.indexOf(Constants::DemoNames::levelMeters));
+        demoSelector.setSelectedItemIndex(demos.indexOf(constants::demoNames::levelMeters));
+
+        lookAndFeelAccessor.attachTo(this);
 
         setSize(720, 360);
         startTimerHz(60);
@@ -81,14 +80,19 @@ namespace jumpDemo
         auto bounds = getLocalBounds();
         backgroundCanvas.setBounds(bounds);
 
-        {
-            auto column = bounds.removeFromLeft(Constants::demoSelectorColumnWidth);
-            demoSelector.setBounds(column.removeFromTop(45).reduced(10));
-            bounds.removeFromLeft(1);
-        }
+        juce::Grid grid;
+        grid.templateRows = { juce::Grid::Fr {1} };
+        grid.templateColumns = lookAndFeelAccessor->getTemplateColumns();
+
+        const auto demoSelectorSize = lookAndFeelAccessor->getDemoSelectorSize();
+        const auto demoSelectorMargin = lookAndFeelAccessor->getDemoSelectorMargin().toGridMargin();
+        grid.items.add(juce::GridItem{ demoSelector }.withSize(demoSelectorSize.width, demoSelectorSize.height)
+                                                     .withMargin(demoSelectorMargin));
 
         if (activeDemo != nullptr)
-            activeDemo->setBounds(bounds);
+            grid.items.add(juce::GridItem{ *activeDemo });
+
+        grid.performLayout(bounds);
     }
 
     void PluginEditor::timerCallback()

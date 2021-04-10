@@ -12,6 +12,16 @@ namespace jumpDemo
     {
     public:
         //==============================================================================================================
+        struct LookAndFeelMethods
+        {
+            virtual ~LookAndFeelMethods() = default;
+
+            virtual jump::TrackInfoList getTemplateColumns() const noexcept = 0;
+            virtual jump::Size<int> getDemoSelectorSize() const noexcept = 0;
+            virtual jump::Margin<float> getDemoSelectorMargin() const noexcept = 0;
+        };
+
+        //==============================================================================================================
         PluginEditor(PluginInstance&);
         ~PluginEditor() override;
 
@@ -22,11 +32,13 @@ namespace jumpDemo
 
         //==============================================================================================================
         PluginInstance& pluginInstance;
-        jump::LookAndFeel jumpLookAndFeel;
+        const std::unique_ptr<juce::LookAndFeel> lookAndFeel;
         jump::Canvas backgroundCanvas;
 
         juce::ComboBox demoSelector;
         std::unique_ptr<juce::Component> activeDemo;
+
+        jump::LookAndFeelAccessor<LookAndFeelMethods> lookAndFeelAccessor;
 
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginEditor)
