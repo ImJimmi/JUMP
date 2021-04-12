@@ -86,6 +86,7 @@ namespace juce
 #include "components/level-meter/jump_LevelMeter.h"
 #include "components/level-meter/jump_LevelMeterLabelsComponent.h"
 #include "components/level-meter/jump_MultiMeter.h"
+#include "components/spectrum-analyser/jump_SpectrumAnalyserEngine.h"
 
 #include "graphics/jump_LookAndFeel.h"
 #include "graphics/jump_Margin.h"

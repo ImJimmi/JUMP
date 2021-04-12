@@ -38,6 +38,8 @@ set(DEMO_PLUGIN_SOURCES
     source/editor/demos/jumpDemo_CanvasContainer.h
     source/editor/demos/jumpDemo_LevelMeters.cpp
     source/editor/demos/jumpDemo_LevelMeters.h
+    source/editor/demos/jumpDemo_SpectrumAnalysers.cpp
+    source/editor/demos/jumpDemo_SpectrumAnalysers.h
 )
 
 target_sources(demo-plugin

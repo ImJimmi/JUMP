@@ -3,6 +3,7 @@
 #include "jumpDemo_LookAndFeel.h"
 #include "demos/jumpDemo_CanvasContainer.h"
 #include "demos/jumpDemo_LevelMeters.h"
+#include "demos/jumpDemo_SpectrumAnalysers.h"
 
 //======================================================================================================================
 namespace jumpDemo
@@ -13,8 +14,9 @@ namespace jumpDemo
         //==============================================================================================================
         namespace demoNames
         {
-            static const juce::String canvases   { "Canvases" };
-            static const juce::String levelMeters{ "Level Meters" };
+            static const juce::String canvases         { "Canvases" };
+            static const juce::String levelMeters      { "Level Meters" };
+            static const juce::String spectrumAnalysers{ "Spectrum Analysers" };
         }   // namespace DemoNames
     }   // namespace Constants
 
@@ -26,6 +28,12 @@ namespace jumpDemo
         if (demoName == constants::demoNames::levelMeters)
         {
             auto demo = std::make_unique<LevelMeters>();
+            demo->setSampleRate(sampleRate);
+            return demo;
+        }
+        if (demoName == constants::demoNames::spectrumAnalysers)
+        {
+            auto demo = std::make_unique<SpectrumAnalysers>();
             demo->setSampleRate(sampleRate);
             return demo;
         }
@@ -52,7 +60,8 @@ namespace jumpDemo
         demoSelector.setEditableText(false);
         const juce::StringArray demos {
             constants::demoNames::canvases,
-            constants::demoNames::levelMeters
+            constants::demoNames::levelMeters,
+            constants::demoNames::spectrumAnalysers
         };
         demoSelector.addItemList(demos,
                                  demoSelector.getNumItems() + 1);
@@ -65,7 +74,7 @@ namespace jumpDemo
 
         lookAndFeelAccessor.attachTo(this);
 
-        setSize(720, 360);
+        setSize(870, 320);
         startTimerHz(60);
     }
 
@@ -97,13 +106,21 @@ namespace jumpDemo
 
     void PluginEditor::timerCallback()
     {
-        const auto inputSamples = pluginInstance.getLatestInputSamples();
-        const auto outputSamples = pluginInstance.getLatestOutputSamples();
-
         if (auto levelMetersDemo = dynamic_cast<LevelMeters*>(activeDemo.get()))
         {
+            const auto inputSamples = pluginInstance.getLatestInputSamples();
+            const auto outputSamples = pluginInstance.getLatestOutputSamples();
+
             levelMetersDemo->addInputSamples(inputSamples);
             levelMetersDemo->addOutputSamples(outputSamples);
+        }
+        else if (auto spectrumAnalysersDemo = dynamic_cast<SpectrumAnalysers*>(activeDemo.get()))
+        {
+            const auto inputSamples = pluginInstance.getLatestInputSamplesMono();
+            const auto outputSamples = pluginInstance.getLatestOutputSamplesMono();
+
+            spectrumAnalysersDemo->addInputSamples(inputSamples);
+            spectrumAnalysersDemo->addOutputSamples(outputSamples);
         }
     }
 } // namespace jumpDemo
