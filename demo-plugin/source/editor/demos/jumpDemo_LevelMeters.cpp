@@ -10,9 +10,9 @@ namespace jumpDemo
     {
         multiMeter.setOrientation(jump::Orientation::horizontal);
         multiMeter.setLabelsPosition(labelsPosition);
-        multiMeter.setColour(jump::LookAndFeel::levelMeterSafeColourId, jump::LookAndFeel::ColourPalette::blueGrey400);
-        multiMeter.setColour(jump::LookAndFeel::levelMeterWarningColourId, jump::LookAndFeel::ColourPalette::blueGrey300);
-        multiMeter.setColour(jump::LookAndFeel::levelMeterDangerColourId, jump::LookAndFeel::ColourPalette::blueGrey200);
+        multiMeter.setColour(jump::levelMeterSafeColourId,    jump::ColourPalette::blueGrey400);
+        multiMeter.setColour(jump::levelMeterWarningColourId, jump::ColourPalette::blueGrey300);
+        multiMeter.setColour(jump::levelMeterDangerColourId,  jump::ColourPalette::blueGrey200);
     }
 
     void setupOutputMeter(jump::MultiMeter& meters, jump::MultiMeter::LabelsPosition labelsPosition)

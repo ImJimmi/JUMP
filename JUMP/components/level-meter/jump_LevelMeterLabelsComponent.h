@@ -12,9 +12,8 @@ namespace jump
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const noexcept = 0;
-            virtual juce::Font getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const noexcept = 0;
-            virtual juce::Colour getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const noexcept = 0;
+            virtual std::unique_ptr<juce::Label> createLabelForLevel(const LevelMeterLabelsComponent& component,
+                                                                     float level) const noexcept = 0;
         };
 
         //==============================================================================================================
@@ -22,11 +21,12 @@ namespace jump
             :   engine{ engineToUse }
         {
             lookAndFeel.attachTo(this);
+            lookAndFeel.onValidLookAndFeelFound = [this]() {
+                updateLabels();
+            };
         }
 
-        ~LevelMeterLabelsComponent() override
-        {
-        }
+        ~LevelMeterLabelsComponent() override = default;
 
         //==============================================================================================================
         int getMinimumRequiredWidthWhenVertical() const
@@ -81,6 +81,11 @@ namespace jump
             resized();
         }
 
+        const LevelMeterEngine& getEngine() const noexcept
+        {
+            return engine;
+        }
+
     private:
         //==============================================================================================================
         void resized() override
@@ -92,14 +97,14 @@ namespace jump
 
             for (auto& label : labels)
             {
-                const auto level = static_cast<float>(label->getProperties()[valuePropertyId]);
+                const auto level = static_cast<float>(label->getProperties()[levelPropertyId]);
                 auto normalisedLevel = normaliseDecibelsTo0To1(level, range);
 
                 if (orientation == Orientation::vertical)
                 {
                     const auto y = (1.f - normalisedLevel) * getHeight();
 
-                    const auto labelHeight = static_cast<int>(std::ceil(label->getFont().getHeight()));
+                    const auto labelHeight = juce::jmin(static_cast<int>(std::ceil(label->getFont().getHeight())), getHeight());
                     const auto labelY = juce::jlimit(0, getHeight() - labelHeight, juce::roundToInt(y - labelHeight / 2.f));
 
                     label->setBounds(0, labelY, getWidth(), labelHeight);
@@ -125,49 +130,23 @@ namespace jump
 
         void lookAndFeelChanged() override
         {
-            if (lookAndFeel)
-            {
-                for (auto& label : labels)
-                {
-                    const auto level = static_cast<float>(label->getProperties()[valuePropertyId]);
-                    const auto isNegativeInf = level <= engine.getDecibelRange().start;
-                    const auto text = lookAndFeel->getLevelMeterTextForLevel(level, isNegativeInf);
-                    label->setText(text, juce::dontSendNotification);
-
-                    const auto font = lookAndFeel->getLevelMeterTextFont(level, isNegativeInf);
-                    label->setFont(font);
-
-                    const auto colour = lookAndFeel->getLevelMeterTextColour(level, isNegativeInf);
-                    label->setColour(juce::Label::textColourId, colour);
-                }
-            }
+            updateLabels();
         }
 
         //==============================================================================================================
         void updateLabels()
         {
+            if (!lookAndFeel)
+                return;
+
             labels.clear();
 
             for (const auto& level : levels)
             {
-                juce::String text;
-                juce::Font font;
-                juce::Colour colour;
 
-                if (lookAndFeel)
-                {
-                    const auto isNegativeInf = level <= engine.getDecibelRange().start;
-                    text = lookAndFeel->getLevelMeterTextForLevel(level, isNegativeInf);
-                    font = lookAndFeel->getLevelMeterTextFont(level, isNegativeInf);
-                    colour = lookAndFeel->getLevelMeterTextColour(level, isNegativeInf);
-                }
-
-                auto label = std::make_unique<juce::Label>("", text);
-                label->setFont(font);
-                label->getProperties().set(valuePropertyId, level);
-                label->setColour(juce::Label::textColourId, colour);
+                auto label = lookAndFeel->createLabelForLevel(*this, level);
+                label->getProperties().set(levelPropertyId, level);
                 label->setJustificationType(justification);
-                label->setBorderSize(juce::BorderSize<int>{ 0 });
                 addAndMakeVisible(*label);
 
                 labels.add(std::move(label));
@@ -182,7 +161,7 @@ namespace jump
         std::vector<float> levels;
         juce::Justification justification{ juce::Justification::left };
         Orientation orientation{ Orientation::vertical };
-        static inline const juce::Identifier valuePropertyId{ "value" };
+        static inline const juce::Identifier levelPropertyId{ "level" };
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
 

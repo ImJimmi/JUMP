@@ -30,7 +30,7 @@ namespace jump
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual int getLevelMetersGap(const MultiMeter& component) const noexcept = 0;
+            virtual int getGapBetweenMeters(const MultiMeter& component) const noexcept = 0;
         };
 
         //==============================================================================================================

@@ -3,115 +3,91 @@
 #include <set>
 
 //======================================================================================================================
-namespace jump
+namespace constants
 {
     //==================================================================================================================
-    namespace Constants
-    {
-        //==============================================================================================================
-        constexpr auto widgetCornerRadius = 2.5f;
-        constexpr auto widgetBorderThickness = 1.f;
-
-        //==============================================================================================================
-        static const std::set<float> levelMeterMajorGridlineLevels{ 0.f, -6.f, -12.f, -24.f, -48.f };
-
-        //==============================================================================================================
-        constexpr auto levelMeterPeakIndicatorThickness = 2.5f;
-        constexpr auto levelMeterCornerSize = 1.f;
-        constexpr auto levelMeterGridlineInterval = 3.f;
-    }   // namespace Constants
+    constexpr auto widgetCornerRadius = 2.5f;
+    constexpr auto widgetBorderThickness = 1.f;
 
     //==================================================================================================================
-    LookAndFeel::LookAndFeel()
-    {
-        setColour(widgetBackgroundColourId, ColourPalette::blueGrey800);
-        setColour(widgetBorderColourId,     ColourPalette::blueGrey900);
-
-        setColour(levelMeterSafeColourId,    ColourPalette::lightGreen500);
-        setColour(levelMeterWarningColourId, ColourPalette::yellow500);
-        setColour(levelMeterDangerColourId,  ColourPalette::red500);
-        setColour(levelMeterLabelNormalTextColourId,  ColourPalette::blueGrey050);
-        setColour(levelMeterLabelHighlightedTextColourId,  ColourPalette::blueGrey100);
-
-        setColour(juce::ResizableWindow::backgroundColourId, ColourPalette::blueGrey850);
-        setColour(juce::Label::textColourId, ColourPalette::blueGrey050);
-    }
+    constexpr auto levelMeterGridlinesIntervalDecibels = 3.f;
+    static const std::set<float> levelMeterMajorGridlineLevels{ 0.f, -6.f, -12.f, -24.f, -48.f };
 
     //==================================================================================================================
-    //================================//
-    // MultiMeter::LookAndFeelMethods //
-    //================================//
-    int LookAndFeel::getLevelMetersGap(const MultiMeter&) const noexcept
-    {
-        return 5;
-    }
+    constexpr auto levelMeterPeakIndicatorThickness = 2.5f;
+    constexpr auto levelMeterCornerSize = 1.f;
+    constexpr auto levelMeterGridlineInterval = 3.f;
+    constexpr auto multiMeterGapBetweenMeters = 5;
+}   // namespace constants
 
-    //================================================//
-    // LevelMeterBackgroundCanvas::LookAndFeelMethods //
-    //================================================//
-    juce::Path createBasicWidgetShape(const juce::Rectangle<float>& bounds, float cornerRadiusModifier = 0.f)
+//======================================================================================================================
+namespace jump::lookAndFeelImplementations
+{
+    //==================================================================================================================
+    template <typename RectangleType>
+    juce::Path createRoundedRectanglePath(const juce::Rectangle<RectangleType>& bounds, float cornerRadius)
     {
         juce::Path path;
-        path.addRoundedRectangle(bounds, Constants::widgetCornerRadius + cornerRadiusModifier);
+        path.addRoundedRectangle(bounds, cornerRadius);
 
         return path;
     }
 
-    juce::Path getLevelMeterShape(const juce::Rectangle<float>& meterBounds, float cornerRadiusModifier = 0.f)
+    //==================================================================================================================
+    void drawLevelMeterBackground(juce::Graphics& g, const LevelMeter& meter)
     {
-        return createBasicWidgetShape(meterBounds, cornerRadiusModifier);
+        constexpr auto halfBorderThickness = constants::widgetBorderThickness / 2.f;
+        const auto pathBounds = meter.getLocalBounds().toFloat().reduced(halfBorderThickness);
+        const auto path = createRoundedRectanglePath(pathBounds, constants::widgetCornerRadius - halfBorderThickness);
+
+        g.setColour(meter.findColour(widgetBackgroundColourId));
+        g.fillPath(path);
+
+        g.setColour(meter.findColour(widgetBorderColourId));
+        g.strokePath(path, juce::PathStrokeType{ constants::widgetBorderThickness });
     }
 
-    void LookAndFeel::drawLevelMeterBackground(juce::Graphics& g,
-                                               const LevelMeterBackgroundCanvas& component) const noexcept
+    void drawLevelMeterGridlines(juce::Graphics& g, const LevelMeter& meter)
     {
-        const auto widgetShape = getLevelMeterShape(component.getLocalBounds().toFloat().reduced(0.5f));
+        const auto clipBounds = meter.getLocalBounds().reduced(1);
+        const auto clipPath = createRoundedRectanglePath(clipBounds,
+                                                         constants::widgetCornerRadius - constants::widgetBorderThickness);
+        g.reduceClipRegion(clipPath);
 
-        g.setColour(component.findColour(ColourIds::widgetBackgroundColourId));
-        g.fillPath(widgetShape);
+        g.setColour(meter.findColour(widgetBorderColourId));
 
-        g.setColour(component.findColour(ColourIds::widgetBorderColourId));
-        g.strokePath(widgetShape, juce::PathStrokeType{ Constants::widgetBorderThickness });
-    }
+        const auto& decibelRange = meter.getEngine().getDecibelRange();
+        const auto orientation = meter.getOrientation();
 
-    float LookAndFeel::getLevelMeterGridlineInterval(const LevelMeterBackgroundCanvas&) const noexcept
-    {
-        return Constants::levelMeterGridlineInterval;
-    }
-
-    void LookAndFeel::drawLevelMeterGridline(juce::Graphics& g, const LevelMeterBackgroundCanvas& component,
-                                            float normalisedLevel, float decibelLevel,
-                                            Orientation orientation) const noexcept
-    {
-        const auto meterShape = getLevelMeterShape(component.getLocalBounds().reduced(1).toFloat());
-        g.reduceClipRegion(meterShape);
-
-        if (normalisedLevel == 0.f || normalisedLevel == 1.f)
-            return;
-
-        g.setColour(component.findColour(ColourIds::widgetBorderColourId));
-
-        const auto lineThickness = Constants::levelMeterMajorGridlineLevels.count(decibelLevel) > 0 ? 1.5f : 1.f;
-
-        if (orientation == Orientation::vertical)
+        for (auto dB = decibelRange.end; dB >= decibelRange.start; dB -= constants::levelMeterGridlinesIntervalDecibels)
         {
-            const auto y = std::round((1.f - normalisedLevel) * component.getHeight()) - lineThickness / 2.f;
-            g.drawLine({ { 0.f, y }, { static_cast<float>(component.getWidth()), y } }, lineThickness);
-        }
-        else if (orientation == Orientation::horizontal)
-        {
-            const auto x = std::round(normalisedLevel * component.getWidth()) - lineThickness / 2.f;
-            g.drawLine({ { x, 0.f }, { x, static_cast<float>(component.getHeight()) } }, lineThickness);
-        }
-        else
-        {
-            jassertfalse;
+            const auto normalisedLevel = decibelRange.convertTo0to1(dB);
+            const auto lineThickness = (constants::levelMeterMajorGridlineLevels.count(dB) > 0 ? 2.f : 1.f) * constants::widgetBorderThickness;
+
+            if (orientation == Orientation::vertical)
+            {
+                const auto y = std::round((1.f - normalisedLevel) * meter.getHeight()) - lineThickness / 2.f;
+                g.drawLine({ { 0.f, y }, { static_cast<float>(meter.getWidth()), y } }, lineThickness);
+            }
+            else if (orientation == Orientation::horizontal)
+            {
+                const auto x = std::round(normalisedLevel * meter.getWidth()) - lineThickness / 2.f;
+                g.drawLine({ { x, 0.f }, { x, static_cast<float>(meter.getHeight()) } }, lineThickness);
+            }
+            else
+            {
+                // Unhandled orientation type.
+                jassertfalse;
+            }
         }
     }
 
-    //=================================================//
-    // LevelMeter::DefaultRenderer::LookAndFeelMethods //
-    //=================================================//
+    void LevelMeterLookAndFeel::drawBackground(juce::Graphics& g, const LevelMeter& meter) const noexcept
+    {
+        drawLevelMeterBackground(g, meter);
+        drawLevelMeterGridlines(g, meter);
+    }
+
     juce::Path createLevelMeterPeakShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
                                          float peakLevel)
     {
@@ -120,7 +96,7 @@ namespace jump
         if (orientation == Orientation::vertical)
         {
             bounds.setWidth(meterBounds.toFloat().getWidth());
-            bounds.setHeight(Constants::levelMeterPeakIndicatorThickness);
+            bounds.setHeight(constants::levelMeterPeakIndicatorThickness);
 
             bounds.setCentre(
                 meterBounds.toFloat().getCentreX(),
@@ -129,7 +105,7 @@ namespace jump
         }
         else if (orientation == Orientation::horizontal)
         {
-            bounds.setWidth(Constants::levelMeterPeakIndicatorThickness);
+            bounds.setWidth(constants::levelMeterPeakIndicatorThickness);
             bounds.setHeight(meterBounds.toFloat().getHeight());
 
             bounds.setCentre(
@@ -143,7 +119,7 @@ namespace jump
         }
 
         juce::Path path;
-        path.addRoundedRectangle(bounds, Constants::levelMeterCornerSize);
+        path.addRoundedRectangle(bounds, constants::levelMeterCornerSize);
 
         return path;
     }
@@ -159,7 +135,7 @@ namespace jump
             bounds.setTop(bounds.getHeight() * (1.f - rmsLevel));
 
             path.addRoundedRectangle(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(),
-                                     Constants::levelMeterCornerSize, Constants::levelMeterCornerSize,
+                                     constants::levelMeterCornerSize, constants::levelMeterCornerSize,
                                      true, true, false, false);
         }
         else if (orientation == Orientation::horizontal)
@@ -167,7 +143,7 @@ namespace jump
             bounds.setRight(bounds.getWidth() * rmsLevel);
 
             path.addRoundedRectangle(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight(),
-                                     Constants::levelMeterCornerSize, Constants::levelMeterCornerSize,
+                                     constants::levelMeterCornerSize, constants::levelMeterCornerSize,
                                      false, true, false, true);
         }
         else
@@ -178,31 +154,34 @@ namespace jump
         return path;
     }
 
-    juce::Path LookAndFeel::createLevelMeterPath(const LevelMeterRenderer& renderer, Orientation orientation,
-                                                 float peakLevel, float rmsLevel) const noexcept
+    juce::Path createLevelMeterPath(Orientation orientation, const juce::Rectangle<int> bounds,
+                                    float peakLevel, float rmsLevel)
     {
         juce::Path path;
 
-        path.addPath(createLevelMeterPeakShape(orientation, renderer.getLocalBounds(), peakLevel));
-        path.addPath(createLevelMeterRMSShape (orientation, renderer.getLocalBounds(), rmsLevel));
+        path.addPath(createLevelMeterPeakShape(orientation, bounds, peakLevel));
+        path.addPath(createLevelMeterRMSShape (orientation, bounds, rmsLevel));
 
         return path;
     }
 
-    void LookAndFeel::drawJumpLevelMeter(juce::Graphics& g, const LevelMeterRenderer& renderer, Orientation orientation,
-                                         const juce::NormalisableRange<float>& decibelRange,
-                                         const juce::Path& meterPath) const noexcept
+    void LevelMeterLookAndFeel::drawLevelMeter(juce::Graphics& g, const LevelMeter& renderer,
+                                               float peakLevelNormalised, float rmsLevelNormalised) const noexcept
     {
-        const auto cornerRadiusModifier = -1.f;
-        const auto meterShape = getLevelMeterShape(renderer.getLocalBounds().reduced(1).toFloat(), cornerRadiusModifier);
-        g.reduceClipRegion(meterShape);
+        const auto clipBounds = renderer.getLocalBounds().reduced(1);
+        const auto clipPath = createRoundedRectanglePath(clipBounds,
+                                                         constants::widgetCornerRadius - constants::widgetBorderThickness);
+        g.reduceClipRegion(clipPath);
 
         juce::ColourGradient gradient;
         const auto safeColour = renderer.findColour(levelMeterSafeColourId);
         const auto warningColour = renderer.findColour(levelMeterWarningColourId);
         const auto dangerColour = renderer.findColour(levelMeterDangerColourId);
 
+        const auto& decibelRange = renderer.getEngine().getDecibelRange();
         const auto normalisedNegative12 = decibelRange.convertTo0to1(-12.f);
+
+        const auto orientation = renderer.getOrientation();
 
         if (orientation == Orientation::vertical)
         {
@@ -214,15 +193,20 @@ namespace jump
             gradient = juce::ColourGradient::horizontal(safeColour, dangerColour, renderer.getLocalBounds());
             gradient.addColour(static_cast<double>(normalisedNegative12), warningColour);
         }
+        else
+        {
+            // Unhandled orientation.
+            jassertfalse;
+        }
 
         g.setGradientFill(gradient);
+
+        const auto meterPath = createLevelMeterPath(orientation, renderer.getLocalBounds(),
+                                                    peakLevelNormalised, rmsLevelNormalised);
         g.fillPath(meterPath);
     }
 
-    //=================================================//
-    // LevelMeter::LabelsComponent::LookAndFeelMethods //
-    //=================================================//
-    juce::String LookAndFeel::getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf) const noexcept
+    juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf)
     {
         static const juce::String units{ "dB" };
 
@@ -240,17 +224,57 @@ namespace jump
         return juce::Font::plain;
     }
 
-    juce::Font LookAndFeel::getLevelMeterTextFont(float decibelLevel, bool isNegativeInf) const noexcept
+    juce::Font getLevelMeterLabelFont(float decibelLevel, bool isNegativeInf)
     {
         const auto flags = getFontFlagsForLevelMeterText(decibelLevel, isNegativeInf);
         return { "Helvetica", 12.f, flags };
     }
 
-    juce::Colour LookAndFeel::getLevelMeterTextColour(float decibelLevel, bool isNegativeInf) const noexcept
+    juce::Colour getLevelMeterTextColour(const LevelMeterLabelsComponent& component,
+                                         const float decibelLevel, bool isNegativeInf)
     {
         if (decibelLevel == 0.f || isNegativeInf)
-            return findColour(levelMeterLabelHighlightedTextColourId);
+            return component.findColour(levelMeterLabelHighlightedTextColourId);
 
-        return findColour(levelMeterLabelNormalTextColourId);
+        return component.findColour(levelMeterLabelNormalTextColourId);
     }
-}   // namespace jump
+
+    std::unique_ptr<juce::Label> LevelMeterLookAndFeel::createLabelForLevel(const LevelMeterLabelsComponent& component,
+                                                                            float level) const noexcept
+    {
+        auto label = std::make_unique<juce::Label>();
+
+        const auto decibelRange = component.getEngine().getDecibelRange();
+        const auto isNegativeInf = level <= decibelRange.start;
+        label->setText(getLevelMeterTextForLevel(level, isNegativeInf), juce::dontSendNotification);
+        label->setFont(getLevelMeterLabelFont(level, isNegativeInf));
+        label->setColour(juce::Label::textColourId, getLevelMeterTextColour(component, level, isNegativeInf));
+
+        return label;
+    }
+
+    int LevelMeterLookAndFeel::getGapBetweenMeters(const MultiMeter&) const noexcept
+    {
+        return constants::multiMeterGapBetweenMeters;
+    }
+}   // namespace jump::lookAndFeelImplementations
+
+//======================================================================================================================
+namespace jump
+{
+    //==================================================================================================================
+    LookAndFeel::LookAndFeel()
+    {
+        setColour(widgetBackgroundColourId, ColourPalette::blueGrey800);
+        setColour(widgetBorderColourId,     ColourPalette::blueGrey900);
+
+        setColour(levelMeterSafeColourId,    ColourPalette::lightGreen500);
+        setColour(levelMeterWarningColourId, ColourPalette::yellow500);
+        setColour(levelMeterDangerColourId,  ColourPalette::red500);
+        setColour(levelMeterLabelNormalTextColourId,  ColourPalette::blueGrey050);
+        setColour(levelMeterLabelHighlightedTextColourId,  ColourPalette::blueGrey100);
+
+        setColour(juce::ResizableWindow::backgroundColourId, ColourPalette::blueGrey850);
+        setColour(juce::Label::textColourId, ColourPalette::blueGrey050);
+    }
+}

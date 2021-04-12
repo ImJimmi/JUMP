@@ -57,8 +57,12 @@ namespace jump
 
         void childrenChanged() override final
         {
-            // Canvas's should never have child components.
-            jassertfalse;
+            for (auto child : getChildren())
+            {
+                // Canvas's should never have child components (with the exception of the LookAndFeelListener used by
+                // the LookAndFeelAccessor class since it's always invisible).
+                jassert(dynamic_cast<LookAndFeelListenerBase*>(child) != nullptr);
+            }
         }
 
         bool hitTest(int, int) override final
