@@ -30,6 +30,8 @@ set(DEMO_PLUGIN_SOURCES
     source/core/jumpDemo_PluginInstance.cpp
     source/core/jumpDemo_PluginInstance.h
 
+    source/editor/jumpDemo_LookAndFeel.cpp
+    source/editor/jumpDemo_LookAndFeel.h
     source/editor/jumpDemo_PluginEditor.cpp
     source/editor/jumpDemo_PluginEditor.h
     source/editor/demos/jumpDemo_CanvasContainer.cpp

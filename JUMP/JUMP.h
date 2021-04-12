@@ -40,6 +40,8 @@ namespace jump
     using ChoiceParam = juce::AudioParameterChoice;
     using FloatParam  = juce::AudioParameterFloat;
     using IntParam    = juce::AudioParameterInt;
+
+    using TrackInfoList = juce::Array<juce::Grid::TrackInfo>;
 }   // namespace jump
 
 //======================================================================================================================
@@ -85,3 +87,5 @@ namespace juce
 #include "components/level-meter/jump_MultiMeter.h"
 
 #include "graphics/jump_LookAndFeel.h"
+#include "graphics/jump_Margin.h"
+#include "graphics/jump_Size.h"
