@@ -79,9 +79,10 @@ namespace juce
 #include "interfaces/jump_PluginProcessor.h"
 #include "interfaces/jump_PluginEditor.h"
 
+#include "graphics/jump_ColourIDs.h"
+#include "graphics/jump_ColourPalette.h"
+
 #include "components/level-meter/jump_LevelMeterEngine.h"
-#include "components/level-meter/jump_LevelMeterBackgroundCanvas.h"
-#include "components/level-meter/jump_LevelMeterRenderer.h"
 #include "components/level-meter/jump_LevelMeter.h"
 #include "components/level-meter/jump_LevelMeterLabelsComponent.h"
 #include "components/level-meter/jump_MultiMeter.h"

@@ -260,7 +260,7 @@ namespace jump
         for (auto i = 0; i < meters.size(); i++)
             grid.items.add(juce::GridItem{ meters[i] }.withArea(meterAreaName + juce::String{ i }));
 
-        grid.setGap(juce::Grid::Px{ lookAndFeel->getLevelMetersGap(*this) });
+        grid.setGap(juce::Grid::Px{ lookAndFeel->getGapBetweenMeters(*this) });
         grid.performLayout(bounds);
     }
 
@@ -278,29 +278,20 @@ namespace jump
 
     void MultiMeter::colourChanged()
     {
-        if (isColourSpecified(LookAndFeel::levelMeterSafeColourId))
+        if (isColourSpecified(levelMeterSafeColourId))
         {
             for (auto& meter : meters)
-            {
-                meter->setColour(LookAndFeel::levelMeterSafeColourId,
-                                 findColour(LookAndFeel::levelMeterSafeColourId));
-            }
+                meter->setColour(levelMeterSafeColourId, findColour(levelMeterSafeColourId));
         }
-        if (isColourSpecified(LookAndFeel::levelMeterWarningColourId))
+        if (isColourSpecified(levelMeterWarningColourId))
         {
             for (auto& meter : meters)
-            {
-                meter->setColour(LookAndFeel::levelMeterWarningColourId,
-                                 findColour(LookAndFeel::levelMeterWarningColourId));
-            }
+                meter->setColour(levelMeterWarningColourId, findColour(levelMeterWarningColourId));
         }
-        if (isColourSpecified(LookAndFeel::levelMeterDangerColourId))
+        if (isColourSpecified(levelMeterDangerColourId))
         {
             for (auto& meter : meters)
-            {
-                meter->setColour(LookAndFeel::levelMeterDangerColourId,
-                                 findColour(LookAndFeel::levelMeterDangerColourId));
-            }
+                meter->setColour(levelMeterDangerColourId, findColour(levelMeterDangerColourId));
         }
     }
 
