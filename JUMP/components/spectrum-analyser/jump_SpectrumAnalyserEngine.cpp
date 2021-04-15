@@ -112,19 +112,19 @@ namespace jump
     float getDecibelLevelFromFFTData(const std::vector<float>& fftData, int binIndex, int fftSize,
                                      const juce::NormalisableRange<float>& decibelRange)
     {
-        const auto gain = fftData[binIndex] / (fftSize * 2.f);
+        const auto gain = fftData[static_cast<std::size_t>(binIndex)] / (fftSize * 2.f);
         return juce::Decibels::gainToDecibels(gain, decibelRange.start);
     }
 
     void SpectrumAnalyserEngine::AnalyserPointInfo::update(const std::vector<float>& fftData, int fftSize,
-                                                           const juce::NormalisableRange<float>& decibelRange,
+                                                           const juce::NormalisableRange<float>& dBRange,
                                                            juce::uint32 now,
-                                                           float holdTime, float maxHoldTime, float decayTime)
+                                                           float holdTimeMS, float maxHoldTimeMS, float decayTimeMS)
     {
-        auto newDB = getDecibelLevelFromFFTData(fftData, binIndex, fftSize, decibelRange);
+        auto newDB = getDecibelLevelFromFFTData(fftData, binIndex, fftSize, dBRange);
 
         if (newDB < dB)
-            newDB = applyEnvelopeToDecibelLevel(levelOfLatestPeak, timeOfLatestPeak, now, holdTime, maxHoldTime, decayTime, decibelRange);
+            newDB = applyEnvelopeToDecibelLevel(levelOfLatestPeak, timeOfLatestPeak, now, holdTimeMS, maxHoldTimeMS, decayTimeMS, dBRange);
         else
         {
             timeOfLatestPeak = juce::Time::getMillisecondCounter();
@@ -134,9 +134,9 @@ namespace jump
         dB = newDB;
     }
 
-    juce::Point<float> SpectrumAnalyserEngine::AnalyserPointInfo::normalise(const juce::NormalisableRange<float>& decibelRange)
+    juce::Point<float> SpectrumAnalyserEngine::AnalyserPointInfo::normalise(const juce::NormalisableRange<float>& dBRange)
     {
-        return { normalisedX, 1.f - decibelRange.convertTo0to1(decibelRange.snapToLegalValue(dB)) };
+        return { normalisedX, 1.f - dBRange.convertTo0to1(dBRange.snapToLegalValue(dB)) };
     }
 
     //==================================================================================================================
@@ -164,7 +164,7 @@ namespace jump
         auto prevBin = -1;
 
         std::vector<juce::Point<float>> points;
-        points.reserve(numPoints);
+        points.reserve(static_cast<std::size_t>(numPoints));
 
         for (auto& pointInfo : pointsInfo)
         {
@@ -235,7 +235,7 @@ namespace jump
             return;
 
         pointsInfo.clear();
-        pointsInfo.reserve(numPoints);
+        pointsInfo.reserve(static_cast<std::size_t>(numPoints));
 
         for (auto& frequency : Math::logRange(frequencyRange.start, frequencyRange.end, numPoints))
         {

@@ -60,6 +60,12 @@ PRIVATE
     JUCE_WEB_BROWSER=0
 )
 
+if (MSVC)
+    target_compile_options(demo-plugin PRIVATE /W4 /WX)
+else()
+    target_compile_options(demo-plugin PRIVATE -Wall -Wextra -pedantic -Werror)
+endif()
+
 target_link_libraries(demo-plugin
 PRIVATE
     juce::juce_audio_devices

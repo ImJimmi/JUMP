@@ -70,12 +70,12 @@ namespace jump
             jassert(end >= start);
             jassert(count >= 2);
 
-            std::vector<T> result(count);
+            std::vector<T> result(static_cast<std::size_t>(count));
 
             for (auto i = 0; i < count; i++)
             {
                 const auto proportion = i / static_cast<float>(count - 1);
-                result[i] = logSpace(start, end, proportion);
+                result[static_cast<std::size_t>(i)] = logSpace(start, end, proportion);
             }
 
             return result;
