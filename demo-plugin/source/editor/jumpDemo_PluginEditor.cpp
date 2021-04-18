@@ -72,6 +72,11 @@ namespace jumpDemo
         };
         demoSelector.setSelectedItemIndex(demos.indexOf(constants::demoNames::levelMeters));
 
+        addAndMakeVisible(separator);
+        separator.setDrawFunction([this](juce::Graphics& g) {
+            lookAndFeelAccessor->drawSeparator(g, separator);
+        });
+
         lookAndFeelAccessor.attachTo(this);
 
         setSize(870, 320);
@@ -97,6 +102,8 @@ namespace jumpDemo
         const auto demoSelectorMargin = lookAndFeelAccessor->getDemoSelectorMargin().toGridMargin();
         grid.items.add(juce::GridItem{ demoSelector }.withSize(demoSelectorSize.width, demoSelectorSize.height)
                                                      .withMargin(demoSelectorMargin));
+
+        grid.items.add(juce::GridItem{ separator });
 
         if (activeDemo != nullptr)
             grid.items.add(juce::GridItem{ *activeDemo });

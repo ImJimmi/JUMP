@@ -20,8 +20,15 @@ namespace jumpDemo
 
     private:
         //==============================================================================================================
+        void resized() override;
+
+        //==============================================================================================================
         jump::SpectrumAnalyserEngine inputEngine;
         jump::SpectrumAnalyserEngine outputEngine;
+
+        juce::Label title;
+
+        jump::SpectrumAnalyser analyser{ outputEngine };
 
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalysers)

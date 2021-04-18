@@ -4,8 +4,8 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeter    :   public Container,
-                            public LevelMeterRendererBase
+    class SpectrumAnalyser  :   public Container,
+                                public SpectrumAnalyserRendererBase
     {
     public:
         //==============================================================================================================
@@ -13,13 +13,13 @@ namespace jump
         {
             virtual ~LookAndFeelMethods() = default;
 
-            virtual void drawBackground(juce::Graphics& g, const LevelMeter& meter) const noexcept = 0;
-            virtual void drawLevelMeter(juce::Graphics& g, const LevelMeter& meter,
-                                        float peakLevelNormalised, float rmsLevelNormalised) const noexcept = 0;
+            virtual void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept = 0;
+            virtual void drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
+                                              const std::vector<juce::Point<float>>& points) const noexcept = 0;
         };
 
         //==============================================================================================================
-        explicit LevelMeter(const LevelMeterEngine& engineToUse)
+        explicit SpectrumAnalyser(const SpectrumAnalyserEngine& engineToUse)
             :   engine{ engineToUse }
         {
             lookAndFeel.attachTo(this);
@@ -29,31 +29,21 @@ namespace jump
                 lookAndFeel->drawBackground(g, *this);
             });
 
-            addAndMakeVisible(meter);
-            meter.setDrawFunction([this](juce::Graphics& g) {
-                lookAndFeel->drawLevelMeter(g, *this, latestPeakLevel, latestRMSLevel);
+            addAndMakeVisible(analyser);
+            analyser.setDrawFunction([this](juce::Graphics& g) {
+                lookAndFeel->drawSpectrumAnalyser(g, *this, analyserPoints);
             });
 
             engineToUse.addRenderer(this);
         }
 
-        ~LevelMeter() override
+        ~SpectrumAnalyser() override
         {
             engine.removeRenderer(this);
         }
 
         //==============================================================================================================
-        void setOrientation(Orientation newOrientation)
-        {
-            orientation = newOrientation;
-        }
-
-        Orientation getOrientation() const noexcept
-        {
-            return orientation;
-        }
-
-        const LevelMeterEngine& getEngine() const noexcept
+        const SpectrumAnalyserEngine& getEngine() const noexcept
         {
             return engine;
         }
@@ -65,30 +55,24 @@ namespace jump
             const auto bounds = getLocalBounds();
 
             background.setBounds(bounds);
-            meter.setBounds(bounds);
+            analyser.setBounds(bounds);
         }
 
-        void newLevelMeterLevelsAvailable(const LevelMeterEngine&, float peakLevel, float rmsLevel) override
+        void newSpectrumAnalyserPointsAvailable(const SpectrumAnalyserEngine&,
+                                                const std::vector<juce::Point<float>>& points) override
         {
-            latestPeakLevel = peakLevel;
-            latestRMSLevel = rmsLevel;
-
-            meter.repaint();
+            analyserPoints = points;
+            analyser.repaint();
         }
 
         //==============================================================================================================
-        const LevelMeterEngine& engine;
-        Orientation orientation{ Orientation::vertical };
+        const SpectrumAnalyserEngine& engine;
 
         Canvas background;
-        Canvas meter;
+        Canvas analyser;
 
-        float latestPeakLevel{ 0.f };
-        float latestRMSLevel{ 0.f };
+        std::vector<juce::Point<float>> analyserPoints;
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
-
-        //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeter)
     };
 }   // namespace jump

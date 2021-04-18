@@ -64,10 +64,20 @@ namespace jump
         setProperty(PropertyIDs::frequencyRangeId, juce::JSON::toString(value, true));
     }
 
+    const juce::NormalisableRange<float>& SpectrumAnalyserEngine::getFrequencyRange() const noexcept
+    {
+        return frequencyRange;
+    }
+
     void SpectrumAnalyserEngine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
     {
         const auto value = juce::var{ juce::Array<juce::var>{ newDecibelRange.start, newDecibelRange.end } };
         setProperty(PropertyIDs::decibelRangeId, juce::JSON::toString(value, true));
+    }
+
+    const juce::NormalisableRange<float>& SpectrumAnalyserEngine::getDecibelRange() const noexcept
+    {
+        return decibelRange;
     }
 
     void SpectrumAnalyserEngine::setHoldTime(float newHoldTimeMs)
@@ -98,6 +108,11 @@ namespace jump
         jassert(newNumPoints >= 0);
 
         setProperty(PropertyIDs::numPointsId, newNumPoints);
+    }
+
+    double SpectrumAnalyserEngine::getNyquistFrequency() const noexcept
+    {
+        return nyquistFrequency;
     }
 
     //==================================================================================================================

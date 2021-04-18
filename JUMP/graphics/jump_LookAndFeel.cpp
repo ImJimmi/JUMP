@@ -10,14 +10,21 @@ namespace constants
     constexpr auto widgetBorderThickness = 1.f;
 
     //==================================================================================================================
+    constexpr auto warningLevelDecibels = -12.f;
+
+    //==================================================================================================================
     constexpr auto levelMeterGridlinesIntervalDecibels = 3.f;
     static const std::set<float> levelMeterMajorGridlineLevels{ 0.f, -6.f, -12.f, -24.f, -48.f };
 
-    //==================================================================================================================
     constexpr auto levelMeterPeakIndicatorThickness = 2.5f;
     constexpr auto levelMeterCornerSize = 1.f;
     constexpr auto levelMeterGridlineInterval = 3.f;
     constexpr auto multiMeterGapBetweenMeters = 5;
+
+    //==================================================================================================================
+    constexpr auto spectrumAnalyserLineThickness = 1.5f;
+    constexpr auto spectrumAnalyserGridlinesIntervalDecibels = 12.f;
+    constexpr auto spectrumAnalyserFillOpacity = 0.1f;
 }   // namespace constants
 
 //======================================================================================================================
@@ -40,10 +47,10 @@ namespace jump::lookAndFeelImplementations
         const auto pathBounds = meter.getLocalBounds().toFloat().reduced(halfBorderThickness);
         const auto path = createRoundedRectanglePath(pathBounds, constants::widgetCornerRadius - halfBorderThickness);
 
-        g.setColour(meter.findColour(widgetBackgroundColourId));
+        g.setColour(meter.findColour(levelMeterBackgroundColourId));
         g.fillPath(path);
 
-        g.setColour(meter.findColour(widgetBorderColourId));
+        g.setColour(meter.findColour(levelMeterBorderColourId));
         g.strokePath(path, juce::PathStrokeType{ constants::widgetBorderThickness });
     }
 
@@ -54,7 +61,7 @@ namespace jump::lookAndFeelImplementations
                                                          constants::widgetCornerRadius - constants::widgetBorderThickness);
         g.reduceClipRegion(clipPath);
 
-        g.setColour(meter.findColour(widgetBorderColourId));
+        g.setColour(meter.findColour(levelMeterGridlinesColourId));
 
         const auto& decibelRange = meter.getEngine().getDecibelRange();
         const auto orientation = meter.getOrientation();
@@ -179,19 +186,19 @@ namespace jump::lookAndFeelImplementations
         const auto dangerColour = renderer.findColour(levelMeterDangerColourId);
 
         const auto& decibelRange = renderer.getEngine().getDecibelRange();
-        const auto normalisedNegative12 = decibelRange.convertTo0to1(-12.f);
+        const auto normalisedWarningLevel = decibelRange.convertTo0to1(constants::warningLevelDecibels);
 
         const auto orientation = renderer.getOrientation();
 
         if (orientation == Orientation::vertical)
         {
             gradient = juce::ColourGradient::vertical(dangerColour, safeColour, renderer.getLocalBounds());
-            gradient.addColour(static_cast<double>(1.f - normalisedNegative12), warningColour);
+            gradient.addColour(static_cast<double>(1.f - normalisedWarningLevel), warningColour);
         }
         else if (orientation == Orientation::horizontal)
         {
             gradient = juce::ColourGradient::horizontal(safeColour, dangerColour, renderer.getLocalBounds());
-            gradient.addColour(static_cast<double>(normalisedNegative12), warningColour);
+            gradient.addColour(static_cast<double>(normalisedWarningLevel), warningColour);
         }
         else
         {
@@ -257,6 +264,144 @@ namespace jump::lookAndFeelImplementations
     {
         return constants::multiMeterGapBetweenMeters;
     }
+
+    //==================================================================================================================
+    void drawSpectrumAnalyserBackground(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    {
+        const auto bounds = analyser.getLocalBounds().toFloat().reduced(constants::widgetBorderThickness / 2.f);
+        const auto path = createRoundedRectanglePath(bounds, constants::widgetCornerRadius);
+
+        g.setColour(analyser.findColour(ColourIds::spectrumAnalyserBackgroundColourId));
+        g.fillPath(path);
+
+        g.setColour(analyser.findColour(ColourIds::spectrumAnalyserBorderColourId));
+        g.strokePath(path, juce::PathStrokeType{ constants::widgetBorderThickness });
+    }
+
+    void drawSpectrumAnalyserVerticalGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    {
+        const auto& freqRange = analyser.getEngine().getFrequencyRange();
+        const auto nyquist = analyser.getEngine().getNyquistFrequency();
+        const auto maxOrder = static_cast<float>(std::ceil(std::log10(nyquist)));
+
+        const auto bounds = analyser.getLocalBounds().toFloat().reduced(constants::widgetBorderThickness);
+
+        for (auto order = 0.f; order < maxOrder; order++)
+        {
+            const auto multipleOfTen = std::pow(10.f, order);
+
+            for (auto multiplier = 1.f; multiplier < 10.f; multiplier++)
+            {
+                const auto freq = multipleOfTen * multiplier;
+
+                if (freq <= freqRange.start) continue;
+                if (freq >= freqRange.end) break;
+
+                const auto normalised = Math::inverseLogSpace(freqRange.start, freqRange.end, freq);
+                const auto x = bounds.getX() + bounds.proportionOfWidth(normalised) - constants::widgetBorderThickness / 2.f;
+
+                g.fillRect(std::round(x), bounds.getY(), constants::widgetBorderThickness, bounds.getHeight());
+            }
+        }
+    }
+
+    void drawSpectrumAnalyserHorizontalGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    {
+        const auto& decibelRange = analyser.getEngine().getDecibelRange();
+        const auto maxAbs = juce::jmax(std::abs(decibelRange.start), std::abs(decibelRange.end));
+
+        const auto bounds = analyser.getLocalBounds().toFloat().reduced(constants::widgetBorderThickness);
+
+        for (auto dB = 0.f; dB < maxAbs; dB += constants::spectrumAnalyserGridlinesIntervalDecibels)
+        {
+            for (auto level : { dB, -dB })
+            {
+                if (level <= decibelRange.start || level >= decibelRange.end)
+                    continue;
+
+                const auto normalised = decibelRange.convertTo0to1(level);
+                const auto y = bounds.getBottom() - bounds.proportionOfHeight(normalised) - constants::widgetBorderThickness / 2.f;
+
+                g.fillRect(bounds.getX(), std::round(y), bounds.getWidth(), constants::widgetBorderThickness);
+            }
+        }
+    }
+
+    void drawSpectrumAnalyserGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    {
+        g.setColour(analyser.findColour(spectrumAnalyserGridlinesColourId));
+
+        drawSpectrumAnalyserVerticalGridlines  (g, analyser);
+        drawSpectrumAnalyserHorizontalGridlines(g, analyser);
+    }
+
+    void SpectrumAnalyserLookAndFeel::drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept
+    {
+        drawSpectrumAnalyserBackground(g, analyser);
+        drawSpectrumAnalyserGridlines (g, analyser);
+    }
+
+    juce::Point<float> denormalisePoint(const juce::Point<float>& normalisedPoint, const juce::Rectangle<float>& bounds)
+    {
+        return {
+            bounds.getX() + bounds.proportionOfWidth (normalisedPoint.x),
+            bounds.getY() + bounds.proportionOfHeight(normalisedPoint.y)
+        };
+    }
+
+    juce::ColourGradient getSpectrumAnalyserGradient(const SpectrumAnalyser& analyser)
+    {
+        auto gradient = juce::ColourGradient::vertical(analyser.findColour(spectrumAnalyserDangerColourId),
+                                                       analyser.findColour(spectrumAnalyserSafeColourId),
+                                                       analyser.getLocalBounds().reduced(1));
+
+        const auto& decibelRange = analyser.getEngine().getDecibelRange();
+        const auto normalisedWarningLevel = 1.0 - static_cast<double>(decibelRange.convertTo0to1(constants::warningLevelDecibels));
+
+        gradient.addColour(normalisedWarningLevel, analyser.findColour(spectrumAnalyserWarningColourId));
+
+        return gradient;
+    }
+
+    void SpectrumAnalyserLookAndFeel::drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
+                                                           const std::vector<juce::Point<float>>& points) const noexcept
+    {
+        if (points.size() == 0)
+            return;
+
+        const auto bounds = analyser.getLocalBounds().reduced(1).toFloat();
+        const auto clippingPath = createRoundedRectanglePath(bounds, constants::widgetCornerRadius - 1.f);
+        g.reduceClipRegion(clippingPath);
+
+        juce::Path path;
+        path.startNewSubPath(bounds.getX() - 10.f, denormalisePoint(points.front(), bounds).y);
+
+        for (const auto& point : points)
+        {
+            auto scaledPoint = denormalisePoint(point, bounds);
+
+            if (point.y == 1.f)
+                scaledPoint.y += constants::spectrumAnalyserLineThickness / 2.f;
+
+            path.lineTo(scaledPoint);
+        }
+
+        path.lineTo(bounds.getRight() + 10.f, denormalisePoint(points.back(), bounds).y);
+        path.lineTo(bounds.expanded(constants::spectrumAnalyserLineThickness).getBottomRight());
+        path.lineTo(bounds.expanded(constants::spectrumAnalyserLineThickness).getBottomLeft());
+
+        g.setGradientFill(getSpectrumAnalyserGradient(analyser));
+
+        {
+            juce::Graphics::ScopedSaveState sss{ g };
+            g.setOpacity(constants::spectrumAnalyserFillOpacity);
+
+            g.fillPath(path);
+        }
+
+        using PST = juce::PathStrokeType;
+        g.strokePath(path, PST{ constants::spectrumAnalyserLineThickness, PST::curved, PST::rounded });
+    }
 }   // namespace jump::lookAndFeelImplementations
 
 //======================================================================================================================
@@ -264,17 +409,53 @@ namespace jump
 {
     //==================================================================================================================
     LookAndFeel::LookAndFeel()
+        :   LookAndFeel{ getMaterialColourScheme() }
     {
-        setColour(widgetBackgroundColourId, ColourPalette::blueGrey800);
-        setColour(widgetBorderColourId,     ColourPalette::blueGrey900);
+    }
 
-        setColour(levelMeterSafeColourId,    ColourPalette::lightGreen500);
-        setColour(levelMeterWarningColourId, ColourPalette::yellow500);
-        setColour(levelMeterDangerColourId,  ColourPalette::red500);
-        setColour(levelMeterLabelNormalTextColourId,  ColourPalette::blueGrey050);
-        setColour(levelMeterLabelHighlightedTextColourId,  ColourPalette::blueGrey100);
+    LookAndFeel::LookAndFeel(const ColourScheme& scheme)
+    {
+        setColourScheme(scheme);
+    }
 
-        setColour(juce::ResizableWindow::backgroundColourId, ColourPalette::blueGrey850);
-        setColour(juce::Label::textColourId, ColourPalette::blueGrey050);
+    //==================================================================================================================
+    void LookAndFeel::setColourScheme(const ColourScheme& scheme)
+    {
+        setColour(levelMeterBackgroundColourId,           scheme.widgetBackground);
+        setColour(levelMeterBorderColourId,               scheme.widgetBorder);
+        setColour(levelMeterGridlinesColourId,            scheme.widgetBorder);
+        setColour(levelMeterSafeColourId,                 scheme.safe);
+        setColour(levelMeterWarningColourId,              scheme.warning);
+        setColour(levelMeterDangerColourId,               scheme.danger);
+        setColour(levelMeterLabelNormalTextColourId,      scheme.textNormal);
+        setColour(levelMeterLabelHighlightedTextColourId, scheme.textBold);
+
+        setColour(spectrumAnalyserBackgroundColourId, scheme.widgetBackground);
+        setColour(spectrumAnalyserBorderColourId,     scheme.widgetBorder);
+        setColour(spectrumAnalyserGridlinesColourId,  scheme.widgetBorder);
+        setColour(spectrumAnalyserSafeColourId,       scheme.safe);
+        setColour(spectrumAnalyserWarningColourId,    scheme.warning);
+        setColour(spectrumAnalyserDangerColourId,     scheme.danger);
+
+        setColour(juce::ResizableWindow::backgroundColourId, scheme.windowBackground);
+        setColour(juce::Label::textColourId,                 scheme.textNormal);
+    }
+
+    LookAndFeel::ColourScheme LookAndFeel::getMaterialColourScheme()
+    {
+        ColourScheme scheme;
+
+        scheme.windowBackground = MaterialColourPalette::blueGrey850;
+
+        scheme.widgetBackground = MaterialColourPalette::blueGrey800;
+        scheme.widgetBorder = MaterialColourPalette::blueGrey900;
+        scheme.textNormal = MaterialColourPalette::blueGrey050;
+        scheme.textBold = MaterialColourPalette::blueGrey100;
+
+        scheme.safe = MaterialColourPalette::lightGreen500;
+        scheme.warning = MaterialColourPalette::yellow500;
+        scheme.danger = MaterialColourPalette::red500;
+
+        return scheme;
     }
 }

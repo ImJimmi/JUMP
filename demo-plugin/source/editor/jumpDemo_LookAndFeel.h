@@ -11,6 +11,8 @@ namespace jumpDemo
         //==================================================================================================================
         class PluginEditorLookAndFeel :   public PluginEditor::LookAndFeelMethods
         {
+            void drawSeparator(juce::Graphics& g, const jump::Canvas& canvas) const noexcept override;
+
             jump::TrackInfoList getTemplateColumns() const noexcept override;
             jump::Size<int> getDemoSelectorSize() const noexcept override;
             jump::Margin<float> getDemoSelectorMargin() const noexcept override;

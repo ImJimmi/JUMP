@@ -65,6 +65,17 @@ namespace jump
             };
         }
 
+        //==============================================================================================================
+        ValueType getRightPlusLeft() const noexcept
+        {
+            return right + left;
+        }
+
+        ValueType getTopPlusBottom() const noexcept
+        {
+            return top + bottom;
+        }
+
     private:
         //==============================================================================================================
         ValueType top;

@@ -93,6 +93,9 @@ namespace jump
         */
         void setFrequencyRange(const juce::NormalisableRange<float>& newFrequencyRange);
 
+        /** Returns the current frequency range being used by this engine. */
+        const juce::NormalisableRange<float>& getFrequencyRange() const noexcept;
+
         /** Changes the decibel range of the analyser.
 
             The start of the range will be treated as -inf Decibels and will be normalised to a value of 0 while the end
@@ -103,6 +106,9 @@ namespace jump
             @param newDecibelRange  The new decibel range to use.
         */
         void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange);
+
+        /** Returns the current decibel range being used by this engine. */
+        const juce::NormalisableRange<float>& getDecibelRange() const noexcept;
 
         /** Changes the time, in milliseconds, for which peaks are held before they start to decay.
 
@@ -150,6 +156,9 @@ namespace jump
             @param newNumPoints The new number of points to calculate.
         */
         void setNumPoints(int newNumPoints);
+
+        /** Returns the current sample rate being used by this engine. */
+        double getNyquistFrequency() const noexcept;
 
     private:
         //==============================================================================================================
