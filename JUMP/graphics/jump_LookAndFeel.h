@@ -12,24 +12,32 @@ namespace jump
                                         public MultiMeter::LookAndFeelMethods
         {
             // LevelMeter
-            void drawBackground(juce::Graphics& g, const LevelMeter& meter) const noexcept override;
+            void drawBackground(juce::Graphics& g, const LevelMeter& meter) const noexcept override final;
             void drawLevelMeter(juce::Graphics& g, const LevelMeter& renderer,
-                                float peakLevelNormalised, float rmsLevelNormalised) const noexcept override;
+                                float peakLevelNormalised, float rmsLevelNormalised) const noexcept override final;
 
             // LevelMeterLabelsComponent
             std::unique_ptr<juce::Label> createLabelForLevel(const LevelMeterLabelsComponent&,
-                                                             float level) const noexcept override;
+                                                             float level) const noexcept override final;
 
             // MultiMeter
-            int getGapBetweenMeters(const MultiMeter& component) const noexcept override;
+            int getGapBetweenMeters(const MultiMeter& component) const noexcept override final;
         };
 
         //==============================================================================================================
-        class SpectrumAnalyserLookAndFeel   :   public SpectrumAnalyser::LookAndFeelMethods
+        class SpectrumAnalyserLookAndFeel   :   public SpectrumAnalyser::LookAndFeelMethods,
+                                                public SpectrumAnalyserLabelsComponent::LookAndFeelMethods
         {
-            void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept override;
+            // SpectrumAnalyser
+            void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept override final;
             void drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
-                                      const std::vector<juce::Point<float>>& points) const noexcept override;
+                                      const std::vector<juce::Point<float>>& points) const noexcept override final;
+
+            // SpectrumAnalyserLabelsComponent
+            std::unique_ptr<juce::Label> createLabelForLevel(const SpectrumAnalyserLabelsComponent& component,
+                                                             float level) const noexcept override final;
+            std::unique_ptr<juce::Label> createLabelForFrequency(const SpectrumAnalyserLabelsComponent& component,
+                                                                 float frequency) const noexcept override final;
         };
     }
 

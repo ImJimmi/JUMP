@@ -9,6 +9,9 @@ namespace constants
     constexpr auto widgetCornerRadius = 2.5f;
     constexpr auto widgetBorderThickness = 1.f;
 
+    constexpr char defaultFontFamily[] = "Helvetica";
+    constexpr auto defaultFontSize = 12.f;
+
     //==================================================================================================================
     constexpr auto warningLevelDecibels = -12.f;
 
@@ -25,6 +28,8 @@ namespace constants
     constexpr auto spectrumAnalyserLineThickness = 1.5f;
     constexpr auto spectrumAnalyserGridlinesIntervalDecibels = 12.f;
     constexpr auto spectrumAnalyserFillOpacity = 0.1f;
+    constexpr auto spectrumAnalyserLevelLabelMarginX = 10;
+    constexpr auto spectrumAnalyserFrequencyLabelMarginBottom = 3;
 }   // namespace constants
 
 //======================================================================================================================
@@ -38,6 +43,11 @@ namespace jump::lookAndFeelImplementations
         path.addRoundedRectangle(bounds, cornerRadius);
 
         return path;
+    }
+
+    juce::Font getDefaultFont(int flags = juce::Font::FontStyleFlags::plain)
+    {
+        return { constants::defaultFontFamily, constants::defaultFontSize, flags };
     }
 
     //==================================================================================================================
@@ -215,12 +225,10 @@ namespace jump::lookAndFeelImplementations
 
     juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf)
     {
-        static const juce::String units{ "dB" };
-
         if (isNegativeInf)
-            return "-inf" + units;
+            return "-inf";
 
-        return juce::String{ decibelLevel } + units;
+        return juce::String{ decibelLevel };
     }
 
     juce::Font::FontStyleFlags getFontFlagsForLevelMeterText(float decibelLevel, bool isNegativeInf)
@@ -234,10 +242,10 @@ namespace jump::lookAndFeelImplementations
     juce::Font getLevelMeterLabelFont(float decibelLevel, bool isNegativeInf)
     {
         const auto flags = getFontFlagsForLevelMeterText(decibelLevel, isNegativeInf);
-        return { "Helvetica", 12.f, flags };
+        return getDefaultFont(flags);
     }
 
-    juce::Colour getLevelMeterTextColour(const LevelMeterLabelsComponent& component,
+    juce::Colour getLevelMeterTextColour(const juce::Component& component,
                                          const float decibelLevel, bool isNegativeInf)
     {
         if (decibelLevel == 0.f || isNegativeInf)
@@ -401,6 +409,58 @@ namespace jump::lookAndFeelImplementations
 
         using PST = juce::PathStrokeType;
         g.strokePath(path, PST{ constants::spectrumAnalyserLineThickness, PST::curved, PST::rounded });
+    }
+
+    Margin<int> getSpectrumAnalyserLevelLabelMargin()
+    {
+        return { 0, constants::spectrumAnalyserLevelLabelMarginX,
+                 0, constants::spectrumAnalyserLevelLabelMarginX };
+    }
+
+    std::unique_ptr<juce::Label> SpectrumAnalyserLookAndFeel::createLabelForLevel(const SpectrumAnalyserLabelsComponent& component,
+                                                                                  float level) const noexcept
+    {
+        auto label = std::make_unique<juce::Label>();
+
+        const auto decibelRange = component.getEngine().getDecibelRange();
+        const auto isNegativeInf = level <= decibelRange.start;
+        label->setText(getLevelMeterTextForLevel(level, isNegativeInf), juce::dontSendNotification);
+        label->setFont(getLevelMeterLabelFont(level, isNegativeInf));
+        label->setColour(juce::Label::textColourId, getLevelMeterTextColour(component, level, isNegativeInf));
+        label->setBorderSize(getSpectrumAnalyserLevelLabelMargin().toBorderSize());
+
+        return label;
+    }
+
+    juce::String getSpectrumAnalyserTextForFrequency(float frequency)
+    {
+        juce::String suffix{ "" };
+
+        if (frequency >= 1000.f)
+        {
+            frequency /= 1000.f;
+            suffix = "k";
+        }
+
+        return juce::String{ juce::roundToInt(frequency) } + suffix;
+    }
+
+    Margin<int> getSpectrumAnalyserFrequencyLabelMargin()
+    {
+        return { 0, 0, constants::spectrumAnalyserFrequencyLabelMarginBottom, 0 };
+    }
+
+    std::unique_ptr<juce::Label> SpectrumAnalyserLookAndFeel::createLabelForFrequency(const SpectrumAnalyserLabelsComponent& component,
+                                                                                      float frequency) const noexcept
+    {
+        auto label = std::make_unique<juce::Label>();
+
+        const auto frequencyRange = component.getEngine().getFrequencyRange();
+        label->setText(getSpectrumAnalyserTextForFrequency(frequency), juce::dontSendNotification);
+        label->setFont(getDefaultFont());
+        label->setBorderSize(getSpectrumAnalyserFrequencyLabelMargin().toBorderSize());
+
+        return label;
     }
 }   // namespace jump::lookAndFeelImplementations
 
