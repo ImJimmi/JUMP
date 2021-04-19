@@ -28,8 +28,7 @@ namespace jumpDemo
 
         juce::Label title;
 
-        jump::SpectrumAnalyser analyser{ outputEngine };
-        jump::SpectrumAnalyserLabelsComponent labels{ outputEngine };
+        jump::MultiAnalyser analyser{ { &inputEngine, &outputEngine } };
 
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalysers)

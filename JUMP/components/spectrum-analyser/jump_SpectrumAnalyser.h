@@ -15,7 +15,8 @@ namespace jump
 
             virtual void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept = 0;
             virtual void drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
-                                              const std::vector<juce::Point<float>>& points) const noexcept = 0;
+                                              const std::vector<juce::Point<float>>& points,
+                                              bool shouldFillGraph) const noexcept = 0;
         };
 
         //==============================================================================================================
@@ -31,7 +32,7 @@ namespace jump
 
             addAndMakeVisible(analyser);
             analyser.setDrawFunction([this](juce::Graphics& g) {
-                lookAndFeel->drawSpectrumAnalyser(g, *this, analyserPoints);
+                lookAndFeel->drawSpectrumAnalyser(g, *this, analyserPoints, shouldFill);
             });
 
             engineToUse.addRenderer(this);
@@ -43,6 +44,17 @@ namespace jump
         }
 
         //==============================================================================================================
+        void setBackgroundVisible(bool backgroundShouldBeVisible)
+        {
+            background.setVisible(backgroundShouldBeVisible);
+        }
+
+        void setShouldFillGraph(bool shouldFillGraph)
+        {
+            shouldFill = shouldFillGraph;
+            repaint();
+        }
+
         const SpectrumAnalyserEngine& getEngine() const noexcept
         {
             return engine;
@@ -70,6 +82,8 @@ namespace jump
 
         Canvas background;
         Canvas analyser;
+
+        bool shouldFill{ true };
 
         std::vector<juce::Point<float>> analyserPoints;
 

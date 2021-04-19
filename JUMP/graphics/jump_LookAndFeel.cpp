@@ -372,7 +372,8 @@ namespace jump::lookAndFeelImplementations
     }
 
     void SpectrumAnalyserLookAndFeel::drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
-                                                           const std::vector<juce::Point<float>>& points) const noexcept
+                                                           const std::vector<juce::Point<float>>& points,
+                                                           bool shouldFillGraph) const noexcept
     {
         if (points.size() == 0)
             return;
@@ -400,6 +401,7 @@ namespace jump::lookAndFeelImplementations
 
         g.setGradientFill(getSpectrumAnalyserGradient(analyser));
 
+        if (shouldFillGraph)
         {
             juce::Graphics::ScopedSaveState sss{ g };
             g.setOpacity(constants::spectrumAnalyserFillOpacity);

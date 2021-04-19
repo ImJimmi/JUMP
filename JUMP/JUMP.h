@@ -89,6 +89,7 @@ namespace juce
 #include "components/spectrum-analyser/jump_SpectrumAnalyserEngine.h"
 #include "components/spectrum-analyser/jump_SpectrumAnalyser.h"
 #include "components/spectrum-analyser/jump_SpectrumAnalyserLabelsComponent.h"
+#include "components/spectrum-analyser/jump_MultiAnalyser.h"
 
 #include "graphics/jump_LookAndFeel.h"
 #include "graphics/jump_Margin.h"

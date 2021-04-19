@@ -13,8 +13,9 @@ namespace jumpDemo
     {
     }
 
-    void AudioProcessor::process(const juce::dsp::ProcessContextReplacing<float>& /*context*/)
+    void AudioProcessor::process(const juce::dsp::ProcessContextReplacing<float>& context)
     {
+        context.getOutputBlock() *= 0.125f;
     }
 
     void AudioProcessor::reset()

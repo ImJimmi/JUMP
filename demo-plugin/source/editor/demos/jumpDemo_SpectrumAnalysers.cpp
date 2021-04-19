@@ -17,9 +17,6 @@ namespace jumpDemo
         title.setFont(getTitleFont());
 
         addAndMakeVisible(analyser);
-        addAndMakeVisible(labels);
-        labels.setHighlightedLevelsAndFrequencies({-12.f, -24.f, -36.f, -48.f, -60.f, -72.f, -84.f, -96.f},
-                                                  {50.f, 100.f, 200.f, 500.f, 1000.f, 2000.f, 5000.f, 10000.f});
     }
 
     //==================================================================================================================
@@ -62,7 +59,5 @@ namespace jumpDemo
         };
 
         grid.performLayout(getLocalBounds().reduced(gap));
-
-        labels.setBounds(analyser.getBounds());
     }
 }   // namespace jumpDemo

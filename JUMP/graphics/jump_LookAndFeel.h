@@ -31,7 +31,8 @@ namespace jump
             // SpectrumAnalyser
             void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept override final;
             void drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
-                                      const std::vector<juce::Point<float>>& points) const noexcept override final;
+                                      const std::vector<juce::Point<float>>& points,
+                                      bool shouldFillGraph) const noexcept override final;
 
             // SpectrumAnalyserLabelsComponent
             std::unique_ptr<juce::Label> createLabelForLevel(const SpectrumAnalyserLabelsComponent& component,

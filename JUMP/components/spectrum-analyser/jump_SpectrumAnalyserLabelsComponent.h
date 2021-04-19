@@ -24,19 +24,24 @@ namespace jump
         {
             lookAndFeel.attachTo(this);
             lookAndFeel.onValidLookAndFeelFound = [this]() {
-                updateLabels();
+                updateLevelLabels();
+                updateFrequencyLabels();
             };
         }
 
         ~SpectrumAnalyserLabelsComponent() override = default;
 
         //==============================================================================================================
-        void setHighlightedLevelsAndFrequencies(const std::vector<float>& newHighlightedLevels,
-                                                const std::vector<float>& newHighlightedFrequencies)
+        void setHighlightedLevels(const std::vector<float>& newHighlightedLevels)
         {
             levels = newHighlightedLevels;
+            updateLevelLabels();
+        }
+
+        void setHighlightedFrequencies(const std::vector<float>& newHighlightedFrequencies)
+        {
             frequencies = newHighlightedFrequencies;
-            updateLabels();
+            updateFrequencyLabels();
         }
 
         const SpectrumAnalyserEngine& getEngine() const noexcept
@@ -48,7 +53,40 @@ namespace jump
         //==============================================================================================================
         void resized() override
         {
-            if (getWidth() <= 0 || getHeight() <= 0)
+            positionLevelLabels();
+            positionFrequencyLabels();
+        }
+
+        void lookAndFeelChanged() override
+        {
+            updateLevelLabels();
+            updateFrequencyLabels();
+        }
+
+        //==============================================================================================================
+        void updateLevelLabels()
+        {
+            if (!lookAndFeel)
+                return;
+
+            levelLabels.clear();
+
+            for (const auto& level : levels)
+            {
+
+                auto label = lookAndFeel->createLabelForLevel(*this, level);
+                label->getProperties().set(levelPropertyId, level);
+                addAndMakeVisible(*label);
+
+                levelLabels.add(std::move(label));
+            }
+
+            positionLevelLabels();
+        }
+
+        void positionLevelLabels()
+        {
+            if (!isVisible() || getWidth() <= 0 || getHeight() <= 0)
                 return;
 
             const auto& decibelRange = engine.getDecibelRange();
@@ -64,7 +102,32 @@ namespace jump
 
                 label->setBounds(0, labelY, labelWidth, labelHeight);
             }
+        }
 
+        void updateFrequencyLabels()
+        {
+            if (!lookAndFeel)
+                return;
+
+            frequencyLabels.clear();
+
+            for (const auto& freq : frequencies)
+            {
+                auto label = lookAndFeel->createLabelForFrequency(*this, freq);
+                label->getProperties().set(frequencyPropertyId, freq);
+                addAndMakeVisible(*label);
+
+                frequencyLabels.add(std::move(label));
+            }
+
+            positionFrequencyLabels();
+        }
+
+        void positionFrequencyLabels()
+        {
+            if (!isVisible() || getWidth() <= 0 || getHeight() <= 0)
+                return;
+                
             const auto& freqRange = engine.getFrequencyRange();
 
             for (auto& label : frequencyLabels)
@@ -78,42 +141,6 @@ namespace jump
 
                 label->setBounds(labelX, getHeight() - labelHeight, labelWidth, labelHeight);
             }
-        }
-
-        void lookAndFeelChanged() override
-        {
-            updateLabels();
-        }
-
-        //==============================================================================================================
-        void updateLabels()
-        {
-            if (!lookAndFeel)
-                return;
-
-            levelLabels.clear();
-            frequencyLabels.clear();
-
-            for (const auto& level : levels)
-            {
-
-                auto label = lookAndFeel->createLabelForLevel(*this, level);
-                label->getProperties().set(levelPropertyId, level);
-                addAndMakeVisible(*label);
-
-                levelLabels.add(std::move(label));
-            }
-
-            for (const auto& freq : frequencies)
-            {
-                auto label = lookAndFeel->createLabelForFrequency(*this, freq);
-                label->getProperties().set(frequencyPropertyId, freq);
-                addAndMakeVisible(*label);
-
-                frequencyLabels.add(std::move(label));
-            }
-
-            resized();
         }
 
         //==============================================================================================================
