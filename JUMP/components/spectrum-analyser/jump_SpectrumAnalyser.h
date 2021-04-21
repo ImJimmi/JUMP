@@ -29,90 +29,29 @@ namespace jump
         //==============================================================================================================
         explicit SpectrumAnalyser(const SpectrumAnalyserEngine& engineToUse,
                                   const juce::Identifier& uniqueID = "NonStatefulSpectrumAnalyser",
-                                  StatefulObject* parentState = nullptr)
-            :   StatefulObject{ uniqueID, parentState },
-                engine{ engineToUse }
-        {
-            initialiseState();
-            lookAndFeel.attachTo(this);
+                                  StatefulObject* parentState = nullptr);
 
-            addAndMakeVisible(background);
-            background.setDrawFunction([this](juce::Graphics& g) {
-                lookAndFeel->drawBackground(g, *this);
-            });
-
-            addAndMakeVisible(analyser);
-            analyser.setDrawFunction([this](juce::Graphics& g) {
-                lookAndFeel->drawSpectrumAnalyser(g, *this, analyserPoints, paintOptions);
-            });
-
-            engineToUse.addRenderer(this);
-        }
-
-        ~SpectrumAnalyser() override
-        {
-            engine.removeRenderer(this);
-        }
+        ~SpectrumAnalyser() override;
 
         //==============================================================================================================
-        void setBackgroundVisible(bool backgroundShouldBeVisible)
-        {
-            setProperty (PropertyIDs::isBackgroundVisibleId, backgroundShouldBeVisible);
-        }
+        void setBackgroundVisible(bool backgroundShouldBeVisible);
+        void setPaintOptions(const PaintOptions& options);
 
-        void setPaintOptions(const PaintOptions& options)
-        {
-            setProperty (PropertyIDs::paintOptionsId, options.serialise());
-        }
-
-        const SpectrumAnalyserEngine& getEngine() const noexcept
-        {
-            return engine;
-        }
+        const SpectrumAnalyserEngine& getEngine() const noexcept;
 
     private:
         //==============================================================================================================
-        void resized() override
-        {
-            const auto bounds = getLocalBounds();
-
-            background.setBounds(bounds);
-            analyser.setBounds(bounds);
-        }
-
+        void resized() override;
         void newSpectrumAnalyserPointsAvailable(const SpectrumAnalyserEngine&,
-                                                const std::vector<juce::Point<float>>& points) override
-        {
-            analyserPoints = points;
-            analyser.repaint();
-        }
-
-        void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override
-        {
-            if (name == PropertyIDs::isBackgroundVisibleId)
-                setBackgroundVisibleInternal(static_cast<bool>(newValue));
-            else if (name == PropertyIDs::paintOptionsId)
-                setPaintOptionsInternal(PaintOptions{ static_cast<juce::int64>(newValue) });
-        }
+                                                const std::vector<juce::Point<float>>& points) override;
+        void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override;
 
         //==============================================================================================================
-        void initialiseState()
-        {
-            setBackgroundVisible(true);
-            setPaintOptions(PaintOptions{ PaintOptions::strokeAndFill });
-        }
+        void initialiseState();
 
         //==============================================================================================================
-        void setBackgroundVisibleInternal (bool shouldBeVisible)
-        {
-            background.setVisible(shouldBeVisible);
-        }
-
-        void setPaintOptionsInternal(const PaintOptions& options)
-        {
-            paintOptions = options;
-            repaint();
-        }
+        void setBackgroundVisibleInternal (bool shouldBeVisible);
+        void setPaintOptionsInternal(const PaintOptions& options);
 
         //==============================================================================================================
         const SpectrumAnalyserEngine& engine;
