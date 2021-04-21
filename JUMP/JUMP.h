@@ -81,6 +81,7 @@ namespace juce
 
 #include "graphics/jump_ColourIDs.h"
 #include "graphics/jump_MaterialColourPalette.h"
+#include "graphics/jump_PaintOptions.h"
 
 #include "components/level-meter/jump_LevelMeterEngine.h"
 #include "components/level-meter/jump_LevelMeter.h"

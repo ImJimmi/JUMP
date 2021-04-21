@@ -33,9 +33,6 @@ namespace jump
 
     protected:
         //==============================================================================================================
-        virtual void propertyChanged(const juce::Identifier& name, const juce::var& newValue) = 0;
-
-        //==============================================================================================================
         juce::ValueTree& getState()
         {
             return valueTree;
@@ -65,6 +62,8 @@ namespace jump
         }
 
         //==============================================================================================================
+        virtual void propertyChanged(const juce::Identifier& name, const juce::var& newValue) = 0;
+
         void addChild(StatefulObject* child)
         {
             children.addIfNotAlreadyThere(child);

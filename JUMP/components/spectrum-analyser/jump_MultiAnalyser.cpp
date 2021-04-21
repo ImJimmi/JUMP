@@ -14,7 +14,8 @@ namespace jump
 
         for (auto& engine : enginesToUse)
         {
-            auto analyser = std::make_unique<SpectrumAnalyser>(*engine);
+            const juce::Identifier id{ "analyser" + juce::String{ analysers.size() } };
+            auto analyser = std::make_unique<SpectrumAnalyser>(*engine, id, this);
             addAndMakeVisible(*analyser);
             analyser->setBackgroundVisible(analysers.size() == 0);
             analysers.add(std::move(analyser));
@@ -25,7 +26,7 @@ namespace jump
             analysers[0]->setColour(spectrumAnalyserSafeColourId,    MaterialColourPalette::blueGrey300);
             analysers[0]->setColour(spectrumAnalyserWarningColourId, MaterialColourPalette::blueGrey200);
             analysers[0]->setColour(spectrumAnalyserDangerColourId,  MaterialColourPalette::blueGrey100);
-            analysers[0]->setShouldFillGraph(false);
+            analysers[0]->setPaintOptions(PaintOptions{ PaintOptions::strokeFlag });
         }
 
         addAndMakeVisible(labels);

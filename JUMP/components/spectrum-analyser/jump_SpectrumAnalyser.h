@@ -5,7 +5,8 @@ namespace jump
 {
     //==================================================================================================================
     class SpectrumAnalyser  :   public Container,
-                                public SpectrumAnalyserRendererBase
+                                public SpectrumAnalyserRendererBase,
+                                private StatefulObject
     {
     public:
         //==============================================================================================================
@@ -16,13 +17,23 @@ namespace jump
             virtual void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept = 0;
             virtual void drawSpectrumAnalyser(juce::Graphics& g, const SpectrumAnalyser& analyser,
                                               const std::vector<juce::Point<float>>& points,
-                                              bool shouldFillGraph) const noexcept = 0;
+                                              const PaintOptions& paintOptions) const noexcept = 0;
+        };
+
+        struct PropertyIDs
+        {
+            static const inline juce::Identifier isBackgroundVisibleId{ "isBackgroundVisible" };
+            static const inline juce::Identifier paintOptionsId       { "paintOptions" };
         };
 
         //==============================================================================================================
-        explicit SpectrumAnalyser(const SpectrumAnalyserEngine& engineToUse)
-            :   engine{ engineToUse }
+        explicit SpectrumAnalyser(const SpectrumAnalyserEngine& engineToUse,
+                                  const juce::Identifier& uniqueID = "NonStatefulSpectrumAnalyser",
+                                  StatefulObject* parentState = nullptr)
+            :   StatefulObject{ uniqueID, parentState },
+                engine{ engineToUse }
         {
+            initialiseState();
             lookAndFeel.attachTo(this);
 
             addAndMakeVisible(background);
@@ -32,7 +43,7 @@ namespace jump
 
             addAndMakeVisible(analyser);
             analyser.setDrawFunction([this](juce::Graphics& g) {
-                lookAndFeel->drawSpectrumAnalyser(g, *this, analyserPoints, shouldFill);
+                lookAndFeel->drawSpectrumAnalyser(g, *this, analyserPoints, paintOptions);
             });
 
             engineToUse.addRenderer(this);
@@ -46,13 +57,12 @@ namespace jump
         //==============================================================================================================
         void setBackgroundVisible(bool backgroundShouldBeVisible)
         {
-            background.setVisible(backgroundShouldBeVisible);
+            setProperty (PropertyIDs::isBackgroundVisibleId, backgroundShouldBeVisible);
         }
 
-        void setShouldFillGraph(bool shouldFillGraph)
+        void setPaintOptions(const PaintOptions& options)
         {
-            shouldFill = shouldFillGraph;
-            repaint();
+            setProperty (PropertyIDs::paintOptionsId, options.serialise());
         }
 
         const SpectrumAnalyserEngine& getEngine() const noexcept
@@ -77,13 +87,40 @@ namespace jump
             analyser.repaint();
         }
 
+        void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override
+        {
+            if (name == PropertyIDs::isBackgroundVisibleId)
+                setBackgroundVisibleInternal(static_cast<bool>(newValue));
+            else if (name == PropertyIDs::paintOptionsId)
+                setPaintOptionsInternal(PaintOptions{ static_cast<juce::int64>(newValue) });
+        }
+
+        //==============================================================================================================
+        void initialiseState()
+        {
+            setBackgroundVisible(true);
+            setPaintOptions(PaintOptions{ PaintOptions::strokeAndFill });
+        }
+
+        //==============================================================================================================
+        void setBackgroundVisibleInternal (bool shouldBeVisible)
+        {
+            background.setVisible(shouldBeVisible);
+        }
+
+        void setPaintOptionsInternal(const PaintOptions& options)
+        {
+            paintOptions = options;
+            repaint();
+        }
+
         //==============================================================================================================
         const SpectrumAnalyserEngine& engine;
 
         Canvas background;
         Canvas analyser;
 
-        bool shouldFill{ true };
+        PaintOptions paintOptions{ PaintOptions::strokeAndFill };
 
         std::vector<juce::Point<float>> analyserPoints;
 
