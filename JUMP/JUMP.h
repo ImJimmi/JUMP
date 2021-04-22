@@ -45,26 +45,6 @@ namespace jump
 }   // namespace jump
 
 //======================================================================================================================
-namespace juce
-{
-    //==================================================================================================================
-    template <>
-    struct VariantConverter<jump::Orientation>
-    {
-        //==============================================================================================================
-        static jump::Orientation fromVar(const juce::var& v)
-        {
-            return static_cast<jump::Orientation>(static_cast<int>(v));
-        }
-
-        static juce::var toVar(const jump::Orientation& orientation)
-        {
-            return { static_cast<int>(orientation) };
-        }
-    };
-}
-
-//======================================================================================================================
 #include "containers/jump_CircularBuffer.h"
 #include "interfaces/jump_StatefulObject.h"
 #include "interfaces/jump_AudioComponentEngine.h"

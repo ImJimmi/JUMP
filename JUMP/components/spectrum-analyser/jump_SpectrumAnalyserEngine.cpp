@@ -6,10 +6,10 @@ namespace jump
     //==================================================================================================================
     void SpectrumAnalyserEngine::initialise()
     {
-        setProperty(PropertyIDs::windowingMethodId, juce::VariantConverter<WindowingMethod>::toVar(WindowingMethod::hann));
+        setProperty(PropertyIDs::windowingMethodId, var_cast<WindowingMethod>(WindowingMethod::hann));
         setProperty(PropertyIDs::fftOrderId,        0);
-        setProperty(PropertyIDs::frequencyRangeId,  "[20.0, 20000.0]");
-        setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0]");
+        setProperty(PropertyIDs::frequencyRangeId,  var_cast<juce::NormalisableRange<float>>({ 20.f, 20000.f }));
+        setProperty(PropertyIDs::decibelRangeId,    var_cast<juce::NormalisableRange<float>>({ -100.f, 0.f }));
         setProperty(PropertyIDs::holdTimeId,        100.f);
         setProperty(PropertyIDs::maxHoldTimeId,     10000.f);
         setProperty(PropertyIDs::decayTimeId,       500.f);
@@ -45,7 +45,7 @@ namespace jump
 
     void SpectrumAnalyserEngine::setWindowingMethod(WindowingMethod newWindowingMethod)
     {
-        setProperty(PropertyIDs::windowingMethodId, juce::VariantConverter<WindowingMethod>::toVar(newWindowingMethod));
+        setProperty(PropertyIDs::windowingMethodId, var_cast<WindowingMethod>(newWindowingMethod));
     }
 
     void SpectrumAnalyserEngine::setFFTOrder(int newFFTOrder)
@@ -60,8 +60,7 @@ namespace jump
         jassert(newFrequencyRange.start > 0.f);
         jassert(newFrequencyRange.end <= nyquistFrequency);
 
-        const auto value = juce::var{ juce::Array<juce::var>{ newFrequencyRange.start, newFrequencyRange.end } };
-        setProperty(PropertyIDs::frequencyRangeId, juce::JSON::toString(value, true));
+        setProperty(PropertyIDs::frequencyRangeId, var_cast<juce::NormalisableRange<float>>(newFrequencyRange));
     }
 
     const juce::NormalisableRange<float>& SpectrumAnalyserEngine::getFrequencyRange() const noexcept
@@ -71,8 +70,7 @@ namespace jump
 
     void SpectrumAnalyserEngine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
     {
-        const auto value = juce::var{ juce::Array<juce::var>{ newDecibelRange.start, newDecibelRange.end } };
-        setProperty(PropertyIDs::decibelRangeId, juce::JSON::toString(value, true));
+        setProperty(PropertyIDs::decibelRangeId, var_cast<juce::NormalisableRange<float>>(newDecibelRange));
     }
 
     const juce::NormalisableRange<float>& SpectrumAnalyserEngine::getDecibelRange() const noexcept
@@ -201,23 +199,9 @@ namespace jump
         else if (name == SharedPropertyIDs::sampleRateId)
             setSampleRateInternal(newValue);
         else if (name == PropertyIDs::frequencyRangeId)
-        {
-            auto value = juce::JSON::fromString(newValue.toString());
-
-            jassert(value.isArray());
-            jassert(value.size() == 2);
-
-            setFrequencyRangeInternal(juce::NormalisableRange<float>{ value[0], value[1] });
-        }
+            setFrequencyRangeInternal(var_cast<juce::NormalisableRange<float>>(newValue));
         else if (name == PropertyIDs::decibelRangeId)
-        {
-            auto value = juce::JSON::fromString(newValue.toString());
-
-            jassert(value.isArray());
-            jassert(value.size() == 2);
-
-            decibelRange = juce::NormalisableRange<float>{ value[0], value[1] };
-        }
+            decibelRange = var_cast<juce::NormalisableRange<float>>(newValue);
         else if (name == PropertyIDs::holdTimeId)
             holdTime = newValue;
         else if (name == PropertyIDs::maxHoldTimeId)
@@ -227,7 +211,7 @@ namespace jump
         else if (name == PropertyIDs::numPointsId)
             numPoints = newValue;
         else if (name == PropertyIDs::windowingMethodId)
-            windowingMethod = static_cast<juce::dsp::WindowingFunction<float>::WindowingMethod>(static_cast<int>(newValue));
+            windowingMethod = var_cast<WindowingMethod>(newValue);
         else
         {
             // Unhandled property ID.

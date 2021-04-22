@@ -47,7 +47,7 @@ namespace jump
     //==================================================================================================================
     void MultiMeter::setLabelsPosition(LabelsPosition newPosition)
     {
-        setProperty(PropertyIDs::labelsPositionId, juce::VariantConverter<LabelsPosition>::toVar(newPosition));
+        setProperty(PropertyIDs::labelsPositionId, var_cast<LabelsPosition>(newPosition));
     }
 
     void MultiMeter::setShowLabels(bool shouldShowLabels)
@@ -57,12 +57,12 @@ namespace jump
 
     void MultiMeter::setDecibelLevelsForLabels(const std::vector<float>& newLabelLevels)
     {
-        setProperty(PropertyIDs::highlightedLevelsId, juce::VariantConverter<std::vector<float>>::toVar(newLabelLevels));
+        setProperty(PropertyIDs::highlightedLevelsId, var_cast<std::vector<float>>(newLabelLevels));
     }
 
     void MultiMeter::setOrientation(Orientation newOrientation)
     {
-        setProperty(PropertyIDs::orientationId, juce::VariantConverter<Orientation>::toVar(newOrientation));
+        setProperty(PropertyIDs::orientationId, var_cast<Orientation>(newOrientation));
     }
 
     //==================================================================================================================
@@ -267,13 +267,13 @@ namespace jump
     void MultiMeter::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
     {
         if (name == PropertyIDs::labelsPositionId)
-            setLabelsPositionInternal(juce::VariantConverter<LabelsPosition>::fromVar(newValue));
+            setLabelsPositionInternal(var_cast<LabelsPosition>(newValue));
         else if (name == PropertyIDs::labelsVisibleId)
             labels.setVisible(static_cast<bool>(newValue));
         else if (name == PropertyIDs::highlightedLevelsId)
-            labels.setHighlightedLevels(juce::VariantConverter<std::vector<float>>::fromVar(newValue));
+            labels.setHighlightedLevels(var_cast<std::vector<float>>(newValue));
         else if (name == PropertyIDs::orientationId)
-            setOrientationInternal(juce::VariantConverter<Orientation>::fromVar(newValue));
+            setOrientationInternal(var_cast<Orientation>(newValue));
     }
 
     void MultiMeter::colourChanged()
@@ -298,16 +298,14 @@ namespace jump
     //==================================================================================================================
     void MultiMeter::initialiseState()
     {
-        setProperty(PropertyIDs::labelsPositionId,
-                    juce::VariantConverter<LabelsPosition>::toVar(LabelsPosition::left));
+        setProperty(PropertyIDs::labelsPositionId, var_cast<LabelsPosition>(LabelsPosition::left));
 
         setProperty(PropertyIDs::labelsVisibleId, true);
 
         setProperty(PropertyIDs::highlightedLevelsId,
-                    juce::VariantConverter<std::vector<float>>::toVar({ 0.f, -6.f, -12.f, -24.f, -48.f, -9999.f }));
+                    var_cast<std::vector<float>>({ 0.f, -6.f, -12.f, -24.f, -48.f, -9999.f }));
 
-        setProperty(PropertyIDs::orientationId,
-                    juce::VariantConverter<Orientation>::toVar(Orientation::vertical));
+        setProperty(PropertyIDs::orientationId, var_cast<Orientation>(Orientation::vertical));
     }
 
     //==================================================================================================================

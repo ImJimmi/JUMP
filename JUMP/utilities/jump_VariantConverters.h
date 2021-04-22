@@ -79,4 +79,36 @@ namespace juce
             return juce::JSON::toString(value, true);
         }
     };
+
+    //==================================================================================================================
+    template <>
+    struct VariantConverter<jump::Orientation>
+    {
+        //==============================================================================================================
+        static jump::Orientation fromVar(const juce::var& v)
+        {
+            return static_cast<jump::Orientation>(static_cast<int>(v));
+        }
+
+        static juce::var toVar(const jump::Orientation& orientation)
+        {
+            return { static_cast<int>(orientation) };
+        }
+    };
 }   // namespace juce
+
+//======================================================================================================================
+namespace jump
+{
+    template <typename T>
+    static inline juce::var var_cast(const T& value)
+    {
+        return juce::VariantConverter<T>::toVar(value);
+    }
+
+    template <typename T>
+    static inline T var_cast(const juce::var& v)
+    {
+        return juce::VariantConverter<T>::fromVar(v);
+    }
+}
