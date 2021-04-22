@@ -8,13 +8,13 @@ namespace jump
                                  juce::Identifier type, StatefulObject* parentState)
         :   StatefulObject{ type, parentState },
             mainEngine{ *enginesToUse.front() },
-            labels{ *enginesToUse.front() }
+            labels{ *enginesToUse.front(), "Labels" }
     {
         initialiseState();
 
         for (auto& engine : enginesToUse)
         {
-            const juce::Identifier id{ "analyser" + juce::String{ analysers.size() } };
+            const juce::Identifier id{ "Analyser" + juce::String{ analysers.size() } };
             auto analyser = std::make_unique<SpectrumAnalyser>(*engine, id, this);
             addAndMakeVisible(*analyser);
             analyser->setBackgroundVisible(analysers.size() == 0);
@@ -40,12 +40,12 @@ namespace jump
 
     void MultiAnalyser::setHighlightedLevels(const std::vector<float>& newLevels)
     {
-        setProperty(PropertyIDs::highlightedLevelsId, juce::VariantConverter<std::vector<float>>::toVar(newLevels));
+        labels.setHighlightedLevels(newLevels);
     }
 
     void MultiAnalyser::setHighlightedFrequencies(const std::vector<float>& newFrequencies)
     {
-        setProperty(PropertyIDs::highlightedFrequenciesId, juce::VariantConverter<std::vector<float>>::toVar(newFrequencies));
+        labels.setHighlightedFrequencies(newFrequencies);
     }
 
     //==================================================================================================================
@@ -63,25 +63,11 @@ namespace jump
     {
         if (name == PropertyIDs::labelsVisibleId)
             labels.setVisible(static_cast<bool>(newValue));
-        else if (name == PropertyIDs::highlightedLevelsId)
-            labels.setHighlightedLevels(juce::VariantConverter<std::vector<float>>::fromVar(newValue));
-        else if (name == PropertyIDs::highlightedFrequenciesId)
-            labels.setHighlightedFrequencies(juce::VariantConverter<std::vector<float>>::fromVar(newValue));
     }
 
     //==================================================================================================================
     void MultiAnalyser::initialiseState()
     {
         setProperty(PropertyIDs::labelsVisibleId, true);
-
-        setProperty(PropertyIDs::highlightedLevelsId,
-                    juce::VariantConverter<std::vector<float>>::toVar({
-                        -12.f, -24.f, -36.f, -48.f, -60.f, -72.f, -84.f, -96.f
-                    }));
-
-        setProperty(PropertyIDs::highlightedFrequenciesId,
-                    juce::VariantConverter<std::vector<float>>::toVar({
-                        50.f, 100.f, 200.f, 500.f, 1000.f, 2000.f, 5000.f, 10000.f
-                    }));
     }
 }   // namespace jump

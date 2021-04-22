@@ -4,7 +4,8 @@
 namespace jump
 {
     //==================================================================================================================
-    class SpectrumAnalyserLabelsComponent :   public Container
+    class SpectrumAnalyserLabelsComponent :   public Container,
+                                              private StatefulObject
     {
     public:
         //==============================================================================================================
@@ -18,10 +19,20 @@ namespace jump
                                                                          float frequency) const noexcept = 0;
         };
 
-        //==============================================================================================================
-        SpectrumAnalyserLabelsComponent(const SpectrumAnalyserEngine& engineToUse)
-            :   engine{ engineToUse }
+        struct PropertyIDs
         {
+            static const inline juce::Identifier highlightedLevelsPropertyId     { "highlightedLevels" };
+            static const inline juce::Identifier highlightedFrequenciesPropertyId{ "highlightedFrequencies" };
+        };
+
+        //==============================================================================================================
+        SpectrumAnalyserLabelsComponent(const SpectrumAnalyserEngine& engineToUse,
+                                        const juce::Identifier& uniqueID, StatefulObject* parentState = nullptr)
+            :   StatefulObject{ uniqueID, parentState },
+                engine{ engineToUse }
+        {
+            initialiseState();
+
             lookAndFeel.attachTo(this);
             lookAndFeel.onValidLookAndFeelFound = [this]() {
                 updateLevelLabels();
@@ -34,14 +45,13 @@ namespace jump
         //==============================================================================================================
         void setHighlightedLevels(const std::vector<float>& newHighlightedLevels)
         {
-            levels = newHighlightedLevels;
-            updateLevelLabels();
+            setProperty(PropertyIDs::highlightedLevelsPropertyId, var_cast<std::vector<float>>(newHighlightedLevels));
         }
 
         void setHighlightedFrequencies(const std::vector<float>& newHighlightedFrequencies)
         {
-            frequencies = newHighlightedFrequencies;
-            updateFrequencyLabels();
+            setProperty(PropertyIDs::highlightedFrequenciesPropertyId,
+                        var_cast<std::vector<float>>(newHighlightedFrequencies));
         }
 
         const SpectrumAnalyserEngine& getEngine() const noexcept
@@ -61,6 +71,14 @@ namespace jump
         {
             updateLevelLabels();
             updateFrequencyLabels();
+        }
+
+        void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override
+        {
+            if (name == PropertyIDs::highlightedLevelsPropertyId)
+                setHighlightedLevelsInternal(var_cast<std::vector<float>>(newValue));
+            else if (name == PropertyIDs::highlightedFrequenciesPropertyId)
+                setHighlightedFrequenciesInternal(var_cast<std::vector<float>>(newValue));
         }
 
         //==============================================================================================================
@@ -141,6 +159,27 @@ namespace jump
 
                 label->setBounds(labelX, getHeight() - labelHeight, labelWidth, labelHeight);
             }
+        }
+
+        void initialiseState()
+        {
+            setProperty(PropertyIDs::highlightedLevelsPropertyId,
+                        var_cast<std::vector<float>>({ -12.f, -24.f, -36.f, -48.f, -60.f, -72.f, -84.f, -96.f }));
+            setProperty(PropertyIDs::highlightedFrequenciesPropertyId,
+                        var_cast<std::vector<float>>({ 50.f, 100.f, 200.f, 500.f, 1000.f, 2000.f, 5000.f, 10000.f }));
+        }
+
+        //==============================================================================================================
+        void setHighlightedLevelsInternal(const std::vector<float>& newHighlightedLevels)
+        {
+            levels = newHighlightedLevels;
+            updateLevelLabels();
+        }
+
+        void setHighlightedFrequenciesInternal(const std::vector<float>& newHighlightedFrequencies)
+        {
+            frequencies = newHighlightedFrequencies;
+            updateFrequencyLabels();
         }
 
         //==============================================================================================================

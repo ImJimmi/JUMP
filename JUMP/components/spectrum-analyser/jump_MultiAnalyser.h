@@ -11,9 +11,7 @@ namespace jump
         //==============================================================================================================
         struct PropertyIDs
         {
-            static inline const juce::Identifier labelsVisibleId         { "labelsVisible" };
-            static inline const juce::Identifier highlightedLevelsId     { "highlightedLevels" };
-            static inline const juce::Identifier highlightedFrequenciesId{ "highlightedFrequencies" };
+            static inline const juce::Identifier labelsVisibleId{ "labelsVisible" };
         };
 
         //==============================================================================================================
