@@ -33,6 +33,13 @@ namespace jump
             meter.setDrawFunction([this](juce::Graphics& g) {
                 lookAndFeel->drawLevelMeter(g, *this, latestPeakLevel, latestRMSLevel);
             });
+
+            engineToUse.addRenderer(this);
+        }
+
+        ~LevelMeter() override
+        {
+            engine.removeRenderer(this);
         }
 
         //==============================================================================================================

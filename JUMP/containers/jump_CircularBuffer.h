@@ -69,8 +69,8 @@ namespace jump
         {
             std::vector<ValueType> result(data.size());
 
-            for (auto i{ 0 }; i < result.size(); i++)
-                result[i] = operator[](i);
+            for (std::size_t i = 0; i < result.size(); i++)
+                result[i] = (*this)[i];
 
             return result;
         }
@@ -78,7 +78,7 @@ namespace jump
         /** Resizes the internal data to the given size. */
         void resize(int newSize)
         {
-            data.resize(newSize);
+            data.resize(static_cast<std::size_t>(newSize));
 
             if (writeIndex >= data.size())
                 writeIndex = 0;
@@ -106,9 +106,9 @@ namespace jump
         /** Returns an element from the buffer in its 'true' position meaning an index of [N - 1] will return the most
             recent value added via write().
         */
-        ValueType operator[](int index) const
+        ValueType operator[](std::size_t index) const
         {
-            auto trueIndex = static_cast<std::size_t>(index + writeIndex);
+            auto trueIndex = index + writeIndex;
 
             if (trueIndex >= data.size())
                 trueIndex -= data.size();
@@ -119,6 +119,6 @@ namespace jump
     private:
         //==============================================================================================================
         std::vector<ValueType> data;
-        int writeIndex{ 0 };
+        std::size_t writeIndex{ 0 };
     };
 }   // namespace jump

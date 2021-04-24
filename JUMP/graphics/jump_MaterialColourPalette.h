@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    struct ColourPalette
+    struct MaterialColourPalette
     {
         static inline const juce::Colour blueGrey050{ 0xFFECEFF1 };
         static inline const juce::Colour blueGrey100{ 0xFFCFD8DC };

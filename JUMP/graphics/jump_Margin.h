@@ -40,12 +40,11 @@ namespace jump
         }
 
         //==============================================================================================================
-        template <typename BorderSizeType>
-        juce::BorderSize<BorderSizeType> toBorderSize() const noexcept
+        juce::BorderSize<ValueType> toBorderSize() const noexcept
         {
-            return juce::BorderSize<BorderSizeType>{
-                static_cast<BorderSizeType>(top), static_cast<BorderSizeType>(left),
-                static_cast<BorderSizeType>(bottom), static_cast<BorderSizeType>(right)
+            return juce::BorderSize<ValueType>{
+                static_cast<ValueType>(top), static_cast<ValueType>(left),
+                static_cast<ValueType>(bottom), static_cast<ValueType>(right)
             };
         }
 
@@ -63,6 +62,17 @@ namespace jump
                 static_cast<float>(top), static_cast<float>(left),
                 static_cast<float>(bottom), static_cast<float>(right)
             };
+        }
+
+        //==============================================================================================================
+        ValueType getRightPlusLeft() const noexcept
+        {
+            return right + left;
+        }
+
+        ValueType getTopPlusBottom() const noexcept
+        {
+            return top + bottom;
         }
 
     private:

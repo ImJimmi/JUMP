@@ -45,26 +45,6 @@ namespace jump
 }   // namespace jump
 
 //======================================================================================================================
-namespace juce
-{
-    //==================================================================================================================
-    template <>
-    struct VariantConverter<jump::Orientation>
-    {
-        //==============================================================================================================
-        static jump::Orientation fromVar(const juce::var& v)
-        {
-            return static_cast<jump::Orientation>(static_cast<int>(v));
-        }
-
-        static juce::var toVar(const jump::Orientation& orientation)
-        {
-            return { static_cast<int>(orientation) };
-        }
-    };
-}
-
-//======================================================================================================================
 #include "containers/jump_CircularBuffer.h"
 #include "interfaces/jump_StatefulObject.h"
 #include "interfaces/jump_AudioComponentEngine.h"
@@ -80,12 +60,17 @@ namespace juce
 #include "interfaces/jump_PluginEditor.h"
 
 #include "graphics/jump_ColourIDs.h"
-#include "graphics/jump_ColourPalette.h"
+#include "graphics/jump_MaterialColourPalette.h"
+#include "graphics/jump_PaintOptions.h"
 
 #include "components/level-meter/jump_LevelMeterEngine.h"
 #include "components/level-meter/jump_LevelMeter.h"
 #include "components/level-meter/jump_LevelMeterLabelsComponent.h"
 #include "components/level-meter/jump_MultiMeter.h"
+#include "components/spectrum-analyser/jump_SpectrumAnalyserEngine.h"
+#include "components/spectrum-analyser/jump_SpectrumAnalyser.h"
+#include "components/spectrum-analyser/jump_SpectrumAnalyserLabelsComponent.h"
+#include "components/spectrum-analyser/jump_MultiAnalyser.h"
 
 #include "graphics/jump_LookAndFeel.h"
 #include "graphics/jump_Margin.h"

@@ -1,36 +1,22 @@
 #pragma once
 
 //======================================================================================================================
-namespace jump::SpectrumAnalyser
+namespace jump
 {
     //==================================================================================================================
-    namespace PropertyIDs
-    {
-        //==============================================================================================================
-        static const inline juce::Identifier windowingMethodId{ "windowingMethod" };
-        static const inline juce::Identifier fftOrderId       { "fftOrder" };
-        static const inline juce::Identifier frequencyRangeId { "frequencyRange" };
-        static const inline juce::Identifier decibelRangeId   { "decibelRange" };
-        static const inline juce::Identifier holdTimeId       { "holdTime" };
-        static const inline juce::Identifier maxHoldTimeId    { "maxHoldTime" };
-        static const inline juce::Identifier decayTimeId      { "decayTime" };
-        static const inline juce::Identifier numPointsId      { "numPoints" };
-    }
+    class SpectrumAnalyserEngine;
 
     //==================================================================================================================
-    class Engine;
-
-    //==================================================================================================================
-    struct Renderer
+    struct SpectrumAnalyserRendererBase
     {
         //==============================================================================================================
-        virtual ~Renderer() = default;
+        virtual ~SpectrumAnalyserRendererBase() = default;
 
         //==============================================================================================================
         /** Derived classes must override this method in order to receive callbacks when a new set of points had been
             calculated by the given engine.
         */
-        virtual void newSpectrumAnalyserPointsAvailable(const Engine* engine,
+        virtual void newSpectrumAnalyserPointsAvailable(const SpectrumAnalyserEngine& engine,
                                                         const std::vector<juce::Point<float>>& points) = 0;
     };
 
@@ -45,15 +31,28 @@ namespace jump::SpectrumAnalyser
         The X axis of the analyser is in Hz and will use a logarithmic scale (base 2) to more accurately represent how
         we as humans perceive pitch.
     */
-    class Engine    :   public AudioComponentEngine<Renderer>
+    class SpectrumAnalyserEngine    :   public AudioComponentEngine<SpectrumAnalyserRendererBase>
     {
     public:
+        //==============================================================================================================
+        struct PropertyIDs
+        {
+            static const inline juce::Identifier windowingMethodId{ "windowingMethod" };
+            static const inline juce::Identifier fftOrderId       { "fftOrder" };
+            static const inline juce::Identifier frequencyRangeId { "frequencyRange" };
+            static const inline juce::Identifier decibelRangeId   { "decibelRange" };
+            static const inline juce::Identifier holdTimeId       { "holdTime" };
+            static const inline juce::Identifier maxHoldTimeId    { "maxHoldTime" };
+            static const inline juce::Identifier decayTimeId      { "decayTime" };
+            static const inline juce::Identifier numPointsId      { "numPoints" };
+        };
+
         //==============================================================================================================
         using WindowingMethod = juce::dsp::WindowingFunction<float>::WindowingMethod;
 
         //==============================================================================================================
-        Engine() = default;
-        Engine(const juce::Identifier& uniqueID, StatefulObject* parentState);
+        SpectrumAnalyserEngine();
+        SpectrumAnalyserEngine(const juce::Identifier& uniqueID, StatefulObject* parentState);
 
         //==============================================================================================================
         void addSamples(const std::vector<float>& samples) override;
@@ -94,6 +93,9 @@ namespace jump::SpectrumAnalyser
         */
         void setFrequencyRange(const juce::NormalisableRange<float>& newFrequencyRange);
 
+        /** Returns the current frequency range being used by this engine. */
+        const juce::NormalisableRange<float>& getFrequencyRange() const noexcept;
+
         /** Changes the decibel range of the analyser.
 
             The start of the range will be treated as -inf Decibels and will be normalised to a value of 0 while the end
@@ -104,6 +106,9 @@ namespace jump::SpectrumAnalyser
             @param newDecibelRange  The new decibel range to use.
         */
         void setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange);
+
+        /** Returns the current decibel range being used by this engine. */
+        const juce::NormalisableRange<float>& getDecibelRange() const noexcept;
 
         /** Changes the time, in milliseconds, for which peaks are held before they start to decay.
 
@@ -152,13 +157,11 @@ namespace jump::SpectrumAnalyser
         */
         void setNumPoints(int newNumPoints);
 
+        /** Returns the current sample rate being used by this engine. */
+        double getNyquistFrequency() const noexcept;
+
     private:
         //==============================================================================================================
-        struct StateInitialiser
-        {
-            StateInitialiser(Engine& engine);
-        };
-
         class AnalyserPointInfo
         {
         public:
@@ -186,6 +189,7 @@ namespace jump::SpectrumAnalyser
         void propertyChanged(const juce::Identifier& name, const juce::var& newValue) override;
 
         //==============================================================================================================
+        void initialise();
         void updateBinRange();
 
         //==============================================================================================================
@@ -211,9 +215,7 @@ namespace jump::SpectrumAnalyser
         float decayTime{ 0.f };
         int numPoints{ 0 };
 
-        StateInitialiser stateInitialiser{ *this };
-
         //==============================================================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Engine)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalyserEngine)
     };
 }   // namespace jump::SpectrumAnalyser

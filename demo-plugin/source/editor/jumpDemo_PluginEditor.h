@@ -16,6 +16,8 @@ namespace jumpDemo
         {
             virtual ~LookAndFeelMethods() = default;
 
+            virtual void drawSeparator(juce::Graphics& g, const jump::Canvas& canvas) const noexcept = 0;
+
             virtual jump::TrackInfoList getTemplateColumns() const noexcept = 0;
             virtual jump::Size<int> getDemoSelectorSize() const noexcept = 0;
             virtual jump::Margin<float> getDemoSelectorMargin() const noexcept = 0;
@@ -36,6 +38,7 @@ namespace jumpDemo
         jump::Canvas backgroundCanvas;
 
         juce::ComboBox demoSelector;
+        jump::Canvas separator;
         std::unique_ptr<juce::Component> activeDemo;
 
         jump::LookAndFeelAccessor<LookAndFeelMethods> lookAndFeelAccessor;

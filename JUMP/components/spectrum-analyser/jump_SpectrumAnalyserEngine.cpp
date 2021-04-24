@@ -1,70 +1,84 @@
 #include "jump_SpectrumAnalyserEngine.h"
 
 //======================================================================================================================
-namespace jump::SpectrumAnalyser
+namespace jump
 {
     //==================================================================================================================
-    Engine::StateInitialiser::StateInitialiser(Engine& engine)
+    void SpectrumAnalyserEngine::initialise()
     {
-        engine.setProperty(PropertyIDs::windowingMethodId, juce::VariantConverter<WindowingMethod>::toVar(WindowingMethod::hann));
-        engine.setProperty(PropertyIDs::fftOrderId,        0);
-        engine.setProperty(PropertyIDs::frequencyRangeId,  "[20.0, 20000.0]");
-        engine.setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0]");
-        engine.setProperty(PropertyIDs::holdTimeId,        100.f);
-        engine.setProperty(PropertyIDs::maxHoldTimeId,     10000.f);
-        engine.setProperty(PropertyIDs::decayTimeId,       500.f);
-        engine.setProperty(PropertyIDs::numPointsId,       256);
+        setProperty(PropertyIDs::windowingMethodId, var_cast<WindowingMethod>(WindowingMethod::hann));
+        setProperty(PropertyIDs::fftOrderId,        0);
+        setProperty(PropertyIDs::frequencyRangeId,  var_cast<juce::NormalisableRange<float>>({ 20.f, 20000.f }));
+        setProperty(PropertyIDs::decibelRangeId,    var_cast<juce::NormalisableRange<float>>({ -100.f, 0.f }));
+        setProperty(PropertyIDs::holdTimeId,        100.f);
+        setProperty(PropertyIDs::maxHoldTimeId,     10000.f);
+        setProperty(PropertyIDs::decayTimeId,       500.f);
+        setProperty(PropertyIDs::numPointsId,       256);
     }
 
     //==================================================================================================================
-    Engine::Engine(const juce::Identifier& uniqueID, StatefulObject* parentState)
+    SpectrumAnalyserEngine::SpectrumAnalyserEngine()
+    {
+        initialise();
+    }
+
+    SpectrumAnalyserEngine::SpectrumAnalyserEngine(const juce::Identifier& uniqueID, StatefulObject* parentState)
         :   AudioComponentEngine{ uniqueID, parentState }
     {
+        initialise();
     }
 
     //==================================================================================================================
-    void Engine::addSamples(const std::vector<float>& samples)
+    void SpectrumAnalyserEngine::addSamples(const std::vector<float>& samples)
     {
         for (auto& sample : samples)
             buffer.write(sample);
     }
 
     //==================================================================================================================
-    void Engine::setSampleRate(double newSampleRate)
+    void SpectrumAnalyserEngine::setSampleRate(double newSampleRate)
     {
         jassert(newSampleRate > 0.0);
 
         setProperty(SharedPropertyIDs::sampleRateId, newSampleRate);
     }
 
-    void Engine::setWindowingMethod(WindowingMethod newWindowingMethod)
+    void SpectrumAnalyserEngine::setWindowingMethod(WindowingMethod newWindowingMethod)
     {
-        setProperty(PropertyIDs::windowingMethodId, juce::VariantConverter<WindowingMethod>::toVar(newWindowingMethod));
+        setProperty(PropertyIDs::windowingMethodId, var_cast<WindowingMethod>(newWindowingMethod));
     }
 
-    void Engine::setFFTOrder(int newFFTOrder)
+    void SpectrumAnalyserEngine::setFFTOrder(int newFFTOrder)
     {
         jassert(newFFTOrder >= 0);
 
         setProperty(PropertyIDs::fftOrderId, newFFTOrder);
     }
 
-    void Engine::setFrequencyRange(const juce::NormalisableRange<float>& newFrequencyRange)
+    void SpectrumAnalyserEngine::setFrequencyRange(const juce::NormalisableRange<float>& newFrequencyRange)
     {
         jassert(newFrequencyRange.start > 0.f);
         jassert(newFrequencyRange.end <= nyquistFrequency);
 
-        const auto value = juce::var{ juce::Array<juce::var>{ newFrequencyRange.start, newFrequencyRange.end } };
-        setProperty(PropertyIDs::frequencyRangeId, juce::JSON::toString(value, true));
+        setProperty(PropertyIDs::frequencyRangeId, var_cast<juce::NormalisableRange<float>>(newFrequencyRange));
     }
 
-    void Engine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
+    const juce::NormalisableRange<float>& SpectrumAnalyserEngine::getFrequencyRange() const noexcept
     {
-        const auto value = juce::var{ juce::Array<juce::var>{ newDecibelRange.start, newDecibelRange.end } };
-        setProperty(PropertyIDs::decibelRangeId, juce::JSON::toString(value, true));
+        return frequencyRange;
     }
 
-    void Engine::setHoldTime(float newHoldTimeMs)
+    void SpectrumAnalyserEngine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
+    {
+        setProperty(PropertyIDs::decibelRangeId, var_cast<juce::NormalisableRange<float>>(newDecibelRange));
+    }
+
+    const juce::NormalisableRange<float>& SpectrumAnalyserEngine::getDecibelRange() const noexcept
+    {
+        return decibelRange;
+    }
+
+    void SpectrumAnalyserEngine::setHoldTime(float newHoldTimeMs)
     {
         jassert(newHoldTimeMs >= 0.f);
         jassert(newHoldTimeMs <= maxHoldTime);
@@ -72,7 +86,7 @@ namespace jump::SpectrumAnalyser
         setProperty(PropertyIDs::holdTimeId, newHoldTimeMs);
     }
 
-    void Engine::setMaxHoldTime(float newMaxHoldTimeMs)
+    void SpectrumAnalyserEngine::setMaxHoldTime(float newMaxHoldTimeMs)
     {
         jassert(newMaxHoldTimeMs >= 0.f);
         jassert(holdTime <= newMaxHoldTimeMs);
@@ -80,23 +94,28 @@ namespace jump::SpectrumAnalyser
         setProperty(PropertyIDs::maxHoldTimeId, newMaxHoldTimeMs);
     }
 
-    void Engine::setDecayTime(float newDecayTimeMs)
+    void SpectrumAnalyserEngine::setDecayTime(float newDecayTimeMs)
     {
         jassert(newDecayTimeMs >= 0.f);
 
         setProperty(PropertyIDs::decayTimeId, newDecayTimeMs);
     }
 
-    void Engine::setNumPoints(int newNumPoints)
+    void SpectrumAnalyserEngine::setNumPoints(int newNumPoints)
     {
         jassert(newNumPoints >= 0);
 
         setProperty(PropertyIDs::numPointsId, newNumPoints);
     }
 
+    double SpectrumAnalyserEngine::getNyquistFrequency() const noexcept
+    {
+        return nyquistFrequency;
+    }
+
     //==================================================================================================================
-    Engine::AnalyserPointInfo::AnalyserPointInfo(int fftBinIndex, float frequency,
-                                                 const juce::NormalisableRange<float>& freqRange)
+    SpectrumAnalyserEngine::AnalyserPointInfo::AnalyserPointInfo(int fftBinIndex, float frequency,
+                                                                 const juce::NormalisableRange<float>& freqRange)
         :   binIndex{ fftBinIndex },
             normalisedX{ Math::inverseLogSpace(freqRange.start, freqRange.end, frequency) }
     {
@@ -106,18 +125,19 @@ namespace jump::SpectrumAnalyser
     float getDecibelLevelFromFFTData(const std::vector<float>& fftData, int binIndex, int fftSize,
                                      const juce::NormalisableRange<float>& decibelRange)
     {
-        const auto gain = fftData[binIndex] / (fftSize * 2.f);
+        const auto gain = fftData[static_cast<std::size_t>(binIndex)] / (fftSize * 2.f);
         return juce::Decibels::gainToDecibels(gain, decibelRange.start);
     }
 
-    void Engine::AnalyserPointInfo::update(const std::vector<float>& fftData, int fftSize,
-                                           const juce::NormalisableRange<float>& decibelRange, juce::uint32 now,
-                                           float holdTime, float maxHoldTime, float decayTime)
+    void SpectrumAnalyserEngine::AnalyserPointInfo::update(const std::vector<float>& fftData, int fftSize,
+                                                           const juce::NormalisableRange<float>& dBRange,
+                                                           juce::uint32 now,
+                                                           float holdTimeMS, float maxHoldTimeMS, float decayTimeMS)
     {
-        auto newDB = getDecibelLevelFromFFTData(fftData, binIndex, fftSize, decibelRange);
+        auto newDB = getDecibelLevelFromFFTData(fftData, binIndex, fftSize, dBRange);
 
         if (newDB < dB)
-            newDB = applyEnvelopeToDecibelLevel(levelOfLatestPeak, timeOfLatestPeak, now, holdTime, maxHoldTime, decayTime, decibelRange);
+            newDB = applyEnvelopeToDecibelLevel(levelOfLatestPeak, timeOfLatestPeak, now, holdTimeMS, maxHoldTimeMS, decayTimeMS, dBRange);
         else
         {
             timeOfLatestPeak = juce::Time::getMillisecondCounter();
@@ -127,9 +147,9 @@ namespace jump::SpectrumAnalyser
         dB = newDB;
     }
 
-    juce::Point<float> Engine::AnalyserPointInfo::normalise(const juce::NormalisableRange<float>& decibelRange)
+    juce::Point<float> SpectrumAnalyserEngine::AnalyserPointInfo::normalise(const juce::NormalisableRange<float>& dBRange)
     {
-        return { normalisedX, 1.f - decibelRange.convertTo0to1(decibelRange.snapToLegalValue(dB)) };
+        return { normalisedX, 1.f - dBRange.convertTo0to1(dBRange.snapToLegalValue(dB)) };
     }
 
     //==================================================================================================================
@@ -144,7 +164,7 @@ namespace jump::SpectrumAnalyser
         return fftData;
     }
 
-    void Engine::update(juce::uint32 now)
+    void SpectrumAnalyserEngine::update(juce::uint32 now)
     {
         if (fft.get() == nullptr)
             return;
@@ -157,7 +177,7 @@ namespace jump::SpectrumAnalyser
         auto prevBin = -1;
 
         std::vector<juce::Point<float>> points;
-        points.reserve(numPoints);
+        points.reserve(static_cast<std::size_t>(numPoints));
 
         for (auto& pointInfo : pointsInfo)
         {
@@ -169,33 +189,19 @@ namespace jump::SpectrumAnalyser
             prevBin = pointInfo.binIndex;
         }
 
-        renderers.call(&Renderer::newSpectrumAnalyserPointsAvailable, this, points);
+        renderers.call(&SpectrumAnalyserRendererBase::newSpectrumAnalyserPointsAvailable, *this, points);
     }
 
-    void Engine::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
+    void SpectrumAnalyserEngine::propertyChanged(const juce::Identifier& name, const juce::var& newValue)
     {
         if (name == PropertyIDs::fftOrderId)
             setFFTOrderInternal(newValue);
         else if (name == SharedPropertyIDs::sampleRateId)
             setSampleRateInternal(newValue);
         else if (name == PropertyIDs::frequencyRangeId)
-        {
-            auto value = juce::JSON::fromString(newValue.toString());
-
-            jassert(value.isArray());
-            jassert(value.size() == 2);
-
-            setFrequencyRangeInternal(juce::NormalisableRange<float>{ value[0], value[1] });
-        }
+            setFrequencyRangeInternal(var_cast<juce::NormalisableRange<float>>(newValue));
         else if (name == PropertyIDs::decibelRangeId)
-        {
-            auto value = juce::JSON::fromString(newValue.toString());
-
-            jassert(value.isArray());
-            jassert(value.size() == 2);
-
-            decibelRange = juce::NormalisableRange<float>{ value[0], value[1] };
-        }
+            decibelRange = var_cast<juce::NormalisableRange<float>>(newValue);
         else if (name == PropertyIDs::holdTimeId)
             holdTime = newValue;
         else if (name == PropertyIDs::maxHoldTimeId)
@@ -205,7 +211,7 @@ namespace jump::SpectrumAnalyser
         else if (name == PropertyIDs::numPointsId)
             numPoints = newValue;
         else if (name == PropertyIDs::windowingMethodId)
-            windowingMethod = static_cast<juce::dsp::WindowingFunction<float>::WindowingMethod>(static_cast<int>(newValue));
+            windowingMethod = var_cast<WindowingMethod>(newValue);
         else
         {
             // Unhandled property ID.
@@ -214,7 +220,7 @@ namespace jump::SpectrumAnalyser
     }
 
     //==================================================================================================================
-    void Engine::updateBinRange()
+    void SpectrumAnalyserEngine::updateBinRange()
     {
         if (fft.get() == nullptr)
             return;
@@ -228,7 +234,7 @@ namespace jump::SpectrumAnalyser
             return;
 
         pointsInfo.clear();
-        pointsInfo.reserve(numPoints);
+        pointsInfo.reserve(static_cast<std::size_t>(numPoints));
 
         for (auto& frequency : Math::logRange(frequencyRange.start, frequencyRange.end, numPoints))
         {
@@ -241,7 +247,7 @@ namespace jump::SpectrumAnalyser
     }
 
     //==================================================================================================================
-    void Engine::setFFTOrderInternal(int newFFTOrder)
+    void SpectrumAnalyserEngine::setFFTOrderInternal(int newFFTOrder)
     {
         fft.reset(new juce::dsp::FFT{ newFFTOrder });
         windowingFunction.reset(new juce::dsp::WindowingFunction<float>{ static_cast<std::size_t>(1) << newFFTOrder, windowingMethod });
@@ -256,13 +262,13 @@ namespace jump::SpectrumAnalyser
         }
     }
 
-    void Engine::setSampleRateInternal(double newSampleRate)
+    void SpectrumAnalyserEngine::setSampleRateInternal(double newSampleRate)
     {
         nyquistFrequency = static_cast<float>(newSampleRate / 2.0);
         updateBinRange();
     }
 
-    void Engine::setFrequencyRangeInternal(const juce::NormalisableRange<float>& newFrequencyRange)
+    void SpectrumAnalyserEngine::setFrequencyRangeInternal(const juce::NormalisableRange<float>& newFrequencyRange)
     {
         frequencyRange = newFrequencyRange;
         updateBinRange();

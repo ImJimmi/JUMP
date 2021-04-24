@@ -77,7 +77,7 @@ namespace jump
 
     void LevelMeterEngine::setDecibelRange(const juce::NormalisableRange<float>& newDecibelRange)
     {
-        const auto value = juce::VariantConverter<juce::NormalisableRange<float>>::toVar(newDecibelRange);
+        const auto value = var_cast<juce::NormalisableRange<float>>(newDecibelRange);
         setProperty(PropertyIDs::decibelRangeId, value);
     }
 
@@ -136,7 +136,7 @@ namespace jump
         else if (name == PropertyIDs::peakMaxHoldTimeId)
             peakMaxHoldTime = newValue;
         else if (name == PropertyIDs::decibelRangeId)
-            decibelRange = juce::VariantConverter<juce::NormalisableRange<float>>::fromVar(newValue);
+            decibelRange = var_cast<juce::NormalisableRange<float>>(newValue);
         else
         {
             // Unhandled property ID.

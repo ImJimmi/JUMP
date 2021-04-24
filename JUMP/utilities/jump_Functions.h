@@ -70,12 +70,12 @@ namespace jump
             jassert(end >= start);
             jassert(count >= 2);
 
-            std::vector<T> result(count);
+            std::vector<T> result(static_cast<std::size_t>(count));
 
             for (auto i = 0; i < count; i++)
             {
                 const auto proportion = i / static_cast<float>(count - 1);
-                result[i] = logSpace(start, end, proportion);
+                result[static_cast<std::size_t>(i)] = logSpace(start, end, proportion);
             }
 
             return result;
@@ -97,6 +97,7 @@ namespace jump
         return ((peakLevelDB - decibelRange.start) * multiplier) + decibelRange.start;
     }
 
+    /** Normalises a value using the given range but with no restrictions on the input range. */
     template <typename T>
     inline T normaliseDecibelsTo0To1(T value, const juce::NormalisableRange<T>& range)
     {
@@ -107,5 +108,43 @@ namespace jump
         normalised = std::pow(normalised, range.skew);
 
         return normalised;
+    }
+
+    //==================================================================================================================
+    /** Returns the minimum width, in pixels, required to properly display a Label. */
+    inline int getMinimumWidthRequiredForLabel(const juce::Label& label)
+    {
+        const auto textWidth = static_cast<int>(std::ceil(label.getFont().getStringWidthFloat(label.getText())));
+        const auto borderLeftAndRight = label.getBorderSize().getLeftAndRight();
+
+        return textWidth + borderLeftAndRight;
+    }
+
+    inline int getMinimumRequiredHeightForLabel(const juce::Label& label)
+    {
+        const auto textHeight = static_cast<int>(std::ceil(label.getFont().getHeight()));
+        const auto borderTopAndBottom = label.getBorderSize().getTopAndBottom();
+
+        return textHeight + borderTopAndBottom;
+    }
+
+    //==================================================================================================================
+    template <typename T>
+    inline juce::String prettifyValue(T value, int numSignificantFigures)
+    {
+        const auto numDigitsBeforePoint = juce::jmax(1, static_cast<int>(std::floor(std::log10(std::abs(value))) + 1));
+
+        if (numDigitsBeforePoint > numSignificantFigures)
+        {
+            const auto difference = numDigitsBeforePoint - numSignificantFigures;
+            return juce::String{ juce::roundToInt(value * std::pow(10.f, -difference)) * std::pow(10.f, difference) };
+        }
+
+        const auto numDecimalPlaces = numSignificantFigures - numDigitsBeforePoint;
+
+        if (numDecimalPlaces == 0)
+            return juce::String{ juce::roundToInt(value) };
+
+        return { value, numDecimalPlaces };
     }
 }   // namespace jump

@@ -35,7 +35,7 @@ namespace jump
 
         //==============================================================================================================
         MultiMeter(const std::vector<LevelMeterEngine*>& enginesToUse,
-                   juce::Identifier type = "NonStatefulLevelMeterComponent",
+                   juce::Identifier type = "NonStatefulMultiMeter",
                    StatefulObject* parentState = nullptr);
 
         //==============================================================================================================
