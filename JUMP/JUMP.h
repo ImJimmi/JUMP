@@ -1,3 +1,5 @@
+#pragma once
+
 /** BEGIN_JUCE_MODULE_DECLARATION
 
     ID:                 JUMP
