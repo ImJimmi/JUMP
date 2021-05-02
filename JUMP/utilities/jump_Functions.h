@@ -147,22 +147,4 @@ namespace jump
 
         return { value, numDecimalPlaces };
     }
-
-    //==================================================================================================================
-    std::vector<std::unique_ptr<juce::AudioProcessorParameter>> getCommonParameters()
-    {
-        std::vector<std::unique_ptr<juce::AudioProcessorParameter>> parameters;
-
-        {
-            juce::NormalisableRange<float> range{ -24.f, 12.f };
-            range.setSkewForCentre(0.f);
-
-            parameters.push_back(std::make_unique<juce::AudioParameterFloat>(
-                "outputGain", "Output Gain",
-                range, 0.f
-            ));
-        }
-
-        return parameters;
-    }
 }   // namespace jump
