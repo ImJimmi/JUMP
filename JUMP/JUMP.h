@@ -67,6 +67,7 @@ namespace jump
 #include "graphics/jump_PaintOptions.h"
 #include "graphics/jump_Size.h"
 
+#include "components/jump_SnapshotGenerator.h"
 #include "components/level-meter/jump_LevelMeterEngine.h"
 #include "components/level-meter/jump_LevelMeter.h"
 #include "components/level-meter/jump_LevelMeterLabelsComponent.h"
