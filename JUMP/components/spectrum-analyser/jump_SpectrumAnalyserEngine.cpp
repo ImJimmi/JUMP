@@ -117,7 +117,7 @@ namespace jump
     SpectrumAnalyserEngine::AnalyserPointInfo::AnalyserPointInfo(int fftBinIndex, float frequency,
                                                                  const juce::NormalisableRange<float>& freqRange)
         :   binIndex{ fftBinIndex },
-            normalisedX{ Math::inverseLogSpace(freqRange.start, freqRange.end, frequency) }
+            normalisedX{ math::inverseLogSpace(freqRange.start, freqRange.end, frequency) }
     {
     }
 
@@ -236,7 +236,7 @@ namespace jump
         pointsInfo.clear();
         pointsInfo.reserve(static_cast<std::size_t>(numPoints));
 
-        for (auto& frequency : Math::logRange(frequencyRange.start, frequencyRange.end, numPoints))
+        for (auto& frequency : math::logRange(frequencyRange.start, frequencyRange.end, numPoints))
         {
             const auto binIndex = juce::roundToInt(juce::jmap(frequency,
                                                                 frequencyRange.start, frequencyRange.end,

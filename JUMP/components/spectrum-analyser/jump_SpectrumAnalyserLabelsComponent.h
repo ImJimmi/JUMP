@@ -151,7 +151,7 @@ namespace jump
             for (auto& label : frequencyLabels)
             {
                 const auto freq = static_cast<float>(label->getProperties()[frequencyPropertyId]);
-                const auto normalisedLevel = Math::inverseLogSpace(freqRange.start, freqRange.end, freq);
+                const auto normalisedLevel = math::inverseLogSpace(freqRange.start, freqRange.end, freq);
                 const auto x = normalisedLevel * getWidth();
                 const auto labelWidth = getMinimumWidthRequiredForLabel(*label);
                 const auto labelX = juce::jlimit(0, getWidth() - labelWidth, juce::roundToInt(x - labelWidth / 2.f));

@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    namespace Math
+    namespace math
     {
         //==============================================================================================================
         /** Returns the value that's the given proportion between the start and end values. */
@@ -80,7 +80,7 @@ namespace jump
 
             return result;
         }
-    }   // namespace Math
+    }   // namespace math
 
     //==================================================================================================================
     /** Applies hold and decay easing to the given peak level. */

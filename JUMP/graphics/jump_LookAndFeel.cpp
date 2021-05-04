@@ -305,7 +305,7 @@ namespace jump::lookAndFeelImplementations
                 if (freq <= freqRange.start) continue;
                 if (freq >= freqRange.end) break;
 
-                const auto normalised = Math::inverseLogSpace(freqRange.start, freqRange.end, freq);
+                const auto normalised = math::inverseLogSpace(freqRange.start, freqRange.end, freq);
                 const auto x = bounds.getX() + bounds.proportionOfWidth(normalised) - constants::widgetBorderThickness / 2.f;
 
                 g.fillRect(std::round(x), bounds.getY(), constants::widgetBorderThickness, bounds.getHeight());
