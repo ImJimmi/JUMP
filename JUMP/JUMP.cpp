@@ -1,6 +1,8 @@
 #include "JUMP.h"
 
 //======================================================================================================================
+#include "audio/jump_Compressor.cpp"
+
 #include "components/jump_SnapshotGenerator.cpp"
 #include "components/level-meter/jump_LevelMeterEngine.cpp"
 #include "components/level-meter/jump_MultiMeter.cpp"

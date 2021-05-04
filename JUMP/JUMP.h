@@ -44,6 +44,9 @@ namespace jump
     using IntParam    = juce::AudioParameterInt;
 
     using TrackInfoList = juce::Array<juce::Grid::TrackInfo>;
+
+    //==================================================================================================================
+    static constexpr auto defaultMinusInfDB = -100.0;
 }   // namespace jump
 
 //======================================================================================================================
@@ -56,6 +59,8 @@ namespace jump
 #include "utilities/jump_VariantConverters.h"
 
 #include "audio/jump_AudioTransferManager.h"
+#include "audio/jump_Level.h"
+#include "audio/jump_Compressor.h"
 #include "interfaces/jump_PluginProcessor.h"
 #include "interfaces/jump_PluginEditor.h"
 
