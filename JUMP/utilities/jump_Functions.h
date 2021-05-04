@@ -80,6 +80,28 @@ namespace jump
 
             return result;
         }
+
+        //==============================================================================================================
+        template <typename T, std::size_t N>
+        inline T lagrangeInterpolate(const std::array<T, N>& x, const std::array<T, N>& y, T proportion)
+        {
+            auto result = static_cast<T>(0);
+
+            for (std::size_t i = 0; i < N; i++)
+            {
+                auto l = 1.f;
+
+                for (std::size_t j = 0; j < N; j++)
+                {
+                    if (j != i)
+                        l *= (proportion - x[j]) / (x[i] - x[j]);
+                }
+
+                result += l * y[i];
+            }
+
+            return result;
+        }
     }   // namespace math
 
     //==================================================================================================================
