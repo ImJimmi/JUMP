@@ -4,13 +4,6 @@
 namespace jump
 {
     //==================================================================================================================
-    Compressor::Compressor(const juce::dsp::ProcessSpec& processSpec)
-        :   sampleRate{ static_cast<float>(processSpec.sampleRate) },
-            numChannels{ static_cast<int>(processSpec.numChannels) }
-    {
-    }
-
-    //==================================================================================================================
     template <typename ValueType>
     bool changeValue(ValueType& valueToChange, const ValueType& newValue)
     {

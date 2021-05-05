@@ -8,7 +8,7 @@ namespace jump
     {
     public:
         //==============================================================================================================
-        explicit Compressor(const juce::dsp::ProcessSpec& processSpec);
+        Compressor() = default;
 
         //==============================================================================================================
         void prepare(const juce::dsp::ProcessSpec& processSpec) override;
