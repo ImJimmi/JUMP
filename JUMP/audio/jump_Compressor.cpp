@@ -114,17 +114,18 @@ namespace jump
         return releaseMs;
     }
 
+    const Level<float>& Compressor::getGainReduction() const noexcept
+    {
+        return gainReduction;
+    }
+
+    //==================================================================================================================
     void Compressor::setGainReduction(const Level<float>& newGainReduction)
     {
         jassert(newGainReduction.toGain() >= 0.f);
 
         if (changeValue(gainReduction, newGainReduction))
             gainReductionChanged();
-    }
-
-    const Level<float>& Compressor::getGainReduction() const noexcept
-    {
-        return gainReduction;
     }
 
     //==================================================================================================================

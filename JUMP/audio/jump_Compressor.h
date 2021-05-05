@@ -33,12 +33,14 @@ namespace jump
         void setRelease(float releaseTimeMs);
         float getRelease() const noexcept;
 
-        void setGainReduction(const Level<float>& newGainReduction);
         const Level<float>& getGainReduction() const noexcept;
 
     protected:
         //==============================================================================================================
         virtual float processSample(int channel, float sample) = 0;
+
+        //==============================================================================================================
+        void setGainReduction(const Level<float>& newGainReduction);
 
     private:
         //==============================================================================================================
