@@ -29,6 +29,11 @@ namespace jump
             return { point.x, point.y };
         }
 
+        void applyTo(juce::Component& component) const
+        {
+            component.setSize(juce::roundToInt(width), juce::roundToInt(height));
+        }
+
         //==============================================================================================================
         ValueType width;
         ValueType height;
