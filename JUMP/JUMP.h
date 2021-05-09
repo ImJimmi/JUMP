@@ -82,4 +82,5 @@ namespace jump
 #include "components/spectrum-analyser/jump_SpectrumAnalyserLabelsComponent.h"
 #include "components/spectrum-analyser/jump_MultiAnalyser.h"
 
+#include "interfaces/jump_Model.h"
 #include "graphics/jump_LookAndFeel.h"
