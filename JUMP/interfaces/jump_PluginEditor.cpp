@@ -1,13 +1,11 @@
-#pragma once
+#include "jump_PluginEditor.h"
 
 //======================================================================================================================
 namespace jump
 {
     //==================================================================================================================
-    class PluginEditor  :   public juce::AudioProcessorEditor
+    PluginEditor::PluginEditor(PluginProcessor& p)
+        :   juce::AudioProcessorEditor{ &p }
     {
-    public:
-        //==============================================================================================================
-        explicit PluginEditor(PluginProcessor& p);
-    };
+    }
 }   // namespace jump
