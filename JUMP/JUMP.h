@@ -50,37 +50,43 @@ namespace jump
 }   // namespace jump
 
 //======================================================================================================================
-#include "containers/jump_CircularBuffer.h"
-
-#include "interfaces/jump_StatefulObject.h"
-#include "interfaces/jump_AudioComponentEngine.h"
-#include "utilities/jump_LookAndFeelAccessor.h"
-#include "utilities/jump_Functions.h"
-#include "utilities/jump_VariantConverters.h"
-
+// Audio
 #include "audio/jump_AudioTransferManager.h"
 #include "audio/jump_Level.h"
 #include "audio/jump_Compressor.h"
-#include "interfaces/jump_PluginProcessor.h"
-#include "interfaces/jump_PluginEditor.h"
 
-#include "graphics/jump_Canvas.h"
-#include "graphics/jump_ColourIDs.h"
-#include "graphics/jump_Container.h"
-#include "graphics/jump_Margin.h"
-#include "graphics/jump_MaterialColourPalette.h"
-#include "graphics/jump_PaintOptions.h"
-#include "graphics/jump_Size.h"
-
+// Components
 #include "components/jump_SnapshotGenerator.h"
+    #include "interfaces/jump_StatefulObject.h"
+    #include "containers/jump_CircularBuffer.h"
+    #include "interfaces/jump_AudioComponentEngine.h"
 #include "components/level-meter/jump_LevelMeterEngine.h"
+    #include "utilities/jump_LookAndFeelAccessor.h"
+    #include "graphics/jump_Canvas.h"
+    #include "graphics/jump_Container.h"
 #include "components/level-meter/jump_LevelMeter.h"
+    #include "utilities/jump_Functions.h"
 #include "components/level-meter/jump_LevelMeterLabelsComponent.h"
 #include "components/level-meter/jump_MultiMeter.h"
 #include "components/spectrum-analyser/jump_SpectrumAnalyserEngine.h"
+    #include "graphics/jump_PaintOptions.h"
 #include "components/spectrum-analyser/jump_SpectrumAnalyser.h"
+    #include "utilities/jump_VariantConverters.h"
 #include "components/spectrum-analyser/jump_SpectrumAnalyserLabelsComponent.h"
 #include "components/spectrum-analyser/jump_MultiAnalyser.h"
 
+// Containers
+
+// Interfaces
 #include "interfaces/jump_Model.h"
+#include "interfaces/jump_PluginProcessor.h"
+#include "interfaces/jump_PluginEditor.h"
+
+// Graphics
+#include "graphics/jump_ColourIDs.h"
 #include "graphics/jump_LookAndFeel.h"
+#include "graphics/jump_Margin.h"
+#include "graphics/jump_MaterialColourPalette.h"
+#include "graphics/jump_Size.h"
+
+// Utilities
