@@ -56,13 +56,14 @@ namespace jump
 #include "audio/jump_Compressor.h"
 
 // Components
+    #include "utilities/jump_LookAndFeelAccessor.h"
+    #include "graphics/jump_Canvas.h"
+#include "components/jump_SvgComponent.h"
 #include "components/jump_SnapshotGenerator.h"
     #include "interfaces/jump_StatefulObject.h"
     #include "containers/jump_CircularBuffer.h"
     #include "interfaces/jump_AudioComponentEngine.h"
 #include "components/level-meter/jump_LevelMeterEngine.h"
-    #include "utilities/jump_LookAndFeelAccessor.h"
-    #include "graphics/jump_Canvas.h"
     #include "graphics/jump_Container.h"
 #include "components/level-meter/jump_LevelMeter.h"
     #include "utilities/jump_Functions.h"

@@ -40,12 +40,20 @@ namespace jump
             std::unique_ptr<juce::Label> createLabelForFrequency(const SpectrumAnalyserLabelsComponent& component,
                                                                  float frequency) const noexcept override final;
         };
+
+        //==============================================================================================================
+        class SvgLookAndFeel    :   public SvgComponent::LookAndFeelMethods
+        {
+            // SvgComponent
+            void drawSvgComponent(juce::Graphics& g, const SvgComponent& component) const override final;
+        };
     }
 
     //==================================================================================================================
     struct LookAndFeel  :   public juce::LookAndFeel_V4,
                             public lookAndFeelImplementations::LevelMeterLookAndFeel,
-                            public lookAndFeelImplementations::SpectrumAnalyserLookAndFeel
+                            public lookAndFeelImplementations::SpectrumAnalyserLookAndFeel,
+                            public lookAndFeelImplementations::SvgLookAndFeel
     {
         //==============================================================================================================
         struct ColourScheme

@@ -464,6 +464,13 @@ namespace jump::lookAndFeelImplementations
 
         return label;
     }
+
+    //==================================================================================================================
+    void SvgLookAndFeel::drawSvgComponent(juce::Graphics& g, const SvgComponent& component) const
+    {
+        component.getDrawable().drawWithin(g, component.getLocalBounds().toFloat(), juce::RectanglePlacement::centred,
+                                           1.f);
+    }
 }   // namespace jump::lookAndFeelImplementations
 
 //======================================================================================================================
