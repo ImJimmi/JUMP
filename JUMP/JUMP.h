@@ -59,6 +59,7 @@ namespace jump
     #include "utilities/jump_LookAndFeelAccessor.h"
     #include "graphics/jump_Canvas.h"
 #include "components/jump_SvgComponent.h"
+#include "components/jump_BrandLogoComponent.h"
 #include "components/jump_SnapshotGenerator.h"
     #include "interfaces/jump_StatefulObject.h"
     #include "containers/jump_CircularBuffer.h"

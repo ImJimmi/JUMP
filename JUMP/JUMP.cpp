@@ -5,6 +5,7 @@
 #include "audio/jump_Compressor.cpp"
 
 // Components
+#include "components/jump_BrandLogoComponent.cpp"
 #include "components/jump_SnapshotGenerator.cpp"
 #include "components/jump_SvgComponent.cpp"
 #include "components/level-meter/jump_LevelMeterEngine.cpp"
