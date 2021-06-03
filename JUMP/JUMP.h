@@ -80,7 +80,6 @@ namespace jump
 // Containers
 
 // Interfaces
-#include "interfaces/jump_Model.h"
 #include "interfaces/jump_PluginProcessor.h"
 #include "interfaces/jump_PluginEditor.h"
 
