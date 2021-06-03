@@ -40,6 +40,10 @@ namespace jump
         const juce::String getProgramName(int) override;
         void changeProgramName(int, const juce::String&) override;
 
+    protected:
+        //==============================================================================================================
+        juce::AudioProcessorValueTreeState& getAPVTS();
+
     private:
         //==============================================================================================================
         void getStateInformation(juce::MemoryBlock& destData) override;

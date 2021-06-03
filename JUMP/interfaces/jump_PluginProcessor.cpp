@@ -108,10 +108,10 @@ namespace jump
     }
 
     //==================================================================================================================
-//    PluginModel& PluginProcessor::getModel() noexcept
-//    {
-//        return model;
-//    }
+    juce::AudioProcessorValueTreeState& PluginProcessor::getAPVTS()
+    {
+        return apvts;
+    }
 
     //==================================================================================================================
     void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
