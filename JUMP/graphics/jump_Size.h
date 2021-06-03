@@ -34,6 +34,16 @@ namespace jump
             component.setSize(juce::roundToInt(width), juce::roundToInt(height));
         }
 
+        Size<float> toFloat() const
+        {
+            return { static_cast<float>(width), static_cast<float>(height) };
+        }
+
+        juce::String toString() const
+        {
+            return juce::String{ width } + ' ' + juce::String{ height };
+        }
+
         //==============================================================================================================
         ValueType width;
         ValueType height;
