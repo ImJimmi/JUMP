@@ -95,7 +95,7 @@ namespace juce
             return { static_cast<int>(orientation) };
         }
     };
-}   // namespace juce
+} // namespace juce
 
 //======================================================================================================================
 namespace jump
@@ -111,4 +111,4 @@ namespace jump
     {
         return juce::VariantConverter<T>::fromVar(v);
     }
-}
+} // namespace jump

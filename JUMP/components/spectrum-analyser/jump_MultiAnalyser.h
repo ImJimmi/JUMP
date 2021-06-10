@@ -4,8 +4,9 @@
 namespace jump
 {
     //==================================================================================================================
-    class MultiAnalyser :   public Container,
-                            public StatefulObject
+    class MultiAnalyser
+        : public Container
+        , public StatefulObject
     {
     public:
         //==============================================================================================================
@@ -42,4 +43,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MultiAnalyser)
     };
-}   // namespace jump
+} // namespace jump

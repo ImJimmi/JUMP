@@ -13,7 +13,7 @@ namespace jump
         override any callbacks from mouse or keyboard events. Instead, you should let a parent Component handle any user
         interactions and pass the information to your custom Canvas instead.
     */
-    class Canvas    :   public juce::Component
+    class Canvas : public juce::Component
     {
     public:
         //==============================================================================================================
@@ -22,7 +22,7 @@ namespace jump
 
         /** Creates a blank Canvas with the given Component name. */
         Canvas(const juce::String& componentName)
-            :   juce::Component{ componentName }
+            : juce::Component{ componentName }
         {
         }
 
@@ -94,14 +94,14 @@ namespace jump
         void focusOfChildComponentChanged(FocusChangeType) override final {}
         void childBoundsChanged(juce::Component*) override final {}
 
-        void mouseMove       (const juce::MouseEvent&) override final {}
-        void mouseEnter      (const juce::MouseEvent&) override final {}
-        void mouseExit       (const juce::MouseEvent&) override final {}
-        void mouseDown       (const juce::MouseEvent&) override final {}
-        void mouseDrag       (const juce::MouseEvent&) override final {}
-        void mouseUp         (const juce::MouseEvent&) override final {}
+        void mouseMove(const juce::MouseEvent&) override final {}
+        void mouseEnter(const juce::MouseEvent&) override final {}
+        void mouseExit(const juce::MouseEvent&) override final {}
+        void mouseDown(const juce::MouseEvent&) override final {}
+        void mouseDrag(const juce::MouseEvent&) override final {}
+        void mouseUp(const juce::MouseEvent&) override final {}
         void mouseDoubleClick(const juce::MouseEvent&) override final {}
-        void mouseWheelMove  (const juce::MouseEvent&, const juce::MouseWheelDetails&) override final {}
-        void mouseMagnify    (const juce::MouseEvent&, float) override final {}
+        void mouseWheelMove(const juce::MouseEvent&, const juce::MouseWheelDetails&) override final {}
+        void mouseMagnify(const juce::MouseEvent&, float) override final {}
     };
-}   // namespace vocaster
+} // namespace jump

@@ -5,8 +5,8 @@ namespace jump
 {
     //==================================================================================================================
     SnapshotGenerator::SnapshotGenerator(juce::Component& targetComponent, const juce::File& outputDirectory)
-        :   component{ targetComponent },
-            file{ outputDirectory.getChildFile(juce::Time::getCurrentTime().toISO8601(false) + ".png") }
+        : component{ targetComponent }
+        , file{ outputDirectory.getChildFile(juce::Time::getCurrentTime().toISO8601(false) + ".png") }
     {
         component.addAndMakeVisible(this);
         setSize(1, 1);
@@ -70,4 +70,4 @@ namespace jump
             DBG("[JUMP SnapshotGenerator] No visual changes detected.");
         }
     }
-}   // namespace jump
+} // namespace jump

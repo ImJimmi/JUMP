@@ -102,7 +102,7 @@ namespace jump
 
             return result;
         }
-    }   // namespace math
+    } // namespace math
 
     //==================================================================================================================
     /** Applies hold and decay easing to the given peak level. */
@@ -169,4 +169,4 @@ namespace jump
 
         return { value, numDecimalPlaces };
     }
-}   // namespace jump
+} // namespace jump

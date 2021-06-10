@@ -4,14 +4,14 @@
 namespace jump
 {
     //==================================================================================================================
-    class Container :   public juce::Component
+    class Container : public juce::Component
     {
     public:
         //==============================================================================================================
         Container() = default;
 
         Container(const juce::String& componentName)
-            :   juce::Component{ componentName }
+            : juce::Component{ componentName }
         {
         }
 
@@ -20,4 +20,4 @@ namespace jump
         void paint(juce::Graphics&) override final {}
         void paintOverChildren(juce::Graphics&) override final {}
     };
-}
+} // namespace jump

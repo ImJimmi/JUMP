@@ -4,8 +4,9 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeter    :   public Container,
-                            public LevelMeterRendererBase
+    class LevelMeter
+        : public Container
+        , public LevelMeterRendererBase
     {
     public:
         //==============================================================================================================
@@ -20,7 +21,7 @@ namespace jump
 
         //==============================================================================================================
         explicit LevelMeter(const LevelMeterEngine& engineToUse)
-            :   engine{ engineToUse }
+            : engine{ engineToUse }
         {
             lookAndFeel.attachTo(this);
 
@@ -91,4 +92,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeter)
     };
-}   // namespace jump
+} // namespace jump

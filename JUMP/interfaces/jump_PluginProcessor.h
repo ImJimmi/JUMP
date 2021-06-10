@@ -10,7 +10,7 @@ namespace jump
         juce::AudioProcessor that seldom differ across projects and adds the additional features required to have
         parameters controlled by a juce::AudioProcessorValueTreeState object.
     */
-    class PluginProcessor   :   public juce::AudioProcessor
+    class PluginProcessor : public juce::AudioProcessor
     {
     public:
         //==============================================================================================================
@@ -18,8 +18,8 @@ namespace jump
                         juce::dsp::ProcessorBase& mainAudioProcessor,
                         const BusesProperties& busesProperties = BusesProperties{}.withInput("Stereo Input",
                                                                                              juce::AudioChannelSet::stereo())
-                                                                                  .withOutput("Stereo Output",
-                                                                                              juce::AudioChannelSet::stereo()),
+                                                                     .withOutput("Stereo Output",
+                                                                                 juce::AudioChannelSet::stereo()),
                         const juce::Identifier& apvtsID = juce::String{ JucePlugin_Name }.replace(" ", "_"));
 
         //==============================================================================================================
@@ -55,4 +55,4 @@ namespace jump
 
         juce::dsp::ProcessorBase& audioProcessor;
     };
-}   // namespace jump
+} // namespace jump

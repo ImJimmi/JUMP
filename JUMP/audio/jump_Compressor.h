@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class Compressor    :   public juce::dsp::ProcessorBase
+    class Compressor : public juce::dsp::ProcessorBase
     {
     public:
         //==============================================================================================================
@@ -70,4 +70,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Compressor)
     };
-}   // namespace jump
+} // namespace jump

@@ -6,12 +6,12 @@ namespace jump
     //==================================================================================================================
     void LevelMeterEngine::initialise()
     {
-        setProperty(PropertyIDs::rmsAttackTimeId,   150.f);
-        setProperty(PropertyIDs::rmsReleaseTimeId,  350.f);
-        setProperty(PropertyIDs::peakHoldTimeId,    400.f);
+        setProperty(PropertyIDs::rmsAttackTimeId, 150.f);
+        setProperty(PropertyIDs::rmsReleaseTimeId, 350.f);
+        setProperty(PropertyIDs::peakHoldTimeId, 400.f);
         setProperty(PropertyIDs::peakMaxHoldTimeId, 10000.f);
         setProperty(PropertyIDs::peakReleaseTimeId, 1500.f);
-        setProperty(PropertyIDs::decibelRangeId,    "[-100.0, 0.0, 2.5]");
+        setProperty(PropertyIDs::decibelRangeId, "[-100.0, 0.0, 2.5]");
     }
 
     //==================================================================================================================
@@ -20,8 +20,8 @@ namespace jump
         initialise();
     }
 
-    LevelMeterEngine::LevelMeterEngine(const juce::Identifier & uniqueID, StatefulObject* parentState)
-        :   AudioComponentEngine{ uniqueID, parentState }
+    LevelMeterEngine::LevelMeterEngine(const juce::Identifier& uniqueID, StatefulObject* parentState)
+        : AudioComponentEngine{ uniqueID, parentState }
     {
         initialise();
     }
@@ -190,4 +190,4 @@ namespace jump
         rmsFilter.setReleaseTime(newReleaseTimeMS);
         rmsRelease = newReleaseTimeMS;
     }
-}   // namespace jump
+} // namespace jump

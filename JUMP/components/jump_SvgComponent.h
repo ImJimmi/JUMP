@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class SvgComponent  :   public Canvas
+    class SvgComponent : public Canvas
     {
     public:
         //==============================================================================================================
@@ -35,4 +35,4 @@ namespace jump
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
     };
-}   // namespace jump
+} // namespace jump

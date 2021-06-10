@@ -10,7 +10,7 @@ namespace jump
     }
 
     SvgComponent::SvgComponent(const juce::XmlElement& svg)
-        :   drawable {juce::Drawable::createFromSVG(svg)}
+        : drawable{ juce::Drawable::createFromSVG(svg) }
     {
         initialise();
     }
@@ -41,4 +41,4 @@ namespace jump
         lookAndFeel.attachTo(this);
         setInterceptsMouseClicks(false, false);
     }
-}   // namespace jump
+} // namespace jump

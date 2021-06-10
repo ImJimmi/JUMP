@@ -18,7 +18,7 @@ namespace juce
             return { static_cast<int>(position) };
         }
     };
-}   // namespace juce
+} // namespace juce
 
 //======================================================================================================================
 namespace jump
@@ -26,9 +26,9 @@ namespace jump
     //==================================================================================================================
     MultiMeter::MultiMeter(const std::vector<LevelMeterEngine*>& enginesToUse,
                            juce::Identifier type, StatefulObject* parentState)
-        :   StatefulObject{ type, parentState },
-            mainEngine{ *enginesToUse.front() },
-            labels{ *enginesToUse.front() }
+        : StatefulObject{ type, parentState }
+        , mainEngine{ *enginesToUse.front() }
+        , labels{ *enginesToUse.front() }
     {
         lookAndFeel.attachTo(this);
 
@@ -107,7 +107,7 @@ namespace jump
         using Fr = juce::Grid::Fr;
 
         if (orientation == orientationForSingleElement)
-            return { { Fr{1} } };
+            return { { Fr{ 1 } } };
 
         juce::Array<juce::Grid::TrackInfo> result;
 
@@ -352,4 +352,4 @@ namespace jump
         orientation = newOrientation;
         resized();
     }
-}   // namespace jump
+} // namespace jump

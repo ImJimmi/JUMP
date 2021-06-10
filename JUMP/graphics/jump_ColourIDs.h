@@ -22,4 +22,4 @@ namespace jump
         spectrumAnalyserWarningColourId,
         spectrumAnalyserDangerColourId
     };
-}   // namespace jump
+} // namespace jump

@@ -4,8 +4,9 @@
 namespace jump
 {
     //==================================================================================================================
-    class SpectrumAnalyserLabelsComponent :   public Container,
-                                              private StatefulObject
+    class SpectrumAnalyserLabelsComponent
+        : public Container
+        , private StatefulObject
     {
     public:
         //==============================================================================================================
@@ -21,15 +22,15 @@ namespace jump
 
         struct PropertyIDs
         {
-            static const inline juce::Identifier highlightedLevelsPropertyId     { "highlightedLevels" };
+            static const inline juce::Identifier highlightedLevelsPropertyId{ "highlightedLevels" };
             static const inline juce::Identifier highlightedFrequenciesPropertyId{ "highlightedFrequencies" };
         };
 
         //==============================================================================================================
         SpectrumAnalyserLabelsComponent(const SpectrumAnalyserEngine& engineToUse,
                                         const juce::Identifier& uniqueID, StatefulObject* parentState = nullptr)
-            :   StatefulObject{ uniqueID, parentState },
-                engine{ engineToUse }
+            : StatefulObject{ uniqueID, parentState }
+            , engine{ engineToUse }
         {
             initialiseState();
 
@@ -91,7 +92,6 @@ namespace jump
 
             for (const auto& level : levels)
             {
-
                 auto label = lookAndFeel->createLabelForLevel(*this, level);
                 label->getProperties().set(levelPropertyId, level);
                 addAndMakeVisible(*label);
@@ -145,7 +145,7 @@ namespace jump
         {
             if (!isVisible() || getWidth() <= 0 || getHeight() <= 0)
                 return;
-                
+
             const auto& freqRange = engine.getFrequencyRange();
 
             for (auto& label : frequencyLabels)
@@ -196,4 +196,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalyserLabelsComponent)
     };
-}   // namespace jump
+} // namespace jump

@@ -171,4 +171,4 @@ namespace jump
     void Compressor::gainReductionChanged()
     {
     }
-}   // namespace jump
+} // namespace jump

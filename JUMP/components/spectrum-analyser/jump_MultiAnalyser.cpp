@@ -6,9 +6,9 @@ namespace jump
     //==================================================================================================================
     MultiAnalyser::MultiAnalyser(const std::vector<SpectrumAnalyserEngine*>& enginesToUse,
                                  juce::Identifier type, StatefulObject* parentState)
-        :   StatefulObject{ type, parentState },
-            mainEngine{ *enginesToUse.front() },
-            labels{ *enginesToUse.front(), "Labels" }
+        : StatefulObject{ type, parentState }
+        , mainEngine{ *enginesToUse.front() }
+        , labels{ *enginesToUse.front(), "Labels" }
     {
         initialiseState();
 
@@ -23,9 +23,9 @@ namespace jump
 
         if (analysers.size() > 1)
         {
-            analysers[0]->setColour(spectrumAnalyserSafeColourId,    MaterialColourPalette::blueGrey300);
+            analysers[0]->setColour(spectrumAnalyserSafeColourId, MaterialColourPalette::blueGrey300);
             analysers[0]->setColour(spectrumAnalyserWarningColourId, MaterialColourPalette::blueGrey200);
-            analysers[0]->setColour(spectrumAnalyserDangerColourId,  MaterialColourPalette::blueGrey100);
+            analysers[0]->setColour(spectrumAnalyserDangerColourId, MaterialColourPalette::blueGrey100);
             analysers[0]->setPaintOptions(PaintOptions{ PaintOptions::strokeFlag });
         }
 
@@ -70,4 +70,4 @@ namespace jump
     {
         setProperty(PropertyIDs::labelsVisibleId, true);
     }
-}   // namespace jump
+} // namespace jump

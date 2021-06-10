@@ -42,8 +42,8 @@ namespace jump
             @param other    The other ATM object to copy from.
         */
         AudioTransferManager(const AudioTransferManager& other)
-            :   buffers{ other.buffers },
-                idx{ other.idx.load() }
+            : buffers{ other.buffers }
+            , idx{ other.idx.load() }
         {
         }
 
@@ -99,7 +99,8 @@ namespace jump
                 {
                     currentIDX &= ~DataFlags::Busy;
                     newValue = (currentIDX ^ DataFlags::IDX) & DataFlags::IDX;
-                } while (!idx.compare_exchange_weak(currentIDX, newValue));
+                }
+                while (!idx.compare_exchange_weak(currentIDX, newValue));
 
                 // Something went wrong here - the value never got changed!
                 jassert(newValue != -1);
@@ -151,11 +152,11 @@ namespace jump
 
         enum DataFlags
         {
-            IDX     = 1 << 0,
+            IDX = 1 << 0,
             NewData = 1 << 1,
-            Busy    = 1 << 2
+            Busy = 1 << 2
         };
 
         mutable std::atomic<int> idx{ 0 };
     };
-}   // namespace jump
+} // namespace jump

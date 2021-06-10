@@ -8,9 +8,9 @@ namespace jump
                                      juce::dsp::ProcessorBase& mainAudioProcessor,
                                      const BusesProperties& busesProperties,
                                      const juce::Identifier& apvtsID)
-        :   juce::AudioProcessor{ busesProperties },
-            apvts{ *this, &undoManager, apvtsID, std::move(parametersLayout) },
-            audioProcessor{ mainAudioProcessor }
+        : juce::AudioProcessor{ busesProperties }
+        , apvts{ *this, &undoManager, apvtsID, std::move(parametersLayout) }
+        , audioProcessor{ mainAudioProcessor }
     {
     }
 
@@ -128,4 +128,4 @@ namespace jump
                 apvts.replaceState(juce::ValueTree::fromXml(*xml));
         }
     }
-}   // namespace jump
+} // namespace jump

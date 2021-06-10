@@ -31,20 +31,20 @@ namespace jump
         The X axis of the analyser is in Hz and will use a logarithmic scale (base 2) to more accurately represent how
         we as humans perceive pitch.
     */
-    class SpectrumAnalyserEngine    :   public AudioComponentEngine<SpectrumAnalyserRendererBase>
+    class SpectrumAnalyserEngine : public AudioComponentEngine<SpectrumAnalyserRendererBase>
     {
     public:
         //==============================================================================================================
         struct PropertyIDs
         {
             static const inline juce::Identifier windowingMethodId{ "windowingMethod" };
-            static const inline juce::Identifier fftOrderId       { "fftOrder" };
-            static const inline juce::Identifier frequencyRangeId { "frequencyRange" };
-            static const inline juce::Identifier decibelRangeId   { "decibelRange" };
-            static const inline juce::Identifier holdTimeId       { "holdTime" };
-            static const inline juce::Identifier maxHoldTimeId    { "maxHoldTime" };
-            static const inline juce::Identifier decayTimeId      { "decayTime" };
-            static const inline juce::Identifier numPointsId      { "numPoints" };
+            static const inline juce::Identifier fftOrderId{ "fftOrder" };
+            static const inline juce::Identifier frequencyRangeId{ "frequencyRange" };
+            static const inline juce::Identifier decibelRangeId{ "decibelRange" };
+            static const inline juce::Identifier holdTimeId{ "holdTime" };
+            static const inline juce::Identifier maxHoldTimeId{ "maxHoldTime" };
+            static const inline juce::Identifier decayTimeId{ "decayTime" };
+            static const inline juce::Identifier numPointsId{ "numPoints" };
         };
 
         //==============================================================================================================
@@ -218,4 +218,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpectrumAnalyserEngine)
     };
-}   // namespace jump::SpectrumAnalyser
+} // namespace jump

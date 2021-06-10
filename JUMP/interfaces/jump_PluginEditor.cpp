@@ -5,7 +5,7 @@ namespace jump
 {
     //==================================================================================================================
     PluginEditor::PluginEditor(PluginProcessor& p)
-        :   juce::AudioProcessorEditor{ &p }
+        : juce::AudioProcessorEditor{ &p }
     {
     }
-}   // namespace jump
+} // namespace jump

@@ -4,13 +4,13 @@
 namespace jump
 {
     //==================================================================================================================
-    class StatefulObject    :   private juce::ValueTree::Listener
+    class StatefulObject : private juce::ValueTree::Listener
     {
     public:
         //==============================================================================================================
         StatefulObject(const juce::Identifier& type = "UnnamedStatefulObject", StatefulObject* parentState = nullptr)
-            :   valueTree{ type },
-                parent{ parentState }
+            : valueTree{ type }
+            , parent{ parentState }
         {
             if (parentState != nullptr)
                 parentState->addChild(this);
@@ -44,7 +44,7 @@ namespace jump
         {
             if (tree != valueTree)
                 return;
-            
+
             callPropertyChangedRecursively(tree, name);
         }
 
@@ -52,7 +52,7 @@ namespace jump
         {
             if (tree != valueTree)
                 return;
-            
+
             for (auto i = 0; i < tree.getNumProperties(); i++)
             {
                 const auto name = tree.getPropertyName(i);
@@ -102,4 +102,4 @@ namespace jump
         StatefulObject* parent{ nullptr };
         juce::Array<StatefulObject*> children;
     };
-}   // namespace jump
+} // namespace jump

@@ -48,4 +48,4 @@ namespace jump
         ValueType width;
         ValueType height;
     };
-}   // namespace jump
+} // namespace jump

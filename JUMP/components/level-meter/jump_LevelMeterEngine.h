@@ -27,18 +27,18 @@ namespace jump
 
         The levels use a linear Decibel scale normalised to 0-1.
     */
-    class LevelMeterEngine  :   public AudioComponentEngine<LevelMeterRendererBase>
+    class LevelMeterEngine : public AudioComponentEngine<LevelMeterRendererBase>
     {
     public:
         //==================================================================================================================
         struct PropertyIDs
         {
-            static const inline juce::Identifier rmsAttackTimeId  { "rmsAttackTime" };
-            static const inline juce::Identifier rmsReleaseTimeId { "rmsReleaseTime" };
-            static const inline juce::Identifier peakHoldTimeId   { "peakHoldTime" };
+            static const inline juce::Identifier rmsAttackTimeId{ "rmsAttackTime" };
+            static const inline juce::Identifier rmsReleaseTimeId{ "rmsReleaseTime" };
+            static const inline juce::Identifier peakHoldTimeId{ "peakHoldTime" };
             static const inline juce::Identifier peakMaxHoldTimeId{ "peakMaxHoldTime" };
             static const inline juce::Identifier peakReleaseTimeId{ "peakReleaseTime" };
-            static const inline juce::Identifier decibelRangeId   { "decibelRange" };
+            static const inline juce::Identifier decibelRangeId{ "decibelRange" };
         };
 
         //==============================================================================================================
@@ -149,4 +149,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterEngine)
     };
-}   // namespace jump
+} // namespace jump

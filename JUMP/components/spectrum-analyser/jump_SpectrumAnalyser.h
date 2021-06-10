@@ -4,9 +4,10 @@
 namespace jump
 {
     //==================================================================================================================
-    class SpectrumAnalyser  :   public Container,
-                                public SpectrumAnalyserRendererBase,
-                                private StatefulObject
+    class SpectrumAnalyser
+        : public Container
+        , public SpectrumAnalyserRendererBase
+        , private StatefulObject
     {
     public:
         //==============================================================================================================
@@ -23,7 +24,7 @@ namespace jump
         struct PropertyIDs
         {
             static const inline juce::Identifier isBackgroundVisibleId{ "isBackgroundVisible" };
-            static const inline juce::Identifier paintOptionsId       { "paintOptions" };
+            static const inline juce::Identifier paintOptionsId{ "paintOptions" };
         };
 
         //==============================================================================================================
@@ -50,7 +51,7 @@ namespace jump
         void initialiseState();
 
         //==============================================================================================================
-        void setBackgroundVisibleInternal (bool shouldBeVisible);
+        void setBackgroundVisibleInternal(bool shouldBeVisible);
         void setPaintOptionsInternal(const PaintOptions& options);
 
         //==============================================================================================================
@@ -65,4 +66,4 @@ namespace jump
 
         LookAndFeelAccessor<LookAndFeelMethods> lookAndFeel;
     };
-}   // namespace jump
+} // namespace jump

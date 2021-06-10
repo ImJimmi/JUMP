@@ -17,25 +17,25 @@ namespace jump
         Margin() = default;
 
         Margin(ValueType topEdge, ValueType rightEdge, ValueType bottomEdge, ValueType leftEdge)
-            :   top   { topEdge },
-                right { rightEdge },
-                bottom{ bottomEdge },
-                left  { leftEdge }
+            : top{ topEdge }
+            , right{ rightEdge }
+            , bottom{ bottomEdge }
+            , left{ leftEdge }
         {
         }
 
         Margin(ValueType topEdge, ValueType rightAndLeftEdges, ValueType bottomEdge)
-            :   Margin{ topEdge, rightAndLeftEdges, bottomEdge, rightAndLeftEdges }
+            : Margin{ topEdge, rightAndLeftEdges, bottomEdge, rightAndLeftEdges }
         {
         }
 
         Margin(ValueType topAndBottomEdges, ValueType rightAndLeftEdges)
-            :   Margin{ topAndBottomEdges, rightAndLeftEdges, topAndBottomEdges }
+            : Margin{ topAndBottomEdges, rightAndLeftEdges, topAndBottomEdges }
         {
         }
 
         explicit Margin(ValueType allEdges)
-            :   Margin{ allEdges, allEdges }
+            : Margin{ allEdges, allEdges }
         {
         }
 
@@ -82,4 +82,4 @@ namespace jump
         ValueType bottom;
         ValueType left;
     };
-}   // namespace jump
+} // namespace jump

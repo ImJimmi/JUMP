@@ -4,10 +4,10 @@
 namespace jump
 {
     //==================================================================================================================
-    class PluginEditor  :   public juce::AudioProcessorEditor
+    class PluginEditor : public juce::AudioProcessorEditor
     {
     public:
         //==============================================================================================================
         explicit PluginEditor(PluginProcessor& p);
     };
-}   // namespace jump
+} // namespace jump

@@ -30,7 +30,7 @@ namespace constants
     constexpr auto spectrumAnalyserFillOpacity = 0.1f;
     constexpr auto spectrumAnalyserLevelLabelMarginX = 10;
     constexpr auto spectrumAnalyserFrequencyLabelMarginBottom = 3;
-}   // namespace constants
+} // namespace constants
 
 //======================================================================================================================
 namespace jump::lookAndFeelImplementations
@@ -115,20 +115,16 @@ namespace jump::lookAndFeelImplementations
             bounds.setWidth(meterBounds.toFloat().getWidth());
             bounds.setHeight(constants::levelMeterPeakIndicatorThickness);
 
-            bounds.setCentre(
-                meterBounds.toFloat().getCentreX(),
-                meterBounds.getHeight() * (1.f - peakLevel)
-            );
+            bounds.setCentre({ meterBounds.toFloat().getCentreX(),
+                               meterBounds.getHeight() * (1.f - peakLevel) });
         }
         else if (orientation == Orientation::horizontal)
         {
             bounds.setWidth(constants::levelMeterPeakIndicatorThickness);
             bounds.setHeight(meterBounds.toFloat().getHeight());
 
-            bounds.setCentre(
-                meterBounds.getWidth() * peakLevel,
-                meterBounds.toFloat().getCentreY()
-            );
+            bounds.setCentre({ meterBounds.getWidth() * peakLevel,
+                               meterBounds.toFloat().getCentreY() });
         }
         else
         {
@@ -177,7 +173,7 @@ namespace jump::lookAndFeelImplementations
         juce::Path path;
 
         path.addPath(createLevelMeterPeakShape(orientation, bounds, peakLevel));
-        path.addPath(createLevelMeterRMSShape (orientation, bounds, rmsLevel));
+        path.addPath(createLevelMeterRMSShape(orientation, bounds, rmsLevel));
 
         return path;
     }
@@ -302,8 +298,11 @@ namespace jump::lookAndFeelImplementations
             {
                 const auto freq = multipleOfTen * multiplier;
 
-                if (freq <= freqRange.start) continue;
-                if (freq >= freqRange.end) break;
+                if (freq <= freqRange.start)
+                    continue;
+
+                if (freq >= freqRange.end)
+                    break;
 
                 const auto normalised = math::inverseLogSpace(freqRange.start, freqRange.end, freq);
                 const auto x = bounds.getX() + bounds.proportionOfWidth(normalised) - constants::widgetBorderThickness / 2.f;
@@ -339,20 +338,20 @@ namespace jump::lookAndFeelImplementations
     {
         g.setColour(analyser.findColour(spectrumAnalyserGridlinesColourId));
 
-        drawSpectrumAnalyserVerticalGridlines  (g, analyser);
+        drawSpectrumAnalyserVerticalGridlines(g, analyser);
         drawSpectrumAnalyserHorizontalGridlines(g, analyser);
     }
 
     void SpectrumAnalyserLookAndFeel::drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept
     {
         drawSpectrumAnalyserBackground(g, analyser);
-        drawSpectrumAnalyserGridlines (g, analyser);
+        drawSpectrumAnalyserGridlines(g, analyser);
     }
 
     juce::Point<float> denormalisePoint(const juce::Point<float>& normalisedPoint, const juce::Rectangle<float>& bounds)
     {
         return {
-            bounds.getX() + bounds.proportionOfWidth (normalisedPoint.x),
+            bounds.getX() + bounds.proportionOfWidth(normalisedPoint.x),
             bounds.getY() + bounds.proportionOfHeight(normalisedPoint.y)
         };
     }
@@ -471,14 +470,14 @@ namespace jump::lookAndFeelImplementations
         component.getDrawable().drawWithin(g, component.getLocalBounds().toFloat(), juce::RectanglePlacement::centred,
                                            1.f);
     }
-}   // namespace jump::lookAndFeelImplementations
+} // namespace jump::lookAndFeelImplementations
 
 //======================================================================================================================
 namespace jump
 {
     //==================================================================================================================
     LookAndFeel::LookAndFeel()
-        :   LookAndFeel{ getMaterialColourScheme() }
+        : LookAndFeel{ getMaterialColourScheme() }
     {
     }
 
@@ -490,24 +489,24 @@ namespace jump
     //==================================================================================================================
     void LookAndFeel::setColourScheme(const ColourScheme& scheme)
     {
-        setColour(levelMeterBackgroundColourId,           scheme.widgetBackground);
-        setColour(levelMeterBorderColourId,               scheme.widgetBorder);
-        setColour(levelMeterGridlinesColourId,            scheme.widgetBorder);
-        setColour(levelMeterSafeColourId,                 scheme.safe);
-        setColour(levelMeterWarningColourId,              scheme.warning);
-        setColour(levelMeterDangerColourId,               scheme.danger);
-        setColour(levelMeterLabelNormalTextColourId,      scheme.textNormal);
+        setColour(levelMeterBackgroundColourId, scheme.widgetBackground);
+        setColour(levelMeterBorderColourId, scheme.widgetBorder);
+        setColour(levelMeterGridlinesColourId, scheme.widgetBorder);
+        setColour(levelMeterSafeColourId, scheme.safe);
+        setColour(levelMeterWarningColourId, scheme.warning);
+        setColour(levelMeterDangerColourId, scheme.danger);
+        setColour(levelMeterLabelNormalTextColourId, scheme.textNormal);
         setColour(levelMeterLabelHighlightedTextColourId, scheme.textBold);
 
         setColour(spectrumAnalyserBackgroundColourId, scheme.widgetBackground);
-        setColour(spectrumAnalyserBorderColourId,     scheme.widgetBorder);
-        setColour(spectrumAnalyserGridlinesColourId,  scheme.widgetBorder);
-        setColour(spectrumAnalyserSafeColourId,       scheme.safe);
-        setColour(spectrumAnalyserWarningColourId,    scheme.warning);
-        setColour(spectrumAnalyserDangerColourId,     scheme.danger);
+        setColour(spectrumAnalyserBorderColourId, scheme.widgetBorder);
+        setColour(spectrumAnalyserGridlinesColourId, scheme.widgetBorder);
+        setColour(spectrumAnalyserSafeColourId, scheme.safe);
+        setColour(spectrumAnalyserWarningColourId, scheme.warning);
+        setColour(spectrumAnalyserDangerColourId, scheme.danger);
 
         setColour(juce::ResizableWindow::backgroundColourId, scheme.windowBackground);
-        setColour(juce::Label::textColourId,                 scheme.textNormal);
+        setColour(juce::Label::textColourId, scheme.textNormal);
     }
 
     LookAndFeel::ColourScheme LookAndFeel::getMaterialColourScheme()
@@ -527,4 +526,4 @@ namespace jump
 
         return scheme;
     }
-}
+} // namespace jump

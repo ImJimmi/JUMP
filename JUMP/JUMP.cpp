@@ -1,6 +1,8 @@
 #include "JUMP.h"
 
 //======================================================================================================================
+// clang-format off
+
 // Audio
 #include "audio/jump_Compressor.cpp"
 
@@ -24,3 +26,5 @@
 #include "graphics/jump_LookAndFeel.cpp"
 
 // Utilities
+
+// clang-format on

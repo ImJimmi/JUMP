@@ -7,13 +7,13 @@ namespace jump
     void SpectrumAnalyserEngine::initialise()
     {
         setProperty(PropertyIDs::windowingMethodId, var_cast<WindowingMethod>(WindowingMethod::hann));
-        setProperty(PropertyIDs::fftOrderId,        0);
-        setProperty(PropertyIDs::frequencyRangeId,  var_cast<juce::NormalisableRange<float>>({ 20.f, 20000.f }));
-        setProperty(PropertyIDs::decibelRangeId,    var_cast<juce::NormalisableRange<float>>({ -100.f, 0.f }));
-        setProperty(PropertyIDs::holdTimeId,        100.f);
-        setProperty(PropertyIDs::maxHoldTimeId,     10000.f);
-        setProperty(PropertyIDs::decayTimeId,       500.f);
-        setProperty(PropertyIDs::numPointsId,       256);
+        setProperty(PropertyIDs::fftOrderId, 0);
+        setProperty(PropertyIDs::frequencyRangeId, var_cast<juce::NormalisableRange<float>>({ 20.f, 20000.f }));
+        setProperty(PropertyIDs::decibelRangeId, var_cast<juce::NormalisableRange<float>>({ -100.f, 0.f }));
+        setProperty(PropertyIDs::holdTimeId, 100.f);
+        setProperty(PropertyIDs::maxHoldTimeId, 10000.f);
+        setProperty(PropertyIDs::decayTimeId, 500.f);
+        setProperty(PropertyIDs::numPointsId, 256);
     }
 
     //==================================================================================================================
@@ -23,7 +23,7 @@ namespace jump
     }
 
     SpectrumAnalyserEngine::SpectrumAnalyserEngine(const juce::Identifier& uniqueID, StatefulObject* parentState)
-        :   AudioComponentEngine{ uniqueID, parentState }
+        : AudioComponentEngine{ uniqueID, parentState }
     {
         initialise();
     }
@@ -116,8 +116,8 @@ namespace jump
     //==================================================================================================================
     SpectrumAnalyserEngine::AnalyserPointInfo::AnalyserPointInfo(int fftBinIndex, float frequency,
                                                                  const juce::NormalisableRange<float>& freqRange)
-        :   binIndex{ fftBinIndex },
-            normalisedX{ math::inverseLogSpace(freqRange.start, freqRange.end, frequency) }
+        : binIndex{ fftBinIndex }
+        , normalisedX{ math::inverseLogSpace(freqRange.start, freqRange.end, frequency) }
     {
     }
 
@@ -228,7 +228,7 @@ namespace jump
         const auto numBinsUpToNyquist = fft->getSize() / 2;
 
         binRange.setStart(juce::roundToInt(numBinsUpToNyquist * frequencyRange.start / nyquistFrequency));
-        binRange.setEnd  (juce::roundToInt(numBinsUpToNyquist * frequencyRange.end   / nyquistFrequency));
+        binRange.setEnd(juce::roundToInt(numBinsUpToNyquist * frequencyRange.end / nyquistFrequency));
 
         if (binRange.getEnd() == 0)
             return;
@@ -239,8 +239,8 @@ namespace jump
         for (auto& frequency : math::logRange(frequencyRange.start, frequencyRange.end, numPoints))
         {
             const auto binIndex = juce::roundToInt(juce::jmap(frequency,
-                                                                frequencyRange.start, frequencyRange.end,
-                                                                static_cast<float>(binRange.getStart()), static_cast<float>(binRange.getEnd())));
+                                                              frequencyRange.start, frequencyRange.end,
+                                                              static_cast<float>(binRange.getStart()), static_cast<float>(binRange.getEnd())));
 
             pointsInfo.push_back({ binIndex, frequency, frequencyRange });
         }
@@ -273,4 +273,4 @@ namespace jump
         frequencyRange = newFrequencyRange;
         updateBinRange();
     }
-}   // namespace jump::SpectrumAnalyser
+} // namespace jump

@@ -59,8 +59,9 @@ namespace jump
 
     private:
         //==============================================================================================================
-        class LookAndFeelListener  :    public LookAndFeelListenerBase,
-                                        public juce::Component
+        class LookAndFeelListener
+            : public LookAndFeelListenerBase
+            , public juce::Component
         {
         public:
             LookAndFeelListener(juce::Component& comp)
@@ -99,4 +100,4 @@ namespace jump
         std::unique_ptr<LookAndFeelListener> listener;
         juce::Component::SafePointer<juce::Component> component;
     };
-}   // namespace jump
+} // namespace jump

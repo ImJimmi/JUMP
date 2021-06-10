@@ -10,15 +10,16 @@ namespace jump
         spectrum analyser or level meter.
     */
     template <typename RendererType>
-    class AudioComponentEngine  :   protected StatefulObject,
-                                    private juce::Timer
+    class AudioComponentEngine
+        : protected StatefulObject
+        , private juce::Timer
     {
     public:
         //==============================================================================================================
         AudioComponentEngine() = default;
 
         AudioComponentEngine(const juce::Identifier& uniqueID, StatefulObject* parentState)
-            :   StatefulObject{ uniqueID, parentState }
+            : StatefulObject{ uniqueID, parentState }
         {
         }
 
@@ -87,4 +88,4 @@ namespace jump
         CircularBuffer<float> buffer;
         StartTimerOnCreation timerStarter{ *this, 60 };
     };
-}
+} // namespace jump

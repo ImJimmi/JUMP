@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class BrandLogoComponent    :   public juce::Component
+    class BrandLogoComponent : public juce::Component
     {
     public:
         //==============================================================================================================
@@ -28,4 +28,4 @@ namespace jump
         SvgComponent logo;
         juce::URL url;
     };
-}   // namespace jump
+} // namespace jump

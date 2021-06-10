@@ -4,7 +4,7 @@
 namespace jump
 {
     //==================================================================================================================
-    class LevelMeterLabelsComponent :   public Container
+    class LevelMeterLabelsComponent : public Container
     {
     public:
         //==============================================================================================================
@@ -18,7 +18,7 @@ namespace jump
 
         //==============================================================================================================
         LevelMeterLabelsComponent(const LevelMeterEngine& engineToUse)
-            :   engine{ engineToUse }
+            : engine{ engineToUse }
         {
             lookAndFeel.attachTo(this);
             lookAndFeel.onValidLookAndFeelFound = [this]() {
@@ -143,7 +143,6 @@ namespace jump
 
             for (const auto& level : levels)
             {
-
                 auto label = lookAndFeel->createLabelForLevel(*this, level);
                 label->getProperties().set(levelPropertyId, level);
                 label->setJustificationType(justification);
@@ -168,4 +167,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LevelMeterLabelsComponent)
     };
-}   // namespace jump
+} // namespace jump

@@ -12,14 +12,14 @@ namespace jump
         Level() = default;
 
         Level(const Level& other)
-            :   gain{ other.gain },
-                decibels{ other.decibels }
+            : gain{ other.gain }
+            , decibels{ other.decibels }
         {
         }
 
         Level(Level&& other)
-            :   gain{ other.gain },
-                decibels{ other.decibels }
+            : gain{ other.gain }
+            , decibels{ other.decibels }
         {
         }
 
@@ -101,7 +101,7 @@ namespace jump
 
     private:
         //==============================================================================================================
-        ValueType gain    { static_cast<ValueType>(0) };
+        ValueType gain{ static_cast<ValueType>(0) };
         ValueType decibels{ static_cast<ValueType>(jump::defaultMinusInfDB) };
     };
-}   // namespace jump
+} // namespace jump

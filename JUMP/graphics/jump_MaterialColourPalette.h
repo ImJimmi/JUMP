@@ -19,7 +19,7 @@ namespace jump
         static inline const juce::Colour blueGrey900{ 0xFF263238 };
 
         static inline const juce::Colour lightGreen500{ 0xFF8BC34A };
-        static inline const juce::Colour yellow500    { 0xFFFFEB3B };
-        static inline const juce::Colour red500       { 0xFFF44336 };
+        static inline const juce::Colour yellow500{ 0xFFFFEB3B };
+        static inline const juce::Colour red500{ 0xFFF44336 };
     };
-}   // namespace jump
+} // namespace jump

@@ -20,7 +20,7 @@ namespace jump
 
         /** Constructs a buffer with every value set to initialValue. */
         CircularBuffer(int initialSize, ValueType initialValue = static_cast<ValueType>(0))
-            :   data{ initialSize, initialValue }
+            : data{ initialSize, initialValue }
         {
         }
 
@@ -29,8 +29,8 @@ namespace jump
             Copies data and write index from other.
         */
         CircularBuffer(const CircularBuffer& other)
-            :   data{ other.data },
-                writeIndex{ other.writeIndex }
+            : data{ other.data }
+            , writeIndex{ other.writeIndex }
         {
         }
 
@@ -39,8 +39,8 @@ namespace jump
             Moves data and write index from other.
         */
         CircularBuffer(CircularBuffer&& other)
-            :   data{ std::move(other.data) },
-                writeIndex{ std::exchange(other.writeIndex) }
+            : data{ std::move(other.data) }
+            , writeIndex{ std::exchange(other.writeIndex) }
         {
         }
 
@@ -121,4 +121,4 @@ namespace jump
         std::vector<ValueType> data;
         std::size_t writeIndex{ 0 };
     };
-}   // namespace jump
+} // namespace jump

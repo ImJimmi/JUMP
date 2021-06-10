@@ -4,8 +4,9 @@
 namespace jump
 {
     //==================================================================================================================
-    class MultiMeter    :   public Container,
-                            private StatefulObject
+    class MultiMeter
+        : public Container
+        , private StatefulObject
     {
     public:
         //==============================================================================================================
@@ -20,10 +21,10 @@ namespace jump
 
         struct PropertyIDs
         {
-            static inline const juce::Identifier labelsPositionId   { "labelsPosition" };
-            static inline const juce::Identifier labelsVisibleId    { "labelsVisible" };
+            static inline const juce::Identifier labelsPositionId{ "labelsPosition" };
+            static inline const juce::Identifier labelsVisibleId{ "labelsVisible" };
             static inline const juce::Identifier highlightedLevelsId{ "highlightedLevels" };
-            static inline const juce::Identifier orientationId      { "orientation" };
+            static inline const juce::Identifier orientationId{ "orientation" };
         };
 
         struct LookAndFeelMethods
@@ -72,4 +73,4 @@ namespace jump
         //==============================================================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MultiMeter)
     };
-}   // namespace jump
+} // namespace jump

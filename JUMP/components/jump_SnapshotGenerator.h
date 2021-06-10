@@ -4,8 +4,9 @@
 namespace jump
 {
     //==================================================================================================================
-    class SnapshotGenerator :   private juce::Component,
-                                private juce::AsyncUpdater
+    class SnapshotGenerator
+        : private juce::Component
+        , private juce::AsyncUpdater
     {
     public:
         //==============================================================================================================
@@ -20,4 +21,4 @@ namespace jump
         juce::Component& component;
         const juce::File file;
     };
-}   // namespace jump
+} // namespace jump

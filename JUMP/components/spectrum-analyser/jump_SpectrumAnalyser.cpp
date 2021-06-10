@@ -6,8 +6,8 @@ namespace jump
     //==================================================================================================================
     SpectrumAnalyser::SpectrumAnalyser(const SpectrumAnalyserEngine& engineToUse,
                                        const juce::Identifier& uniqueID, StatefulObject* parentState)
-        :   StatefulObject{ uniqueID, parentState },
-            engine{ engineToUse }
+        : StatefulObject{ uniqueID, parentState }
+        , engine{ engineToUse }
     {
         initialiseState();
         lookAndFeel.attachTo(this);
@@ -33,12 +33,12 @@ namespace jump
     //==================================================================================================================
     void SpectrumAnalyser::setBackgroundVisible(bool backgroundShouldBeVisible)
     {
-        setProperty (PropertyIDs::isBackgroundVisibleId, backgroundShouldBeVisible);
+        setProperty(PropertyIDs::isBackgroundVisibleId, backgroundShouldBeVisible);
     }
 
     void SpectrumAnalyser::setPaintOptions(const PaintOptions& options)
     {
-        setProperty (PropertyIDs::paintOptionsId, options.serialise());
+        setProperty(PropertyIDs::paintOptionsId, options.serialise());
     }
 
     const SpectrumAnalyserEngine& SpectrumAnalyser::getEngine() const noexcept
@@ -78,7 +78,7 @@ namespace jump
     }
 
     //==================================================================================================================
-    void SpectrumAnalyser::setBackgroundVisibleInternal (bool shouldBeVisible)
+    void SpectrumAnalyser::setBackgroundVisibleInternal(bool shouldBeVisible)
     {
         background.setVisible(shouldBeVisible);
     }
@@ -88,4 +88,4 @@ namespace jump
         paintOptions = options;
         repaint();
     }
-}   // namespace jump
+} // namespace jump

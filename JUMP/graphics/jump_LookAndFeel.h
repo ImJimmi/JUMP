@@ -7,9 +7,10 @@ namespace jump
     namespace lookAndFeelImplementations
     {
         //==============================================================================================================
-        class LevelMeterLookAndFeel :   public LevelMeter::LookAndFeelMethods,
-                                        public LevelMeterLabelsComponent::LookAndFeelMethods,
-                                        public MultiMeter::LookAndFeelMethods
+        class LevelMeterLookAndFeel
+            : public LevelMeter::LookAndFeelMethods
+            , public LevelMeterLabelsComponent::LookAndFeelMethods
+            , public MultiMeter::LookAndFeelMethods
         {
             // LevelMeter
             void drawBackground(juce::Graphics& g, const LevelMeter& meter) const noexcept override final;
@@ -25,8 +26,9 @@ namespace jump
         };
 
         //==============================================================================================================
-        class SpectrumAnalyserLookAndFeel   :   public SpectrumAnalyser::LookAndFeelMethods,
-                                                public SpectrumAnalyserLabelsComponent::LookAndFeelMethods
+        class SpectrumAnalyserLookAndFeel
+            : public SpectrumAnalyser::LookAndFeelMethods
+            , public SpectrumAnalyserLabelsComponent::LookAndFeelMethods
         {
             // SpectrumAnalyser
             void drawBackground(juce::Graphics& g, const SpectrumAnalyser& analyser) const noexcept override final;
@@ -42,18 +44,19 @@ namespace jump
         };
 
         //==============================================================================================================
-        class SvgLookAndFeel    :   public SvgComponent::LookAndFeelMethods
+        class SvgLookAndFeel : public SvgComponent::LookAndFeelMethods
         {
             // SvgComponent
             void drawSvgComponent(juce::Graphics& g, const SvgComponent& component) const override final;
         };
-    }
+    } // namespace lookAndFeelImplementations
 
     //==================================================================================================================
-    struct LookAndFeel  :   public juce::LookAndFeel_V4,
-                            public lookAndFeelImplementations::LevelMeterLookAndFeel,
-                            public lookAndFeelImplementations::SpectrumAnalyserLookAndFeel,
-                            public lookAndFeelImplementations::SvgLookAndFeel
+    struct LookAndFeel
+        : public juce::LookAndFeel_V4
+        , public lookAndFeelImplementations::LevelMeterLookAndFeel
+        , public lookAndFeelImplementations::SpectrumAnalyserLookAndFeel
+        , public lookAndFeelImplementations::SvgLookAndFeel
     {
         //==============================================================================================================
         struct ColourScheme
@@ -79,4 +82,4 @@ namespace jump
 
         static ColourScheme getMaterialColourScheme();
     };
-}   // namespace jump
+} // namespace jump

@@ -10,8 +10,8 @@ namespace jump
     }
 
     BrandLogoComponent::BrandLogoComponent(const juce::XmlElement& brandLogoSVG, const juce::URL& brandURL)
-        :   logo{ brandLogoSVG },
-            url{ brandURL }
+        : logo{ brandLogoSVG }
+        , url{ brandURL }
     {
         initialise();
     }
@@ -45,4 +45,4 @@ namespace jump
     {
         addAndMakeVisible(logo);
     }
-}   // namespace jump
+} // namespace jump

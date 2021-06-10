@@ -11,14 +11,14 @@ namespace jump
         enum Flags
         {
             strokeFlag = 1 << 0,
-            fillFlag   = 1 << 1,
+            fillFlag = 1 << 1,
 
             strokeAndFill = strokeFlag + fillFlag
         };
 
         //==============================================================================================================
         explicit PaintOptions(juce::int64 flags)
-            :   options{ flags }
+            : options{ flags }
         {
         }
 
@@ -42,4 +42,4 @@ namespace jump
         //==============================================================================================================
         juce::int64 options;
     };
-}   // namespace jump
+} // namespace jump

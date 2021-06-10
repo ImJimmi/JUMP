@@ -28,7 +28,7 @@ namespace jump
     {
         //==============================================================================================================
         const static juce::Identifier sampleRateId{ "sampleRate" };
-    }  // namespace SharedPropertyIDs
+    } // namespace SharedPropertyIDs
 
     //==================================================================================================================
     enum class Orientation
@@ -38,18 +38,20 @@ namespace jump
     };
 
     //==================================================================================================================
-    using BoolParam   = juce::AudioParameterBool;
+    using BoolParam = juce::AudioParameterBool;
     using ChoiceParam = juce::AudioParameterChoice;
-    using FloatParam  = juce::AudioParameterFloat;
-    using IntParam    = juce::AudioParameterInt;
+    using FloatParam = juce::AudioParameterFloat;
+    using IntParam = juce::AudioParameterInt;
 
     using TrackInfoList = juce::Array<juce::Grid::TrackInfo>;
 
     //==================================================================================================================
     static constexpr auto defaultMinusInfDB = -100.0;
-}   // namespace jump
+} // namespace jump
 
 //======================================================================================================================
+// clang-format off
+
 // Audio
 #include "audio/jump_AudioTransferManager.h"
 #include "audio/jump_Level.h"
@@ -91,3 +93,5 @@ namespace jump
 #include "graphics/jump_Size.h"
 
 // Utilities
+
+// clang-format on
