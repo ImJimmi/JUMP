@@ -82,8 +82,10 @@ namespace jump
 // Containers
 
 // Interfaces
-#include "interfaces/jump_PluginProcessor.h"
-#include "interfaces/jump_PluginEditor.h"
+#ifdef JucePlugin_Name
+    #include "interfaces/jump_PluginProcessor.h"
+    #include "interfaces/jump_PluginEditor.h"
+#endif
 
 // Graphics
 #include "graphics/jump_ColourIDs.h"

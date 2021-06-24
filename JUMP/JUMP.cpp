@@ -19,8 +19,10 @@
 // Containers
 
 // Interfaces
-#include "interfaces/jump_PluginEditor.cpp"
-#include "interfaces/jump_PluginProcessor.cpp"
+#ifdef JucePlugin_Name
+    #include "interfaces/jump_PluginEditor.cpp"
+    #include "interfaces/jump_PluginProcessor.cpp"
+#endif
 
 // Graphics
 #include "graphics/jump_LookAndFeel.cpp"
