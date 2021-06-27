@@ -169,4 +169,17 @@ namespace jump
 
         return { value, numDecimalPlaces };
     }
+
+    //==================================================================================================================
+    template <typename T>
+    juce::NormalisableRange<T> buildNormalisableRange (const T& min,
+                                                       const T& max,
+                                                       const T& mid,
+                                                       const T& interval = static_cast<T> (0))
+    {
+        juce::NormalisableRange<T> range{ min, max, interval };
+        range.setSkewForCentre(mid);
+
+        return range;
+    }
 } // namespace jump
