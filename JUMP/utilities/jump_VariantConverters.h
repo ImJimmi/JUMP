@@ -95,6 +95,22 @@ namespace juce
             return { static_cast<int>(orientation) };
         }
     };
+
+    //==================================================================================================================
+    template <typename T>
+    struct VariantConverter<jump::Level<T>>
+    {
+        //==============================================================================================================
+        static jump::Level<T> fromVar(const juce::var& v)
+        {
+            return jump::Level<T>::fromDecibels(static_cast<T> (v));
+        }
+
+        static juce::var toVar(const jump::Level<T>& level)
+        {
+            return { level.toDecibels() };
+        }
+    };
 } // namespace juce
 
 //======================================================================================================================
