@@ -25,8 +25,11 @@ namespace jump
 
         ~Level()
         {
-            static_assert(std::is_trivially_copyable<ValueType>::value,
+            static_assert(std::is_trivially_copyable_v<ValueType>,
                           "`ValueType` for jump::Level<ValueType> must be trivially copyable!");
+
+            static_assert(std::is_floating_point_v<ValueType>,
+                          "`ValueType` for jump::Level<ValueType> must be a floating-point type!");
         }
 
         //==============================================================================================================
