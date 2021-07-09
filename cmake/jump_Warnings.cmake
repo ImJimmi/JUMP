@@ -1,0 +1,42 @@
+add_library(jump_warnings INTERFACE)
+
+if(WINDOWS)
+    target_compile_options(jump_warnings
+    INTERFACE
+        /WX
+        /W4
+    )
+elseif(APPLE)
+    target_compile_options(jump_warnings
+    INTERFACE
+        -Wall
+        -Wbool-conversion
+        -Wcast-align
+        -Wconditional-uninitialized
+        -Wconstant-conversion
+        -Wconversion
+        -Werror
+        -Wextra-semi
+        -Winconsistent-missing-destructor-override
+        -Wint-conversion
+        -Wno-ignored-qualifiers
+        -Wno-missing-field-initializers
+        -Wnullable-to-nonnull-conversion
+        -Woverloaded-virtual
+        -Wpedantic
+        -Wreorder
+        -Wshadow-all
+        -Wshift-sign-overflow
+        -Wshorten-64-to-32
+        -Wsign-compare
+        -Wsign-conversion
+        -Wstrict-aliasing
+        -Wswitch-enum
+        -Wuninitialized
+        -Wunreachable-code
+        -Wunused-parameter
+        -Wunused-private-field
+        -Wzero-as-null-pointer-constant
+    )
+endif()
+

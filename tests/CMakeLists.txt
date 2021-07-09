@@ -1,8 +1,30 @@
 project("JUMP Tests" VERSION 1.0.0)
 
+# ==============================================================================
+set(JUMP_TEST_SOURCES
+    source/jump-tests/jump_TestConstants.h
+
+    source/jump-tests/main.cpp
+)
+
+# ==============================================================================
 juce_add_console_app(jump-tests)
 
 target_sources(jump-tests
 PRIVATE
-    src/jump-tests/main.cpp
+    ${JUMP_TEST_SOURCES}
 )
+
+target_link_libraries(jump-tests
+PRIVATE
+    juce::juce_core
+    jump_warnings
+)
+
+target_compile_features(jump-tests
+PRIVATE
+    cxx_std_17
+)
+
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${JUMP_TEST_SOURCES})

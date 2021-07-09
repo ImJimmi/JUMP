@@ -7,5 +7,11 @@ option(JUMP_BUILD_TESTS_TARGET
 )
 
 if (JUMP_BUILD_TESTS_TARGET)
+    set(CMAKE_MODULE_PATH
+        ${CMAKE_MODULE_PATH}
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    )
+
+    include(jump_warnings)
     add_subdirectory(tests)
 endif()
