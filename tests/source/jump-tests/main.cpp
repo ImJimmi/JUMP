@@ -42,7 +42,7 @@ namespace jump
 void printNumFailuresMessage(int numFailures)
 {
     std::cout << std::endl;
-    std::cout << numFailures << " JUMP tests failed!" << std::endl;
+    std::cout << numFailures << " JUMP test(s) failed!" << std::endl;
     std::cout << std::endl;
 }
 
