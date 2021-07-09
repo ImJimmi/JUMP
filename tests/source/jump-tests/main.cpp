@@ -10,7 +10,11 @@ namespace jump
     {
     public:
         //==============================================================================================================
-        TestRunner() = default;
+        TestRunner()
+        {
+            testRunner.setAssertOnFailure(false);
+            testRunner.setPassesAreLogged(false);
+        }
 
         //==============================================================================================================
         void runTests()
