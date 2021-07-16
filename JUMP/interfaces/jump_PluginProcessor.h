@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef JucePlugin_Name
+    #define JucePlugin_Name "Unnamed Plugin"
+#endif
+
 //======================================================================================================================
 namespace jump
 {
@@ -14,13 +18,11 @@ namespace jump
     {
     public:
         //==============================================================================================================
-        PluginProcessor(juce::AudioProcessorValueTreeState::ParameterLayout parametersLayout,
-                        juce::dsp::ProcessorBase& mainAudioProcessor,
+        PluginProcessor(juce::dsp::ProcessorBase& mainAudioProcessor,
                         const BusesProperties& busesProperties = BusesProperties{}.withInput("Stereo Input",
                                                                                              juce::AudioChannelSet::stereo())
                                                                      .withOutput("Stereo Output",
-                                                                                 juce::AudioChannelSet::stereo()),
-                        const juce::Identifier& apvtsID = juce::String{ JucePlugin_Name }.replace(" ", "_"));
+                                                                                 juce::AudioChannelSet::stereo()));
 
         //==============================================================================================================
         void prepareToPlay(double sampleRate, int blockSize) override;
@@ -40,19 +42,11 @@ namespace jump
         const juce::String getProgramName(int) override;
         void changeProgramName(int, const juce::String&) override;
 
-    protected:
-        //==============================================================================================================
-        juce::AudioProcessorValueTreeState& getAPVTS();
-
-    private:
-        //==============================================================================================================
         void getStateInformation(juce::MemoryBlock& destData) override;
         void setStateInformation(const void* data, int sizeInBytes) override;
 
+    private:
         //==============================================================================================================
-        juce::AudioProcessorValueTreeState apvts;
-        juce::UndoManager undoManager;
-
         juce::dsp::ProcessorBase& audioProcessor;
     };
 } // namespace jump

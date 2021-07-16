@@ -1,15 +1,21 @@
 #include "jump_PluginProcessor.h"
 
+
+#ifndef JucePlugin_WantsMidiInput
+    #define JucePlugin_WantsMidiInput false
+#endif
+
+#ifndef JucePlugin_ProducesMidiOutput
+    #define JucePlugin_ProducesMidiOutput false
+#endif
+
 //======================================================================================================================
 namespace jump
 {
     //==================================================================================================================
-    PluginProcessor::PluginProcessor(juce::AudioProcessorValueTreeState::ParameterLayout parametersLayout,
-                                     juce::dsp::ProcessorBase& mainAudioProcessor,
-                                     const BusesProperties& busesProperties,
-                                     const juce::Identifier& apvtsID)
+    PluginProcessor::PluginProcessor(juce::dsp::ProcessorBase& mainAudioProcessor,
+                                     const BusesProperties& busesProperties)
         : juce::AudioProcessor{ busesProperties }
-        , apvts{ *this, &undoManager, apvtsID, std::move(parametersLayout) }
         , audioProcessor{ mainAudioProcessor }
     {
     }
@@ -108,24 +114,12 @@ namespace jump
     }
 
     //==================================================================================================================
-    juce::AudioProcessorValueTreeState& PluginProcessor::getAPVTS()
+    void PluginProcessor::getStateInformation(juce::MemoryBlock&)
     {
-        return apvts;
     }
 
-    //==================================================================================================================
-    void PluginProcessor::getStateInformation(juce::MemoryBlock& destData)
+    void PluginProcessor::setStateInformation(const void*, int)
     {
-        if (const auto xml = apvts.copyState().createXml())
-            copyXmlToBinary(*xml, destData);
-    }
 
-    void PluginProcessor::setStateInformation(const void* data, int sizeInBytes)
-    {
-        if (const auto xml{ getXmlFromBinary(data, sizeInBytes) })
-        {
-            if (xml->hasTagName(apvts.state.getType()))
-                apvts.replaceState(juce::ValueTree::fromXml(*xml));
-        }
     }
 } // namespace jump

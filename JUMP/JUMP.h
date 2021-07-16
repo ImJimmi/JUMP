@@ -82,7 +82,7 @@ namespace jump
 // Containers
 
 // Interfaces
-#ifdef JucePlugin_Name
+#if JUCE_MODULE_AVAILABLE_juce_audio_processors
     #include "interfaces/jump_PluginProcessor.h"
     #include "interfaces/jump_PluginEditor.h"
 #endif
