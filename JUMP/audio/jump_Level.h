@@ -61,7 +61,7 @@ namespace jump
         }
 
         //==============================================================================================================
-        Level operator=(const Level& other)
+        Level& operator=(const Level& other)
         {
             gain = other.gain;
             decibels = other.decibels;
@@ -69,32 +69,32 @@ namespace jump
             return *this;
         }
 
-        bool operator==(const Level& other)
+        bool operator==(const Level& other) const
         {
             return gain == other.gain;
         }
 
-        bool operator!=(const Level& other)
+        bool operator!=(const Level& other) const
         {
             return !(*this == other);
         }
 
-        bool operator>(const Level& other)
+        bool operator>(const Level& other) const
         {
             return gain > other.gain;
         }
 
-        bool operator>=(const Level& other)
+        bool operator>=(const Level& other) const
         {
             return gain >= other.gain;
         }
 
-        bool operator<(const Level& other)
+        bool operator<(const Level& other) const
         {
             return gain < other.gain;
         }
 
-        bool operator<=(const Level& other)
+        bool operator<=(const Level& other) const
         {
             return gain <= other.gain;
         }
