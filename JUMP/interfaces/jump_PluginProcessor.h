@@ -3,6 +3,9 @@
 #ifndef JucePlugin_Name
     #define JucePlugin_Name "Unnamed Plugin"
 #endif
+#ifndef JucePlugin_VersionString
+    #define JucePlugin_VersionString "0.0.0"
+#endif
 
 //======================================================================================================================
 namespace jump
