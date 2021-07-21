@@ -7,6 +7,7 @@
 #include "audio/jump_Compressor.cpp"
 
 // Components
+#include "components/jump_AttributedLabel.cpp"
 #include "components/jump_SnapshotGenerator.cpp"
 #include "components/jump_SvgComponent.cpp"
 #include "components/buttons/jump_BrandLogoButton.cpp"

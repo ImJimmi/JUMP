@@ -58,8 +58,9 @@ namespace jump
 #include "audio/jump_Compressor.h"
 
 // Components
-    #include "utilities/jump_LookAndFeelAccessor.h"
+        #include "utilities/jump_LookAndFeelAccessor.h"
     #include "graphics/jump_Canvas.h"
+#include "components/jump_AttributedLabel.h"
 #include "components/jump_SvgComponent.h"
 #include "components/jump_SnapshotGenerator.h"
 #include "components/buttons/jump_BrandLogoButton.h"
