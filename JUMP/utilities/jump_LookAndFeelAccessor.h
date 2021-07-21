@@ -20,11 +20,15 @@ namespace jump
         LookAndFeelAccessor() = default;
 
         //==============================================================================================================
-        void attachTo(juce::Component* componentToAttachTo)
+        void attachToComponentWithoutListener(juce::Component* componentToAttachTo)
         {
             jassert(componentToAttachTo != nullptr);
-
             component = componentToAttachTo;
+        }
+
+        void attachTo(juce::Component* componentToAttachTo)
+        {
+            attachToComponentWithoutListener(componentToAttachTo);
 
             listener.reset(new LookAndFeelListener{ *componentToAttachTo });
             listener->setCallback([this]() {
