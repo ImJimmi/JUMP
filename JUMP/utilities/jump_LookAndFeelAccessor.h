@@ -34,24 +34,36 @@ namespace jump
         }
 
         //==============================================================================================================
-        const LookAndFeelMethods* operator->() const
+        bool hasValidLookAndFeel() const
         {
-            if (auto laf = dynamic_cast<LookAndFeelMethods*>(&component->getLookAndFeel()))
-                return laf;
+            jassert(component != nullptr);
+            return dynamic_cast<LookAndFeelMethods*>(&component->getLookAndFeel()) != nullptr;
+        }
 
+        LookAndFeelMethods& getLookAndFeel() const
+        {
             /** The look and feel type being used by the Component this object is attached to isn't of the type given as
                 a template argument!
 
                 You should make sure to only use this operator when you're sure the correct LookAndFeel is being used.
             */
-            jassertfalse;
+            jassert (hasValidLookAndFeel());
+
+            return *dynamic_cast<LookAndFeelMethods*>(&component->getLookAndFeel());
+        }
+
+        //==============================================================================================================
+        const LookAndFeelMethods* operator->() const
+        {
+            if (auto* laf = &getLookAndFeel())
+                return laf;
 
             return nullptr;
         }
 
         operator bool()
         {
-            return dynamic_cast<LookAndFeelMethods*>(&component->getLookAndFeel()) != nullptr;
+            return hasValidLookAndFeel();
         }
 
         //==============================================================================================================
