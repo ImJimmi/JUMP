@@ -16,6 +16,7 @@
 #include "components/spectrum-analyser/jump_SpectrumAnalyserEngine.cpp"
 #include "components/spectrum-analyser/jump_SpectrumAnalyser.cpp"
 #include "components/spectrum-analyser/jump_MultiAnalyser.cpp"
+#include "components/windows/jump_ModalWindow.cpp"
 
 // Containers
 

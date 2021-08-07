@@ -79,6 +79,7 @@ namespace jump
     #include "utilities/jump_VariantConverters.h"
 #include "components/spectrum-analyser/jump_SpectrumAnalyserLabelsComponent.h"
 #include "components/spectrum-analyser/jump_MultiAnalyser.h"
+#include "components/windows/jump_ModalWindow.h"
 
 // Containers
 
