@@ -2,10 +2,11 @@ project("JUMP Tests" VERSION 1.0.0)
 
 # ==============================================================================
 set(JUMP_TEST_SOURCES
-    source/jump-tests/audio/jump_LevelTests.cpp
-
     source/jump-tests/jump_TestConstants.h
     source/jump-tests/main.cpp
+
+    source/jump-tests/audio/jump_LevelTests.cpp
+    source/jump-tests/utilities/jump_MathTests.cpp
 )
 
 # ==============================================================================

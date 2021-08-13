@@ -8,42 +8,83 @@ namespace jump
     {
         //==============================================================================================================
         /** Returns the value that's the given proportion between the start and end values. */
-        template <typename T>
-        inline T linearSpace(T start, T end, float proportion)
+        template <typename ValueType, typename ProportionType>
+        typename std::enable_if_t<!std::is_integral_v<ValueType>, ValueType> linearSpace(ValueType start,
+                                                                                         ValueType end,
+                                                                                         ProportionType proportion)
         {
+            static_assert(std::is_floating_point_v<ProportionType>);
+
             jassert(end >= start);
             jassert(proportion >= 0 && proportion <= 1);
 
-            return start + (end - start) * proportion;
+            return static_cast<ValueType>(start + (end - start) * proportion);
         }
 
+        template <typename IntegerType, typename ProportionType>
+        typename std::enable_if_t<std::is_integral_v<IntegerType>, IntegerType> linearSpace(IntegerType start,
+                                                                                            IntegerType end,
+                                                                                            ProportionType proportion)
+        {
+            return static_cast<IntegerType>(std::round(linearSpace<double>(static_cast<double>(start),
+                                                                           static_cast<double>(end),
+                                                                           proportion)));
+        }
+
+        //==============================================================================================================
         /** Returns the value that's the given proportion between the start and end values on a logarithmic scale
             (base 2).
         */
-        template <typename T>
-        inline T logSpace(T start, T end, float proportion)
+        template <typename ValueType, typename ProportionType>
+        typename std::enable_if_t<!std::is_integral_v<ValueType>, ValueType> logSpace(ValueType start,
+                                                                                      ValueType end,
+                                                                                      ProportionType proportion)
         {
-            jassert(start > static_cast<T>(0));
-            jassert(end >= start);
-            jassert(proportion >= 0.f && proportion <= 1.f);
+            static_assert(std::is_floating_point_v<ProportionType>);
 
-            return start * std::pow(end / start, static_cast<T>(proportion));
+            jassert(start > 0);
+            jassert(end >= start);
+            jassert(proportion >= 0 && proportion <= 1);
+
+            return start * std::pow(static_cast<ProportionType>(end) / start, proportion);
         }
 
+        template <typename IntegerType, typename ProportionType>
+        typename std::enable_if_t<std::is_integral_v<IntegerType>, IntegerType> logSpace(IntegerType start,
+                                                                                         IntegerType end,
+                                                                                         ProportionType proportion)
+        {
+            return static_cast<IntegerType>(std::round(logSpace<double>(static_cast<double>(start),
+                                                                        static_cast<double>(end),
+                                                                        proportion)));
+        }
+
+        //==============================================================================================================
         /** Returns the proportion between the start and end values that the given value lies on a logarithmic scale
             (base 2)
         */
-        template <typename T>
-        inline float inverseLogSpace(T start, T end, T value)
+        template <typename ValueType>
+        typename std::enable_if_t<!std::is_integral_v<ValueType>, ValueType> inverseLogSpace(ValueType start,
+                                                                                             ValueType end,
+                                                                                             ValueType value)
         {
-            jassert(start > static_cast<T>(0));
+            jassert(start > 0);
             jassert(end >= start);
             jassert(value >= start && value <= end);
-            jassert(std::log(end / start) != static_cast<T>(0));
+            jassert(std::log(end / start) != static_cast<ValueType>(0));
 
             return std::log(value / start) / std::log(end / start);
         }
 
+        template <typename IntegerType>
+        typename std::enable_if_t<std::is_integral_v<IntegerType>, double> inverseLogSpace(IntegerType start,
+                                                                                           IntegerType end,
+                                                                                           IntegerType value)
+        {
+            return inverseLogSpace(static_cast<double>(start), static_cast<double>(end), static_cast<double>(value));
+        }
+
+        //==============================================================================================================
         /** Returns a specified number of values evenly spaced between start and end. */
         template <typename T>
         inline std::vector<T> linearRange(T start, T end, int count)
