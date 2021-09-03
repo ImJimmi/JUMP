@@ -32,7 +32,8 @@ namespace jump
     //==================================================================================================================
     void SvgComponent::paint(juce::Graphics& g)
     {
-        lookAndFeel->drawSvgComponent(g, *this);
+        if (drawable != nullptr)
+            lookAndFeel->drawSvgComponent(g, *this);
     }
 
     //==================================================================================================================
