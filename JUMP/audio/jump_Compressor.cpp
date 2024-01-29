@@ -7,7 +7,7 @@ namespace jump
     template <typename ValueType>
     bool changeValue(ValueType& valueToChange, const ValueType& newValue)
     {
-        auto hasValueChanged = valueToChange != newValue;
+        auto hasValueChanged = !juce::approximatelyEqual(valueToChange, newValue);
         valueToChange = newValue;
 
         return hasValueChanged;

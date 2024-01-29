@@ -37,7 +37,7 @@ namespace jump::lookAndFeelImplementations
 {
     //==================================================================================================================
     template <typename RectangleType>
-    juce::Path createRoundedRectanglePath(const juce::Rectangle<RectangleType>& bounds, float cornerRadius)
+    [[nodiscard]] static auto createRoundedRectanglePath(const juce::Rectangle<RectangleType>& bounds, float cornerRadius)
     {
         juce::Path path;
         path.addRoundedRectangle(bounds, cornerRadius);
@@ -45,13 +45,13 @@ namespace jump::lookAndFeelImplementations
         return path;
     }
 
-    juce::Font getDefaultFont(int flags = juce::Font::FontStyleFlags::plain)
+    [[nodiscard]] static auto getDefaultFont(int flags = juce::Font::FontStyleFlags::plain)
     {
-        return { constants::defaultFontFamily, constants::defaultFontSize, flags };
+        return juce::Font{ constants::defaultFontFamily, constants::defaultFontSize, flags };
     }
 
     //==================================================================================================================
-    void drawLevelMeterBackground(juce::Graphics& g, const LevelMeter& meter)
+    static void drawLevelMeterBackground(juce::Graphics& g, const LevelMeter& meter)
     {
         constexpr auto halfBorderThickness = constants::widgetBorderThickness / 2.f;
         const auto pathBounds = meter.getLocalBounds().toFloat().reduced(halfBorderThickness);
@@ -64,7 +64,7 @@ namespace jump::lookAndFeelImplementations
         g.strokePath(path, juce::PathStrokeType{ constants::widgetBorderThickness });
     }
 
-    void drawLevelMeterGridlines(juce::Graphics& g, const LevelMeter& meter)
+    static void drawLevelMeterGridlines(juce::Graphics& g, const LevelMeter& meter)
     {
         const auto clipBounds = meter.getLocalBounds().reduced(1);
         const auto clipPath = createRoundedRectanglePath(clipBounds,
@@ -105,8 +105,8 @@ namespace jump::lookAndFeelImplementations
         drawLevelMeterGridlines(g, meter);
     }
 
-    juce::Path createLevelMeterPeakShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
-                                         float peakLevel)
+    [[nodiscard]] static auto createLevelMeterPeakShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
+                                                        float peakLevel)
     {
         juce::Rectangle<float> bounds;
 
@@ -137,8 +137,8 @@ namespace jump::lookAndFeelImplementations
         return path;
     }
 
-    juce::Path createLevelMeterRMSShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
-                                        float rmsLevel)
+    [[nodiscard]] static auto createLevelMeterRMSShape(Orientation orientation, const juce::Rectangle<int>& meterBounds,
+                                                       float rmsLevel)
     {
         juce::Rectangle<float> bounds{ meterBounds.toFloat() };
         juce::Path path;
@@ -167,8 +167,8 @@ namespace jump::lookAndFeelImplementations
         return path;
     }
 
-    juce::Path createLevelMeterPath(Orientation orientation, const juce::Rectangle<int> bounds,
-                                    float peakLevel, float rmsLevel)
+    [[nodiscard]] static auto createLevelMeterPath(Orientation orientation, const juce::Rectangle<int> bounds,
+                                                   float peakLevel, float rmsLevel)
     {
         juce::Path path;
 
@@ -219,15 +219,15 @@ namespace jump::lookAndFeelImplementations
         g.fillPath(meterPath);
     }
 
-    juce::String getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf)
+    [[nodiscard]] static auto getLevelMeterTextForLevel(float decibelLevel, bool isNegativeInf)
     {
         if (isNegativeInf)
-            return "-inf";
+            return juce::String{ "-inf" };
 
         return juce::String{ decibelLevel };
     }
 
-    juce::Font::FontStyleFlags getFontFlagsForLevelMeterText(float decibelLevel, bool isNegativeInf)
+    [[nodiscard]] static auto getFontFlagsForLevelMeterText(float decibelLevel, bool isNegativeInf)
     {
         if (decibelLevel == 0.f || isNegativeInf)
             return juce::Font::bold;
@@ -235,14 +235,14 @@ namespace jump::lookAndFeelImplementations
         return juce::Font::plain;
     }
 
-    juce::Font getLevelMeterLabelFont(float decibelLevel, bool isNegativeInf)
+    [[nodiscard]] static auto getLevelMeterLabelFont(float decibelLevel, bool isNegativeInf)
     {
         const auto flags = getFontFlagsForLevelMeterText(decibelLevel, isNegativeInf);
         return getDefaultFont(flags);
     }
 
-    juce::Colour getLevelMeterTextColour(const juce::Component& component,
-                                         const float decibelLevel, bool isNegativeInf)
+    [[nodiscard]] static auto getLevelMeterTextColour(const juce::Component& component,
+                                                      const float decibelLevel, bool isNegativeInf)
     {
         if (decibelLevel == 0.f || isNegativeInf)
             return component.findColour(levelMeterLabelHighlightedTextColourId);
@@ -270,7 +270,7 @@ namespace jump::lookAndFeelImplementations
     }
 
     //==================================================================================================================
-    void drawSpectrumAnalyserBackground(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    static void drawSpectrumAnalyserBackground(juce::Graphics& g, const SpectrumAnalyser& analyser)
     {
         const auto bounds = analyser.getLocalBounds().toFloat().reduced(constants::widgetBorderThickness / 2.f);
         const auto path = createRoundedRectanglePath(bounds, constants::widgetCornerRadius);
@@ -282,7 +282,7 @@ namespace jump::lookAndFeelImplementations
         g.strokePath(path, juce::PathStrokeType{ constants::widgetBorderThickness });
     }
 
-    void drawSpectrumAnalyserVerticalGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    static void drawSpectrumAnalyserVerticalGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
     {
         const auto& freqRange = analyser.getEngine().getFrequencyRange();
         const auto nyquist = analyser.getEngine().getNyquistFrequency();
@@ -312,7 +312,7 @@ namespace jump::lookAndFeelImplementations
         }
     }
 
-    void drawSpectrumAnalyserHorizontalGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    static void drawSpectrumAnalyserHorizontalGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
     {
         const auto& decibelRange = analyser.getEngine().getDecibelRange();
         const auto maxAbs = juce::jmax(std::abs(decibelRange.start), std::abs(decibelRange.end));
@@ -334,7 +334,7 @@ namespace jump::lookAndFeelImplementations
         }
     }
 
-    void drawSpectrumAnalyserGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
+    static void drawSpectrumAnalyserGridlines(juce::Graphics& g, const SpectrumAnalyser& analyser)
     {
         g.setColour(analyser.findColour(spectrumAnalyserGridlinesColourId));
 
@@ -348,15 +348,15 @@ namespace jump::lookAndFeelImplementations
         drawSpectrumAnalyserGridlines(g, analyser);
     }
 
-    juce::Point<float> denormalisePoint(const juce::Point<float>& normalisedPoint, const juce::Rectangle<float>& bounds)
+    [[nodiscard]] static auto denormalisePoint(const juce::Point<float>& normalisedPoint, const juce::Rectangle<float>& bounds)
     {
-        return {
+        return juce::Point{
             bounds.getX() + bounds.proportionOfWidth(normalisedPoint.x),
             bounds.getY() + bounds.proportionOfHeight(normalisedPoint.y)
         };
     }
 
-    juce::ColourGradient getSpectrumAnalyserGradient(const SpectrumAnalyser& analyser)
+    [[nodiscard]] static auto getSpectrumAnalyserGradient(const SpectrumAnalyser& analyser)
     {
         auto gradient = juce::ColourGradient::vertical(analyser.findColour(spectrumAnalyserDangerColourId),
                                                        analyser.findColour(spectrumAnalyserSafeColourId),
@@ -412,10 +412,14 @@ namespace jump::lookAndFeelImplementations
         g.strokePath(path, PST{ constants::spectrumAnalyserLineThickness, PST::curved, PST::rounded });
     }
 
-    Margin<int> getSpectrumAnalyserLevelLabelMargin()
+    [[nodiscard]] static auto getSpectrumAnalyserLevelLabelMargin()
     {
-        return { 0, constants::spectrumAnalyserLevelLabelMarginX,
-                 0, constants::spectrumAnalyserLevelLabelMarginX };
+        return Margin{
+            0,
+            constants::spectrumAnalyserLevelLabelMarginX,
+            0,
+            constants::spectrumAnalyserLevelLabelMarginX,
+        };
     }
 
     std::unique_ptr<juce::Label> SpectrumAnalyserLookAndFeel::createLabelForLevel(const SpectrumAnalyserLabelsComponent& component,
@@ -433,7 +437,7 @@ namespace jump::lookAndFeelImplementations
         return label;
     }
 
-    juce::String getSpectrumAnalyserTextForFrequency(float frequency)
+    [[nodiscard]] static auto getSpectrumAnalyserTextForFrequency(float frequency)
     {
         juce::String suffix{ "" };
 
@@ -446,9 +450,9 @@ namespace jump::lookAndFeelImplementations
         return juce::String{ juce::roundToInt(frequency) } + suffix;
     }
 
-    Margin<int> getSpectrumAnalyserFrequencyLabelMargin()
+    [[nodiscard]] static auto getSpectrumAnalyserFrequencyLabelMargin()
     {
-        return { 0, 0, constants::spectrumAnalyserFrequencyLabelMarginBottom, 0 };
+        return Margin{ 0, 0, constants::spectrumAnalyserFrequencyLabelMarginBottom, 0 };
     }
 
     std::unique_ptr<juce::Label> SpectrumAnalyserLookAndFeel::createLabelForFrequency(const SpectrumAnalyserLabelsComponent& component,

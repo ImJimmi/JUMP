@@ -1,6 +1,5 @@
 #include "jump_PluginProcessor.h"
 
-
 #ifndef JucePlugin_WantsMidiInput
     #define JucePlugin_WantsMidiInput false
 #endif
@@ -21,8 +20,8 @@ namespace jump
     }
 
     //==================================================================================================================
-    void prepareAudioProcessor(juce::dsp::ProcessorBase& audioProcessor,
-                               double sampleRate, juce::uint32 blockSize, juce::uint32 numChannels)
+    static void prepareAudioProcessor(juce::dsp::ProcessorBase& audioProcessor,
+                                      double sampleRate, juce::uint32 blockSize, juce::uint32 numChannels)
     {
         juce::dsp::ProcessSpec spec;
         spec.sampleRate = sampleRate;
@@ -120,6 +119,5 @@ namespace jump
 
     void PluginProcessor::setStateInformation(const void*, int)
     {
-
     }
 } // namespace jump

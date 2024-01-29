@@ -19,7 +19,8 @@ namespace jump
         setVisible(false);
     }
 
-    bool snapshotIsIdenticalToMostRecentSavedSnapshot(const juce::Image& snapshotImage, const juce::File& snapshotFile)
+    [[nodiscard]] static auto snapshotIsIdenticalToMostRecentSavedSnapshot(const juce::Image& snapshotImage,
+                                                                           const juce::File& snapshotFile)
     {
         juce::StringArray snapshotNames;
 

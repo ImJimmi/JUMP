@@ -71,7 +71,7 @@ namespace jump
 
         bool operator==(const Level& other) const
         {
-            return gain == other.gain;
+            return juce::approximatelyEqual(gain, other.gain);
         }
 
         bool operator!=(const Level& other) const

@@ -133,7 +133,8 @@ namespace jump
         m_attributedString.setFont(font);
     }
 
-    int getMinimumRequiredWidthForAttribute(const AttributedLabel::Attribute& attribute, const juce::String& text)
+    [[nodiscard]] static auto getMinimumRequiredWidthForAttribute(const AttributedLabel::Attribute& attribute,
+                                                                  const juce::String& text)
     {
         const auto subText = text.substring(attribute.range.getStart(), attribute.range.getEnd());
         return juce::roundToInt(std::ceil(attribute.font.getStringWidthFloat(subText)));

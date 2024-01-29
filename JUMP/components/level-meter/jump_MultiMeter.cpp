@@ -66,9 +66,9 @@ namespace jump
     }
 
     //==================================================================================================================
-    juce::StringArray getTemplateAreasForLayout(Orientation orientation,
-                                                MultiMeter::LabelsPosition /*position*/, int numMeters,
-                                                const juce::String& meterAreaName, const juce::String& /*labelsAreaName*/)
+    [[nodiscard]] static auto getTemplateAreasForLayout(Orientation orientation,
+                                                        MultiMeter::LabelsPosition /*position*/, int numMeters,
+                                                        const juce::String& meterAreaName, const juce::String& /*labelsAreaName*/)
     {
         juce::StringArray result;
 
@@ -100,14 +100,14 @@ namespace jump
         return result;
     }
 
-    juce::Array<juce::Grid::TrackInfo> getTrackInfoArray(Orientation orientation,
-                                                         Orientation orientationForSingleElement,
-                                                         int numElementsOtherwise)
+    [[nodiscard]] static auto getTrackInfoArray(Orientation orientation,
+                                                Orientation orientationForSingleElement,
+                                                int numElementsOtherwise)
     {
         using Fr = juce::Grid::Fr;
 
         if (orientation == orientationForSingleElement)
-            return { { Fr{ 1 } } };
+            return juce::Array<juce::Grid::TrackInfo>{ { Fr{ 1 } } };
 
         juce::Array<juce::Grid::TrackInfo> result;
 
@@ -117,18 +117,18 @@ namespace jump
         return result;
     }
 
-    juce::Array<juce::Grid::TrackInfo> getTemplateColumnsForLayout(Orientation orientation, int numElements)
+    [[nodiscard]] static auto getTemplateColumnsForLayout(Orientation orientation, int numElements)
     {
         return getTrackInfoArray(orientation, Orientation::horizontal, numElements);
     }
 
-    juce::Array<juce::Grid::TrackInfo> getTemplateRowsForLayout(Orientation orientation, int numElements)
+    [[nodiscard]] static auto getTemplateRowsForLayout(Orientation orientation, int numElements)
     {
         return getTrackInfoArray(orientation, Orientation::vertical, numElements);
     }
 
-    void addLabelsElementToTemplateAreas(juce::StringArray& templateAreas, MultiMeter::LabelsPosition position,
-                                         Orientation orientation, const juce::String& labelsAreaName)
+    static void addLabelsElementToTemplateAreas(juce::StringArray& templateAreas, MultiMeter::LabelsPosition position,
+                                                Orientation orientation, const juce::String& labelsAreaName)
     {
         if (position == MultiMeter::LabelsPosition::left
             || position == MultiMeter::LabelsPosition::right)
@@ -193,11 +193,11 @@ namespace jump
         }
     }
 
-    void addLabelsElementToTemplateColumnsOrRows(juce::Array<juce::Grid::TrackInfo>& templateColumns,
-                                                 juce::Array<juce::Grid::TrackInfo>& templateRows,
-                                                 MultiMeter::LabelsPosition position,
-                                                 Orientation orientation,
-                                                 int labelsWidthIfColumn, int labelsHeightIfRow)
+    static void addLabelsElementToTemplateColumnsOrRows(juce::Array<juce::Grid::TrackInfo>& templateColumns,
+                                                        juce::Array<juce::Grid::TrackInfo>& templateRows,
+                                                        MultiMeter::LabelsPosition position,
+                                                        Orientation orientation,
+                                                        int labelsWidthIfColumn, int labelsHeightIfRow)
     {
         using Px = juce::Grid::Px;
 

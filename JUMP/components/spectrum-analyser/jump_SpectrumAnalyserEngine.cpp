@@ -122,8 +122,8 @@ namespace jump
     }
 
     //==================================================================================================================
-    float getDecibelLevelFromFFTData(const std::vector<float>& fftData, int binIndex, int fftSize,
-                                     const juce::NormalisableRange<float>& decibelRange)
+    [[nodiscard]] static auto getDecibelLevelFromFFTData(const std::vector<float>& fftData, int binIndex, int fftSize,
+                                                         const juce::NormalisableRange<float>& decibelRange)
     {
         const auto gain = fftData[static_cast<std::size_t>(binIndex)] / (fftSize * 2.f);
         return juce::Decibels::gainToDecibels(gain, decibelRange.start);
@@ -153,7 +153,7 @@ namespace jump
     }
 
     //==================================================================================================================
-    std::vector<float> getFFTData(CircularBuffer<float>& buffer, juce::dsp::FFT& fft, juce::dsp::WindowingFunction<float>& windowingFunction)
+    [[nodiscard]] static auto getFFTData(CircularBuffer<float>& buffer, juce::dsp::FFT& fft, juce::dsp::WindowingFunction<float>& windowingFunction)
     {
         auto fftData = buffer.read();
         fftData.resize(static_cast<std::size_t>(fft.getSize()) * 2, 0.f);

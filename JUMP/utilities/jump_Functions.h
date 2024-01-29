@@ -39,7 +39,7 @@ namespace jump
             jassert(start > static_cast<T>(0));
             jassert(end >= start);
             jassert(value >= start && value <= end);
-            jassert(std::log(end / start) != static_cast<T>(0));
+            jassert(!juce::approximatelyEqual(std::log(end / start), static_cast<T>(0)));
 
             return std::log(value / start) / std::log(end / start);
         }
@@ -172,10 +172,10 @@ namespace jump
 
     //==================================================================================================================
     template <typename T>
-    juce::NormalisableRange<T> buildNormalisableRange (const T& min,
-                                                       const T& max,
-                                                       const T& mid,
-                                                       const T& interval = static_cast<T> (0))
+    juce::NormalisableRange<T> buildNormalisableRange(const T& min,
+                                                      const T& max,
+                                                      const T& mid,
+                                                      const T& interval = static_cast<T>(0))
     {
         juce::NormalisableRange<T> range{ min, max, interval };
         range.setSkewForCentre(mid);

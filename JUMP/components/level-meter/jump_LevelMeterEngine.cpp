@@ -87,8 +87,8 @@ namespace jump
     }
 
     //==================================================================================================================
-    void callRenderers(juce::ListenerList<LevelMeterRendererBase>& renderers, const LevelMeterEngine* engine,
-                       juce::var peak, juce::var rms, const juce::NormalisableRange<float>& decibelRange)
+    static void callRenderers(juce::ListenerList<LevelMeterRendererBase>& renderers, const LevelMeterEngine* engine,
+                              juce::var peak, juce::var rms, const juce::NormalisableRange<float>& decibelRange)
     {
         if (peak != juce::var() && rms != juce::var())
         {
