@@ -47,7 +47,19 @@ namespace jump::lookAndFeelImplementations
 
     [[nodiscard]] static auto getDefaultFont(int flags = juce::Font::FontStyleFlags::plain)
     {
-        return juce::Font{ constants::defaultFontFamily, constants::defaultFontSize, flags };
+#if JUCE_MAJOR_VERSION < 8
+        return juce::Font{
+            constants::defaultFontFamily,
+            constants::defaultFontSize,
+            flags,
+        };
+#else
+        return juce::FontOptions{
+            constants::defaultFontFamily,
+            constants::defaultFontSize,
+            flags,
+        };
+#endif
     }
 
     //==================================================================================================================
