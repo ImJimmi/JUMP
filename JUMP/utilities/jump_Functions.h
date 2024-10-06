@@ -136,7 +136,7 @@ namespace jump
     /** Returns the minimum width, in pixels, required to properly display a Label. */
     inline int getMinimumWidthRequiredForLabel(const juce::Label& label)
     {
-        const auto textWidth = static_cast<int>(std::ceil(label.getFont().getStringWidthFloat(label.getText())));
+        const auto textWidth = static_cast<int>(std::ceil(juce::GlyphArrangement::getStringWidth(label.getFont(), label.getText())));
         const auto borderLeftAndRight = label.getBorderSize().getLeftAndRight();
 
         return textWidth + borderLeftAndRight;

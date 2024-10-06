@@ -137,7 +137,7 @@ namespace jump
                                                                   const juce::String& text)
     {
         const auto subText = text.substring(attribute.range.getStart(), attribute.range.getEnd());
-        return juce::roundToInt(std::ceil(attribute.font.getStringWidthFloat(subText)));
+        return juce::roundToInt(std::ceil(juce::GlyphArrangement::getStringWidth(attribute.font, subText)));
     }
 
     int AttributedLabel::getMinimumRequiredWidth() const
