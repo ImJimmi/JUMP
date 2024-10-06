@@ -35,7 +35,7 @@ namespace jump
 
             for (const auto& label : labels)
             {
-                const auto textWidth = static_cast<int>(std::ceil(label->getFont().getStringWidthFloat(label->getText())));
+                const auto textWidth = static_cast<int>(std::ceil(juce::GlyphArrangement::getStringWidth(label->getFont(), label->getText())));
                 const auto xPadding = label->getBorderSize().getLeftAndRight();
                 const auto totalWidth = textWidth + xPadding;
 
@@ -113,7 +113,7 @@ namespace jump
                 {
                     const auto x = normalisedLevel * getWidth();
 
-                    const auto textWidth = static_cast<int>(std::ceil(label->getFont().getStringWidthFloat(label->getText())));
+                    const auto textWidth = static_cast<int>(std::ceil(juce::GlyphArrangement::getStringWidth(label->getFont(), label->getText())));
                     const auto xPadding = label->getBorderSize().getLeftAndRight();
                     const auto labelWidth = textWidth + xPadding;
                     const auto labelX = juce::jlimit(0, getWidth() - labelWidth, juce::roundToInt(x - labelWidth / 2.f));
