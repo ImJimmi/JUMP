@@ -10,45 +10,22 @@ namespace jump
     {
     public:
         //==============================================================================================================
-        /** Default constructor.
+        static_assert(std::is_trivially_constructible<ValueType>::value,
+                      "'ValueType' for jump::CircularBuffer should be trivially copyable.");
 
-            Creates the buffer with uninitialised data.
-        */
-        CircularBuffer()
-        {
-        }
-
+        //==============================================================================================================
         /** Constructs a buffer with every value set to initialValue. */
         CircularBuffer(int initialSize, ValueType initialValue = static_cast<ValueType>(0))
             : data{ initialSize, initialValue }
         {
         }
 
-        /** Copy constructor.
-
-            Copies data and write index from other.
-        */
-        CircularBuffer(const CircularBuffer& other)
-            : data{ other.data }
-            , writeIndex{ other.writeIndex }
-        {
-        }
-
-        /** Move constructor.
-
-            Moves data and write index from other.
-        */
-        CircularBuffer(CircularBuffer&& other)
-            : data{ std::move(other.data) }
-            , writeIndex{ std::exchange(other.writeIndex) }
-        {
-        }
-
-        ~CircularBuffer()
-        {
-            static_assert(std::is_trivially_constructible<ValueType>::value,
-                          "'ValueType' for jump::CircularBuffer should be trivially copyable.");
-        }
+        CircularBuffer() = default;
+        CircularBuffer(const CircularBuffer& other) = default;
+        CircularBuffer(CircularBuffer&& other) = default;
+        CircularBuffer& operator=(const CircularBuffer& other) = default;
+        CircularBuffer& operator=(CircularBuffer&& other) = default;
+        ~CircularBuffer() = default;
 
         //==============================================================================================================
         /** Writes the given value to the container. */
@@ -85,24 +62,6 @@ namespace jump
         }
 
         //==============================================================================================================
-        /** Copy assignment - copies data and write index from other. */
-        CircularBuffer& operator=(const CircularBuffer& other)
-        {
-            data = other.data;
-            writeIndex = other.writeIndex;
-
-            return *this;
-        }
-
-        /** Move assignment - moves data and write index from other. */
-        CircularBuffer& operator=(CircularBuffer&& other)
-        {
-            data = std::move(other.data);
-            writeIndex = std::exchange(other.writeIndex);
-
-            return *this;
-        }
-
         /** Returns an element from the buffer in its 'true' position meaning an index of [N - 1] will return the most
             recent value added via write().
         */

@@ -103,7 +103,7 @@ namespace juce
         //==============================================================================================================
         static jump::Level<T> fromVar(const juce::var& v)
         {
-            return jump::Level<T>::fromDecibels(static_cast<T> (v));
+            return jump::Level<T>::fromDecibels(static_cast<T>(v));
         }
 
         static juce::var toVar(const jump::Level<T>& level)
